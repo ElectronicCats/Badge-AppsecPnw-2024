@@ -4675,7 +4675,7 @@
 		(uuid "71b10d11-b906-4eb2-b434-5750606cb413")
 	)
 	(junction
-		(at 178.054 35.814)
+		(at 187.325 42.164)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "71cee5d7-db88-42fd-8321-2c7bb55ce8f0")
@@ -4735,7 +4735,7 @@
 		(uuid "ce0ab7b1-3c88-4481-863b-a64f204d8a7e")
 	)
 	(junction
-		(at 176.53 35.814)
+		(at 185.801 42.164)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d60c1709-c1ad-4571-a1f0-521d981e50d2")
@@ -4753,7 +4753,7 @@
 		(uuid "ea0411e4-df6a-4a5b-94d8-a5aadd02d08e")
 	)
 	(junction
-		(at 163.322 37.846)
+		(at 172.593 44.196)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ea8bc7fe-cea5-41bc-af0d-014ac018c58c")
@@ -4765,7 +4765,7 @@
 		(uuid "f18a687f-9150-4458-8f22-e8538c45b517")
 	)
 	(junction
-		(at 163.83 51.562)
+		(at 173.101 57.912)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f7fae093-12f5-4c0a-86f8-9b64b4fb30aa")
@@ -4777,7 +4777,7 @@
 		(uuid "fcdfff70-5074-4663-a1e8-82642ed4d9ff")
 	)
 	(junction
-		(at 177.292 49.53)
+		(at 186.563 55.88)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "fed84c52-86f9-42d7-812d-4a0bac5514cf")
@@ -4882,16 +4882,6 @@
 	)
 	(wire
 		(pts
-			(xy 16.51 140.335) (xy 22.86 140.335)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "10a720fe-6d40-4a6f-804c-58c753a3ef66")
-	)
-	(wire
-		(pts
 			(xy 194.818 138.43) (xy 195.961 138.43)
 		)
 		(stroke
@@ -4922,7 +4912,7 @@
 	)
 	(wire
 		(pts
-			(xy 178.054 35.814) (xy 180.1876 35.814)
+			(xy 187.325 42.164) (xy 189.4586 42.164)
 		)
 		(stroke
 			(width 0)
@@ -5092,7 +5082,7 @@
 	)
 	(wire
 		(pts
-			(xy 178.054 34.798) (xy 178.054 35.814)
+			(xy 187.325 41.148) (xy 187.325 42.164)
 		)
 		(stroke
 			(width 0)
@@ -5212,7 +5202,7 @@
 	)
 	(wire
 		(pts
-			(xy 161.417 66.802) (xy 160.02 66.802)
+			(xy 170.688 73.152) (xy 169.291 73.152)
 		)
 		(stroke
 			(width 0)
@@ -5252,7 +5242,7 @@
 	)
 	(wire
 		(pts
-			(xy 173.482 37.846) (xy 176.53 37.846)
+			(xy 182.753 44.196) (xy 185.801 44.196)
 		)
 		(stroke
 			(width 0)
@@ -5282,7 +5272,7 @@
 	)
 	(wire
 		(pts
-			(xy 168.529 66.802) (xy 166.497 66.802)
+			(xy 177.8 73.152) (xy 175.768 73.152)
 		)
 		(stroke
 			(width 0)
@@ -5502,7 +5492,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.322 35.814) (xy 163.322 37.846)
+			(xy 172.593 42.164) (xy 172.593 44.196)
 		)
 		(stroke
 			(width 0)
@@ -5512,7 +5502,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.149 66.802) (xy 178.181 66.802)
+			(xy 185.42 73.152) (xy 187.452 73.152)
 		)
 		(stroke
 			(width 0)
@@ -5522,7 +5512,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.149 49.53) (xy 177.292 49.53)
+			(xy 185.42 55.88) (xy 186.563 55.88)
 		)
 		(stroke
 			(width 0)
@@ -5602,7 +5592,7 @@
 	)
 	(wire
 		(pts
-			(xy 177.292 49.53) (xy 180.213 49.53)
+			(xy 186.563 55.88) (xy 189.484 55.88)
 		)
 		(stroke
 			(width 0)
@@ -5642,7 +5632,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.53 35.814) (xy 178.054 35.814)
+			(xy 185.801 42.164) (xy 187.325 42.164)
 		)
 		(stroke
 			(width 0)
@@ -5662,7 +5652,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.322 37.846) (xy 163.322 38.1)
+			(xy 172.593 44.196) (xy 172.593 44.45)
 		)
 		(stroke
 			(width 0)
@@ -5722,7 +5712,7 @@
 	)
 	(wire
 		(pts
-			(xy 159.512 83.947) (xy 159.512 84.836)
+			(xy 168.783 90.297) (xy 168.783 91.186)
 		)
 		(stroke
 			(width 0)
@@ -5822,7 +5812,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 51.562) (xy 163.83 52.07)
+			(xy 173.101 57.912) (xy 173.101 58.42)
 		)
 		(stroke
 			(width 0)
@@ -5882,7 +5872,7 @@
 	)
 	(wire
 		(pts
-			(xy 161.036 83.947) (xy 159.512 83.947)
+			(xy 170.307 90.297) (xy 168.783 90.297)
 		)
 		(stroke
 			(width 0)
@@ -5952,7 +5942,7 @@
 	)
 	(wire
 		(pts
-			(xy 165.989 35.814) (xy 163.322 35.814)
+			(xy 175.26 42.164) (xy 172.593 42.164)
 		)
 		(stroke
 			(width 0)
@@ -6012,7 +6002,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.53 37.846) (xy 176.53 35.814)
+			(xy 185.801 44.196) (xy 185.801 42.164)
 		)
 		(stroke
 			(width 0)
@@ -6042,7 +6032,7 @@
 	)
 	(wire
 		(pts
-			(xy 16.51 137.795) (xy 22.86 137.795)
+			(xy 19.05 130.81) (xy 25.4 130.81)
 		)
 		(stroke
 			(width 0)
@@ -6052,7 +6042,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 51.562) (xy 168.656 51.562)
+			(xy 173.101 57.912) (xy 177.927 57.912)
 		)
 		(stroke
 			(width 0)
@@ -6082,7 +6072,7 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 66.802) (xy 160.02 67.564)
+			(xy 169.291 73.152) (xy 169.291 73.914)
 		)
 		(stroke
 			(width 0)
@@ -6182,7 +6172,7 @@
 	)
 	(wire
 		(pts
-			(xy 178.054 28.194) (xy 178.054 29.718)
+			(xy 187.325 34.544) (xy 187.325 36.068)
 		)
 		(stroke
 			(width 0)
@@ -6192,7 +6182,7 @@
 	)
 	(wire
 		(pts
-			(xy 175.768 83.947) (xy 177.8 83.947)
+			(xy 185.039 90.297) (xy 187.071 90.297)
 		)
 		(stroke
 			(width 0)
@@ -6242,7 +6232,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 49.53) (xy 163.83 51.562)
+			(xy 173.101 55.88) (xy 173.101 57.912)
 		)
 		(stroke
 			(width 0)
@@ -6352,7 +6342,7 @@
 	)
 	(wire
 		(pts
-			(xy 168.148 83.947) (xy 166.116 83.947)
+			(xy 177.419 90.297) (xy 175.387 90.297)
 		)
 		(stroke
 			(width 0)
@@ -6372,7 +6362,7 @@
 	)
 	(wire
 		(pts
-			(xy 177.292 51.562) (xy 177.292 49.53)
+			(xy 186.563 57.912) (xy 186.563 55.88)
 		)
 		(stroke
 			(width 0)
@@ -6399,6 +6389,16 @@
 			(type default)
 		)
 		(uuid "dc700739-4b0f-4aa9-8ba1-879837a68f8a")
+	)
+	(wire
+		(pts
+			(xy 16.51 133.35) (xy 25.4 133.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dd26ceaa-3697-47e9-8ae5-e8b95884e204")
 	)
 	(polyline
 		(pts
@@ -6472,7 +6472,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.322 37.846) (xy 168.402 37.846)
+			(xy 172.593 44.196) (xy 177.673 44.196)
 		)
 		(stroke
 			(width 0)
@@ -6522,6 +6522,16 @@
 	)
 	(wire
 		(pts
+			(xy 16.51 132.08) (xy 16.51 133.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e941a234-e6ef-4d2e-9ee8-ccb644a911c4")
+	)
+	(wire
+		(pts
 			(xy 109.982 97.282) (xy 116.332 97.282)
 		)
 		(stroke
@@ -6532,7 +6542,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.149 35.814) (xy 176.53 35.814)
+			(xy 185.42 42.164) (xy 185.801 42.164)
 		)
 		(stroke
 			(width 0)
@@ -6542,7 +6552,7 @@
 	)
 	(wire
 		(pts
-			(xy 165.989 49.53) (xy 163.83 49.53)
+			(xy 175.26 55.88) (xy 173.101 55.88)
 		)
 		(stroke
 			(width 0)
@@ -6562,7 +6572,7 @@
 	)
 	(wire
 		(pts
-			(xy 16.51 145.415) (xy 22.86 145.415)
+			(xy 19.05 138.43) (xy 25.4 138.43)
 		)
 		(stroke
 			(width 0)
@@ -6612,7 +6622,7 @@
 	)
 	(wire
 		(pts
-			(xy 16.51 142.875) (xy 22.86 142.875)
+			(xy 19.05 135.89) (xy 25.4 135.89)
 		)
 		(stroke
 			(width 0)
@@ -6622,7 +6632,7 @@
 	)
 	(wire
 		(pts
-			(xy 173.736 51.562) (xy 177.292 51.562)
+			(xy 183.007 57.912) (xy 186.563 57.912)
 		)
 		(stroke
 			(width 0)
@@ -6932,7 +6942,7 @@
 		(uuid "434cc65c-68e1-464d-b087-d1f2b0f4d249")
 	)
 	(label "EN"
-		(at 180.1876 35.814 0)
+		(at 189.4586 42.164 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -6987,7 +6997,7 @@
 		(uuid "5e9a54ca-07b7-4e04-9a79-6a9e95cab9f0")
 	)
 	(label "LED2"
-		(at 177.8 83.947 0)
+		(at 187.071 90.297 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7063,8 +7073,19 @@
 		)
 		(uuid "94c8f88b-ce62-44a0-a12b-78d35790dc86")
 	)
+	(label "GND"
+		(at 19.05 130.81 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9555bf3a-d88b-40ba-a27b-9c3b1ca33207")
+	)
 	(label "SDA"
-		(at 16.51 145.415 0)
+		(at 19.05 138.43 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7107,17 +7128,6 @@
 		)
 		(uuid "a2a379cf-4517-4f00-a438-4aec87512182")
 	)
-	(label "GND"
-		(at 16.51 140.335 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "ab5ea921-9f96-4b9f-b18f-a289159922e0")
-	)
 	(label "Buzz"
 		(at 170.18 141.859 0)
 		(fields_autoplaced yes)
@@ -7130,7 +7140,7 @@
 		(uuid "ad265391-1b8b-4b95-a17f-0c8a1626e44a")
 	)
 	(label "SCL"
-		(at 16.51 142.875 0)
+		(at 19.05 135.89 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7174,7 +7184,7 @@
 		(uuid "c706cb9a-d542-4438-ab57-deb2d991e913")
 	)
 	(label "LED1"
-		(at 178.181 66.802 0)
+		(at 187.452 73.152 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7218,7 +7228,7 @@
 		(uuid "d57d9a45-5c68-4804-9ed7-5f6034c1905c")
 	)
 	(label "BOOT"
-		(at 180.213 49.53 0)
+		(at 189.484 55.88 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -7351,7 +7361,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 222.504 140.843 0)
 			(effects
 				(font
@@ -7413,7 +7423,7 @@
 	)
 	(symbol
 		(lib_id "Device:C_Small")
-		(at 171.196 51.562 90)
+		(at 180.467 57.912 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7421,7 +7431,7 @@
 		(dnp no)
 		(uuid "08dd5d6a-7146-42b2-b57b-56202ea07bec")
 		(property "Reference" "C15"
-			(at 172.72 54.102 90)
+			(at 181.991 60.452 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7430,7 +7440,7 @@
 			)
 		)
 		(property "Value" ".1uF"
-			(at 172.974 55.626 90)
+			(at 182.245 61.976 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7439,7 +7449,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
-			(at 171.196 51.562 0)
+			(at 180.467 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7447,8 +7457,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
-			(at 171.196 51.562 0)
+		(property "Datasheet" ""
+			(at 180.467 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7457,7 +7467,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 171.196 51.562 0)
+			(at 180.467 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7466,7 +7476,7 @@
 			)
 		)
 		(property "manf#" ""
-			(at 171.196 51.562 0)
+			(at 180.467 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7475,7 +7485,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 171.196 51.562 0)
+			(at 180.467 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7484,7 +7494,7 @@
 			)
 		)
 		(property "LCSC#" "C478888"
-			(at 171.196 51.562 0)
+			(at 180.467 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7598,7 +7608,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Footprint:Buzzer4x4"
+		(property "Footprint" "Footprints:Buzzer4x4"
 			(at 143.383 129.159 90)
 			(effects
 				(font
@@ -7669,34 +7679,32 @@
 	)
 	(symbol
 		(lib_id "Connector:Screw_Terminal_01x04")
-		(at 27.94 140.335 0)
+		(at 30.48 135.89 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "0c2b3550-7ee2-432f-9ae6-9506bc45be34")
 		(property "Reference" "J1"
-			(at 30.226 140.3349 0)
+			(at 30.48 124.46 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Value" "OLED"
-			(at 30.226 142.8749 0)
+			(at 30.48 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
-			(at 27.94 140.335 0)
+			(at 30.48 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7705,7 +7713,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 27.94 140.335 0)
+			(at 30.48 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7714,7 +7722,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 27.94 140.335 0)
+			(at 30.48 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7723,7 +7731,7 @@
 			)
 		)
 		(property "manf#" "I2C SH1106 Display Oled Azul 128×64 1.3 ” "
-			(at 27.94 140.335 0)
+			(at 30.48 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7732,7 +7740,7 @@
 			)
 		)
 		(property "provedor" "UNIT Electronics"
-			(at 27.94 140.335 0)
+			(at 30.48 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7797,7 +7805,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 209.55 124.714 0)
 			(effects
 				(font
@@ -7891,7 +7899,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1810170519_PANASONIC-ERJ3RBD5101V_C191782.pdf"
+		(property "Datasheet" ""
 			(at 266.954 37.592 0)
 			(effects
 				(font
@@ -8509,7 +8517,7 @@
 	)
 	(symbol
 		(lib_id "power:+3V3")
-		(at 178.054 28.194 0)
+		(at 187.325 34.544 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -8517,7 +8525,7 @@
 		(dnp no)
 		(uuid "22806f8a-2128-4c5d-bec5-9cfb1434b43f")
 		(property "Reference" "#PWR048"
-			(at 178.054 32.004 0)
+			(at 187.325 38.354 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8526,7 +8534,7 @@
 			)
 		)
 		(property "Value" "+3V3"
-			(at 178.435 23.7998 0)
+			(at 187.706 30.1498 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8534,7 +8542,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 178.054 28.194 0)
+			(at 187.325 34.544 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8543,7 +8551,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 178.054 28.194 0)
+			(at 187.325 34.544 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8552,7 +8560,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 178.054 28.194 0)
+			(at 187.325 34.544 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8574,7 +8582,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 171.069 35.814 0)
+		(at 180.34 42.164 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -8582,7 +8590,7 @@
 		(dnp no)
 		(uuid "2a031483-447b-493b-9db2-5ff7dec0eafd")
 		(property "Reference" "SW6"
-			(at 171.069 28.575 0)
+			(at 180.34 34.925 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8590,7 +8598,7 @@
 			)
 		)
 		(property "Value" "RESET"
-			(at 171.069 30.8864 0)
+			(at 180.34 37.2364 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8598,7 +8606,7 @@
 			)
 		)
 		(property "Footprint" "Button_Switch_SMD:SW_SPST_TL3342"
-			(at 171.069 30.734 0)
+			(at 180.34 37.084 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8606,8 +8614,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2205161616_E-Switch-TL3342F450QG_C2886897.pdf"
-			(at 171.069 30.734 0)
+		(property "Datasheet" ""
+			(at 180.34 37.084 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8616,7 +8624,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 171.069 35.814 0)
+			(at 180.34 42.164 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8625,7 +8633,7 @@
 			)
 		)
 		(property "manf#" ""
-			(at 171.069 35.814 0)
+			(at 180.34 42.164 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8634,7 +8642,7 @@
 			)
 		)
 		(property "LCSC#" "C318889"
-			(at 171.069 35.814 0)
+			(at 180.34 42.164 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8643,7 +8651,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 171.069 35.814 0)
+			(at 180.34 42.164 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8691,7 +8699,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Footprint:MOD28_ESP32-C6-WROOM-1U_EXP"
+		(property "Footprint" "Footprints:MOD28_ESP32-C6-WROOM-1U_EXP"
 			(at 53.848 12.446 0)
 			(effects
 				(font
@@ -8948,7 +8956,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Footprint:BAT-TH_BH-AAA-A1AJ024"
+		(property "Footprint" "Footprints:BAT-TH_BH-AAA-A1AJ024"
 			(at 49.53 135.89 0)
 			(effects
 				(font
@@ -9116,7 +9124,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1810170519_PANASONIC-ERJ3RBD5101V_C191782.pdf"
+		(property "Datasheet" ""
 			(at 266.954 40.132 0)
 			(effects
 				(font
@@ -9178,7 +9186,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 159.512 84.836 0)
+		(at 168.783 91.186 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9186,7 +9194,7 @@
 		(dnp no)
 		(uuid "421b83ec-01a4-4261-842f-e3681d26515c")
 		(property "Reference" "#PWR044"
-			(at 159.512 91.186 0)
+			(at 168.783 97.536 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9195,7 +9203,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 159.639 89.2302 0)
+			(at 168.91 95.5802 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9203,7 +9211,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 159.512 84.836 0)
+			(at 168.783 91.186 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9212,7 +9220,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 159.512 84.836 0)
+			(at 168.783 91.186 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9221,7 +9229,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 159.512 84.836 0)
+			(at 168.783 91.186 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9331,7 +9339,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Footprint:JS102011SAQN"
+		(property "Footprint" "Footprints:JS102011SAQN"
 			(at 92.075 130.81 0)
 			(effects
 				(font
@@ -9340,7 +9348,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.mouser.mx/datasheet/2/60/js-1841892.pdf"
+		(property "Datasheet" ""
 			(at 92.075 130.81 0)
 			(effects
 				(font
@@ -9434,7 +9442,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2205161616_E-Switch-TL3342F450QG_C2886897.pdf"
+		(property "Datasheet" ""
 			(at 209.55 117.094 0)
 			(effects
 				(font
@@ -9561,7 +9569,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 160.02 67.564 0)
+		(at 169.291 73.914 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9569,7 +9577,7 @@
 		(dnp no)
 		(uuid "460ae7a1-ee18-42ee-b7b3-3bca37f7459f")
 		(property "Reference" "#PWR045"
-			(at 160.02 73.914 0)
+			(at 169.291 80.264 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9578,7 +9586,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 160.147 71.9582 0)
+			(at 169.418 78.3082 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9586,7 +9594,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 160.02 67.564 0)
+			(at 169.291 73.914 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9595,7 +9603,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 160.02 67.564 0)
+			(at 169.291 73.914 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9604,7 +9612,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 160.02 67.564 0)
+			(at 169.291 73.914 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9756,7 +9764,7 @@
 	)
 	(symbol
 		(lib_id "Device:LED")
-		(at 172.339 66.802 0)
+		(at 181.61 73.152 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9764,7 +9772,7 @@
 		(dnp no)
 		(uuid "50dbf420-7cdb-4fc2-934d-a7a346bed559")
 		(property "Reference" "D4"
-			(at 172.1612 61.3156 0)
+			(at 181.4322 67.6656 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9772,7 +9780,7 @@
 			)
 		)
 		(property "Value" "LED"
-			(at 172.1612 63.627 0)
+			(at 181.4322 69.977 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9780,7 +9788,7 @@
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
-			(at 172.339 66.802 0)
+			(at 181.61 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9789,7 +9797,7 @@
 			)
 		)
 		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2101201032_XINGLIGHT-XL-2012UGC_C965815.pdf"
-			(at 172.339 66.802 0)
+			(at 181.61 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9798,7 +9806,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 172.339 66.802 0)
+			(at 181.61 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9807,7 +9815,7 @@
 			)
 		)
 		(property "manf#" "XL-2012UGC"
-			(at 172.339 66.802 0)
+			(at 181.61 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9816,7 +9824,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 172.339 66.802 0)
+			(at 181.61 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9825,7 +9833,7 @@
 			)
 		)
 		(property "LCSC#" "C965815"
-			(at 172.339 66.802 0)
+			(at 181.61 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9850,7 +9858,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 163.322 38.1 0)
+		(at 172.593 44.45 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9858,7 +9866,7 @@
 		(dnp no)
 		(uuid "51095a18-de7d-4ccd-8a69-12145daaba46")
 		(property "Reference" "#PWR046"
-			(at 163.322 44.45 0)
+			(at 172.593 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9867,7 +9875,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 163.449 42.4942 0)
+			(at 172.72 48.8442 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9875,7 +9883,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 163.322 38.1 0)
+			(at 172.593 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9884,7 +9892,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 163.322 38.1 0)
+			(at 172.593 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9893,7 +9901,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 163.322 38.1 0)
+			(at 172.593 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10245,7 +10253,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2205161616_E-Switch-TL3342F450QG_C2886897.pdf"
+		(property "Datasheet" ""
 			(at 222.504 133.477 0)
 			(effects
 				(font
@@ -10339,7 +10347,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2205161616_E-Switch-TL3342F450QG_C2886897.pdf"
+		(property "Datasheet" ""
 			(at 209.423 151.257 0)
 			(effects
 				(font
@@ -10466,7 +10474,7 @@
 	)
 	(symbol
 		(lib_id "Device:C_Small")
-		(at 170.942 37.846 90)
+		(at 180.213 44.196 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -10474,7 +10482,7 @@
 		(dnp no)
 		(uuid "77809809-76af-41a8-a2ff-c4fe21326c9f")
 		(property "Reference" "C14"
-			(at 172.466 40.386 90)
+			(at 181.737 46.736 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10483,7 +10491,7 @@
 			)
 		)
 		(property "Value" ".1uF"
-			(at 172.72 41.91 90)
+			(at 181.991 48.26 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10492,7 +10500,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
-			(at 170.942 37.846 0)
+			(at 180.213 44.196 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10500,8 +10508,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
-			(at 170.942 37.846 0)
+		(property "Datasheet" ""
+			(at 180.213 44.196 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10510,7 +10518,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 170.942 37.846 0)
+			(at 180.213 44.196 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10519,7 +10527,7 @@
 			)
 		)
 		(property "manf#" ""
-			(at 170.942 37.846 0)
+			(at 180.213 44.196 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10528,7 +10536,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 170.942 37.846 0)
+			(at 180.213 44.196 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10537,7 +10545,7 @@
 			)
 		)
 		(property "LCSC#" "C478888"
-			(at 170.942 37.846 0)
+			(at 180.213 44.196 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10585,7 +10593,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 164.846 141.859 0)
 			(effects
 				(font
@@ -10594,7 +10602,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://lcsc.com/product-detail/Chip-Resistor-Surface-Mount_YAGEO-RC0603JR-071K1L_C246023.html"
+		(property "Datasheet" ""
 			(at 164.846 141.859 0)
 			(effects
 				(font
@@ -10755,7 +10763,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 189.865 140.716 0)
 			(effects
 				(font
@@ -10980,7 +10988,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2205161616_E-Switch-TL3342F450QG_C2886897.pdf"
+		(property "Datasheet" ""
 			(at 189.738 133.35 0)
 			(effects
 				(font
@@ -11141,7 +11149,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~https://datasheet.lcsc.com/lcsc/1811021421_Samsung-Electro-Mechanics-CL10A106MP8NNNC_C85713.pdf"
+		(property "Datasheet" ""
 			(at 125.222 133.35 0)
 			(effects
 				(font
@@ -11427,7 +11435,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_Small")
-		(at 163.576 83.947 270)
+		(at 172.847 90.297 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11435,7 +11443,7 @@
 		(dnp no)
 		(uuid "a49762d4-e6e2-483b-921e-082648ed2a19")
 		(property "Reference" "R4"
-			(at 163.576 78.9686 90)
+			(at 172.847 85.3186 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11443,7 +11451,7 @@
 			)
 		)
 		(property "Value" "1K"
-			(at 163.576 81.28 90)
+			(at 172.847 87.63 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11451,7 +11459,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 163.576 83.947 0)
+			(at 172.847 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11459,8 +11467,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811151132_Walsin-Tech-Corp-WR06X1001FTL_C112433.pdf"
-			(at 163.576 83.947 0)
+		(property "Datasheet" ""
+			(at 172.847 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11469,7 +11477,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 163.576 83.947 0)
+			(at 172.847 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11478,7 +11486,7 @@
 			)
 		)
 		(property "manf#" "WR06X1001FTL"
-			(at 163.576 83.947 0)
+			(at 172.847 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11487,7 +11495,7 @@
 			)
 		)
 		(property "LCSC#" "C112433"
-			(at 163.576 83.947 0)
+			(at 172.847 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11496,7 +11504,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 163.576 83.947 0)
+			(at 172.847 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11555,7 +11563,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 209.423 158.623 0)
 			(effects
 				(font
@@ -11934,7 +11942,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811151133_Walsin-Tech-Corp-WR06X104JTL_C163843.pdf"
+		(property "Datasheet" ""
 			(at 71.882 137.541 0)
 			(effects
 				(font
@@ -12070,7 +12078,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 163.83 52.07 0)
+		(at 173.101 58.42 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12078,7 +12086,7 @@
 		(dnp no)
 		(uuid "bec2b27b-39d6-4256-8da1-e34ba9e37df2")
 		(property "Reference" "#PWR047"
-			(at 163.83 58.42 0)
+			(at 173.101 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12087,7 +12095,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 163.957 56.4642 0)
+			(at 173.228 62.8142 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12095,7 +12103,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 163.83 52.07 0)
+			(at 173.101 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12104,7 +12112,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 163.83 52.07 0)
+			(at 173.101 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12113,7 +12121,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 163.83 52.07 0)
+			(at 173.101 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12273,7 +12281,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~https://datasheet.lcsc.com/lcsc/1811021421_Samsung-Electro-Mechanics-CL10A106MP8NNNC_C85713.pdf"
+		(property "Datasheet" ""
 			(at 100.838 135.382 0)
 			(effects
 				(font
@@ -12435,7 +12443,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 105.664 35.306 0)
 			(effects
 				(font
@@ -12531,7 +12539,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 114.3 35.052 0)
 			(effects
 				(font
@@ -12593,7 +12601,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_Small")
-		(at 163.957 66.802 270)
+		(at 173.228 73.152 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12601,7 +12609,7 @@
 		(dnp no)
 		(uuid "da9c822c-fb7f-4c59-8683-0d27201361e2")
 		(property "Reference" "R5"
-			(at 163.957 61.8236 90)
+			(at 173.228 68.1736 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12609,7 +12617,7 @@
 			)
 		)
 		(property "Value" "1K"
-			(at 163.957 64.135 90)
+			(at 173.228 70.485 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12617,7 +12625,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 163.957 66.802 0)
+			(at 173.228 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12625,8 +12633,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811151132_Walsin-Tech-Corp-WR06X1001FTL_C112433.pdf"
-			(at 163.957 66.802 0)
+		(property "Datasheet" ""
+			(at 173.228 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12635,7 +12643,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 163.957 66.802 0)
+			(at 173.228 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12644,7 +12652,7 @@
 			)
 		)
 		(property "manf#" "WR06X1001FTL"
-			(at 163.957 66.802 0)
+			(at 173.228 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12653,7 +12661,7 @@
 			)
 		)
 		(property "LCSC#" "C112433"
-			(at 163.957 66.802 0)
+			(at 173.228 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12662,7 +12670,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 163.957 66.802 0)
+			(at 173.228 73.152 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12786,7 +12794,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1912111437_CCTC-TCC0603COG100J500CT_C376764.pdf"
+		(property "Datasheet" ""
 			(at 98.044 35.433 0)
 			(effects
 				(font
@@ -12848,7 +12856,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_Small")
-		(at 178.054 32.258 180)
+		(at 187.325 38.608 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12856,7 +12864,7 @@
 		(dnp no)
 		(uuid "e7fce853-cc08-460c-bb84-0f78be96ae31")
 		(property "Reference" "R8"
-			(at 176.5554 33.4264 0)
+			(at 185.8264 39.7764 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12865,7 +12873,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 176.5554 31.115 0)
+			(at 185.8264 37.465 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12874,7 +12882,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 178.054 32.258 0)
+			(at 187.325 38.608 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12882,8 +12890,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/1811151133_Walsin-Tech-Corp-WR06X104JTL_C163843.pdf"
-			(at 178.054 32.258 0)
+		(property "Datasheet" ""
+			(at 187.325 38.608 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12892,7 +12900,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 178.054 32.258 0)
+			(at 187.325 38.608 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12901,7 +12909,7 @@
 			)
 		)
 		(property "manf#" "CR-03JL7---10K"
-			(at 178.054 32.258 0)
+			(at 187.325 38.608 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12910,7 +12918,7 @@
 			)
 		)
 		(property "LCSC#" "C217281"
-			(at 178.054 32.258 0)
+			(at 187.325 38.608 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12919,7 +12927,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 178.054 32.258 0)
+			(at 187.325 38.608 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12943,33 +12951,32 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+3V3")
-		(at 16.51 137.795 0)
+		(lib_id "Switch:SW_Push")
+		(at 180.34 55.88 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "eecdcab4-cf4f-4589-87fa-31509ddc6a9f")
-		(property "Reference" "#PWR01"
-			(at 16.51 141.605 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 16.891 133.4008 0)
+		(uuid "f0cdb138-f7cd-4a3f-8931-e58dfed5bdcd")
+		(property "Reference" "SW7"
+			(at 172.72 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" ""
-			(at 16.51 137.795 0)
+		(property "Value" "GPIO"
+			(at 172.593 52.578 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_SMD:SW_SPST_TL3342"
+			(at 180.34 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12978,7 +12985,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 16.51 137.795 0)
+			(at 180.34 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12987,71 +12994,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 16.51 137.795 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "eeebbba2-ab55-4888-91f5-c70766ccf371")
-		)
-		(instances
-			(project "AppsecPnw-2024"
-				(path "/cf60c621-db9c-496a-8528-e48a112b4341"
-					(reference "#PWR01")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Switch:SW_Push")
-		(at 171.069 49.53 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f0cdb138-f7cd-4a3f-8931-e58dfed5bdcd")
-		(property "Reference" "SW7"
-			(at 163.449 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GPIO"
-			(at 163.322 46.228 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Button_Switch_SMD:SW_SPST_TL3342"
-			(at 171.069 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2205161616_E-Switch-TL3342F450QG_C2886897.pdf"
-			(at 171.069 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 171.069 49.53 0)
+			(at 180.34 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13060,7 +13003,7 @@
 			)
 		)
 		(property "manf#" ""
-			(at 171.069 49.53 0)
+			(at 180.34 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13069,7 +13012,7 @@
 			)
 		)
 		(property "LCSC#" "C318889"
-			(at 171.069 49.53 0)
+			(at 180.34 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13078,7 +13021,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 171.069 49.53 0)
+			(at 180.34 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13196,32 +13139,16 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED")
-		(at 171.958 83.947 0)
+		(lib_id "power:+3V3")
+		(at 16.51 132.08 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "fd17e0a3-5ba9-4c2a-91f1-c855a5ee0349")
-		(property "Reference" "D3"
-			(at 171.7802 78.4606 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "LED"
-			(at 171.7802 80.772 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
-			(at 171.958 83.947 0)
+		(uuid "f7fd88e1-2354-4bce-9683-2a6628e57472")
+		(property "Reference" "#PWR01"
+			(at 16.51 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13229,8 +13156,25 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2101201032_XINGLIGHT-XL-2012UGC_C965815.pdf"
-			(at 171.958 83.947 0)
+		(property "Value" "+3V3"
+			(at 16.891 127.6858 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 16.51 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 16.51 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13239,7 +13183,71 @@
 			)
 		)
 		(property "Description" ""
-			(at 171.958 83.947 0)
+			(at 16.51 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c033ff16-05f6-47b4-8688-d7e75b2f52ee")
+		)
+		(instances
+			(project "AppsecPnw-2024"
+				(path "/cf60c621-db9c-496a-8528-e48a112b4341"
+					(reference "#PWR01")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 181.229 90.297 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fd17e0a3-5ba9-4c2a-91f1-c855a5ee0349")
+		(property "Reference" "D3"
+			(at 181.0512 84.8106 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "LED"
+			(at 181.0512 87.122 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 181.229 90.297 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://datasheet.lcsc.com/lcsc/2101201032_XINGLIGHT-XL-2012UGC_C965815.pdf"
+			(at 181.229 90.297 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 181.229 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13248,7 +13256,7 @@
 			)
 		)
 		(property "manf#" "XL-2012UGC"
-			(at 171.958 83.947 0)
+			(at 181.229 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13257,7 +13265,7 @@
 			)
 		)
 		(property "provedor" "LCSC"
-			(at 171.958 83.947 0)
+			(at 181.229 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13266,7 +13274,7 @@
 			)
 		)
 		(property "LCSC#" "C965815"
-			(at 171.958 83.947 0)
+			(at 181.229 90.297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13314,7 +13322,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Footprint:C393939"
+		(property "Footprint" "Footprints:C393939"
 			(at 251.206 47.752 0)
 			(effects
 				(font
