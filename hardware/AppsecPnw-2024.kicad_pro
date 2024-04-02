@@ -573,25 +573,19 @@
           "group_by": false,
           "label": "LCSC#",
           "name": "LCSC#",
-          "show": false
+          "show": true
         },
         {
           "group_by": false,
           "label": "Proveedor",
           "name": "Proveedor",
-          "show": false
+          "show": true
         },
         {
           "group_by": false,
           "label": "manf#",
           "name": "manf#",
-          "show": false
-        },
-        {
-          "group_by": false,
-          "label": "provedor",
-          "name": "provedor",
-          "show": false
+          "show": true
         },
         {
           "group_by": false,
