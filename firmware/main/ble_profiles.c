@@ -382,11 +382,11 @@ void gatts_profiles_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatt
             gatts_profile_tab[DEVICE_PROFILE].descr_uuid.uuid.uuid16 = GATTS_DESCR_UUID_USERNAME;
 
             esp_ble_gatts_start_service(gatts_profile_tab[DEVICE_PROFILE].service_handle);
-            username_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
+            username_property = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE_NR | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
             //username_property = ESP_GATT_CHAR_PROP_BIT_READ;
             esp_err_t add_chart_ret = esp_ble_gatts_add_char(gatts_profile_tab[DEVICE_PROFILE].service_handle,
                                                              &gatts_profile_tab[DEVICE_PROFILE].char_uuid,
-                                                             ESP_GATT_PERM_READ,
+                                                             ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
                                                              username_property,
                                                              &gatts_demo_char1_val, NULL);
             if (add_chart_ret) {
