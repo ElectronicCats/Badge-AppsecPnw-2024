@@ -265,6 +265,7 @@ void display_in_development_banner() {
 
 void ble_game_paring() {
     current_game.game_state = PAIRING;
+
     ssd1306_fadeout(&dev);
     ssd1306_clear_screen(&dev, false);
     ssd1306_bitmaps(&dev, 0, 0, epd_bitmap_ble_logo, 16, 16, NO_INVERT);
@@ -294,17 +295,36 @@ void display_handle_game_state(ButtonType button){
                     break;
                 case BUTTON_LEFT:
                     break;
-                case BUTTON_RIGHT:
+                case BUTTON_RIGHT: {
                     current_game.profile = getOWASPProfile(selected_option);
+                    // uint8_t *command[sizeof(current_game.profile->vuln->cwe)+1];
+                    // create_owasp_commmand(&command, current_game.profile);
+                    //send_ble_data(&command, sizeof(current_game.profile->vuln->cwe)+1);
                     display_ble_owasp_profile_attacks();
                     break;
+                }
                 case BUTTON_BOOT:
-                    break;
                 default:
                     break;
             }
             break;
         case WAITING_ATTACK:
+            switch(button) {
+                case BUTTON_UP:
+                    display_ble_owasp_profile_attacks();
+                    break;
+                case BUTTON_DOWN:
+                    display_ble_owasp_profile_attacks();
+                    break;
+                case BUTTON_LEFT:
+                    break;
+                case BUTTON_RIGHT:
+                    //display_ble_sending_attack();
+                    break;
+                case BUTTON_BOOT:
+                default:
+                    break;
+            }
             break;
         case SEND_ATTACK:
             break;
@@ -339,23 +359,48 @@ void display_ble_owasp_profile() {
             ssd1306_display_text(&dev, (i+1) - (int)selected_option, profile->vuln->cwe, strlen(profile->vuln->cwe), NO_INVERT);
         }
     }
-    ESP_LOGI(TAG_SCREEN, "Selected option: %d", selected_option);
 }
 
-void display_ble_owasp_profile_attacks(){
+void display_ble_owasp_profile_attacks() {
     current_game.game_state = WAITING_ATTACK;
     ssd1306_clear_screen(&dev, false);
     ESP_LOGI(TAG_SCREEN, "Selected option: %s", current_game.profile->vuln->name);
-    
-    char* owasp_cwe = (char*)malloc(strlen(current_game.profile->vuln->cwe));
-    strcpy(owasp_cwe, current_game.profile->vuln->cwe);
-    char *prefix = "appsec@";
-    char item_text[strlen(prefix) + strlen(owasp_cwe) + 1];
-    strcpy(item_text, prefix);
-    strcat(item_text, owasp_cwe);
-    ssd1306_display_text(&dev, 0, item_text, strlen(item_text), NO_INVERT);
     ssd1306_display_text(&dev, 1, "Select attack", 13, NO_INVERT);
-    ssd1306_display_text(&dev, 2, current_game.profile->action1->attack->identifier, strlen(current_game.profile->action1->attack->identifier), INVERT);
-    ssd1306_display_text(&dev, 4, current_game.profile->action2->attack->identifier, strlen(current_game.profile->action2->attack->identifier), NO_INVERT);
-    ssd1306_display_text(&dev, 6, "Salir", 5, NO_INVERT);
+
+    if (selected_option > 2) {
+        selected_option = 0;
+    }
+
+    if (selected_option == 0) {
+        ssd1306_display_text(&dev, 2, current_game.profile->action1->attack->identifier, strlen(current_game.profile->action1->attack->identifier), INVERT);
+        ssd1306_display_text(&dev, 4, current_game.profile->action2->attack->identifier, strlen(current_game.profile->action2->attack->identifier), NO_INVERT);
+    }else{
+        ssd1306_display_text(&dev, 2, current_game.profile->action1->attack->identifier, strlen(current_game.profile->action1->attack->identifier), NO_INVERT);
+        ssd1306_display_text(&dev, 4, current_game.profile->action2->attack->identifier, strlen(current_game.profile->action2->attack->identifier), INVERT);
+    }
+}
+
+void display_ble_sending_attack() {
+    current_game.game_state = SEND_ATTACK;
+    ssd1306_clear_screen(&dev, false);
+    ssd1306_display_text(&dev, 4, "Sending attack", 14, NO_INVERT);
+    if (selected_option == 0) {
+        uint8_t *command[sizeof(current_game.profile->action1->attack->identifier)+1];
+    
+        create_owasp_commmand(&command, current_game.profile->action1->attack->identifier);
+        send_ble_data(&command, sizeof(current_game.profile->action1->attack->identifier)+1);
+    }else{
+        uint8_t *command[sizeof(current_game.profile->action2->attack->identifier)+1];
+    
+        create_owasp_commmand(&command, current_game.profile->action2->attack->identifier);
+        send_ble_data(&command, sizeof(current_game.profile->action2->attack->identifier)+1);
+    }
+    ESP_LOGI(TAG_SCREEN, "Attack sent");
+    display_waiting_response();
+}
+
+void display_waiting_response() {
+    current_game.game_state = WAITING_RESPONSE;
+    ssd1306_clear_screen(&dev, false);
+    ssd1306_display_text(&dev, 4, "Waiting response", 16, NO_INVERT);
 }

@@ -74,6 +74,8 @@ extern void get_player_array_uint8(uint8_t* response_information, PlayerInformat
 extern void get_profile_owasp_array(esp_gatt_rsp_t* response_information, OWASPProfile *profile);
 extern void get_profile_owasp_uint8(uint8_t* response_information, OWASPProfile *profile);
 
+extern void send_ble_data(uint8_t* data, int length);
+
 void init_ble_task(void);
 void stop_ble_task(void);
 #endif // BLE_PROFILES_H

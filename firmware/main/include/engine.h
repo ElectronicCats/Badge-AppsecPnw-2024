@@ -67,9 +67,39 @@ extern OWASPProfile OWASPA09;
 extern OWASPProfile OWASPA10;
 
 extern OWASPProfile* owasp_profiles[];
+/**
+ * @brief Get the OWASP profile by index.
+ *
+ * @param index The index of the OWASP profile.
+ * @return The OWASP profile pointer.
+ */
 OWASPProfile* getOWASPProfile(int index);
 
+/**
+ * @brief Convert the OWASP profile struct to a uint8_t array.
+ *
+ * @param dest_buffer The pointer to the destination buffer.
+ * @param profile The OWASP profile pointer to convert.
+ * @return The CWE value.
+ */
 extern void get_owasp_profile_cwe_uint8(uint8_t* dest_buffer, OWASPProfile *profile);
+
+/**
+ * @brief Convert the OWASP profile struct to a uint8_t array.
+ *
+ * @param dest_buffer The pointer to the destination buffer.
+ * @param profile The OWASP profile pointer to convert.
+ * @return The CWE value.
+ */
 extern void create_owasp_commmand(uint8_t* dest_buffer, OWASPProfile *profile);
+
+/**
+ * @brief Convert the OWASP base action struct to a uint8_t array.
+ *
+ * @param dest_buffer The pointer to the destination buffer.
+ * @param attack The OWASP base action pointer to convert.
+ * @return The CWE value.
+ */
+extern void create_owasp_commmand_identifier(uint8_t* dest_buffer, OWASPBaseAction *attack);
 
 #endif // ENGINE_H

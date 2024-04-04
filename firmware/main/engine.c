@@ -93,18 +93,13 @@ OWASPProfile profiles[] = {
 };
 
 
-/**
- * @brief Convert the OWASP profile struct to a uint8_t array.
- *
- * @param dest_buffer The pointer to the destination buffer.
- * @param profile The OWASP profile pointer to convert.
- * @return The CWE value.
- */
+
 void get_owasp_profile_cwe_uint8(uint8_t* dest_buffer, OWASPProfile *profile) {
     for (int i = 0; i < sizeof(profile->vuln->cwe); i++) {
         dest_buffer[i] = profile->vuln->cwe[i];
     }
 }
+
 
 void create_owasp_commmand(uint8_t* dest_buffer, OWASPProfile *profile) {
     dest_buffer[0] = '1'; // Agregar el número 1 después del primer carácter
@@ -112,18 +107,16 @@ void create_owasp_commmand(uint8_t* dest_buffer, OWASPProfile *profile) {
     for (int i = 1; i < sizeof(profile->vuln->cwe); i++) {
         dest_buffer[i+1] = profile->vuln->cwe[i]; // Copiar el resto de los caracteres
     }
-    // dest_buffer[0] = '1';
-    // dest_buffer[1] = profile->vuln->cwe[0];
-    // dest_buffer[2] = profile->vuln->cwe[1];
-    // dest_buffer[3] = profile->vuln->cwe[2];
-    
 }
-/**
- * @brief Get the OWASP profile by index.
- *
- * @param index The index of the OWASP profile.
- * @return The OWASP profile pointer.
- */
+
+void create_owasp_commmand_identifier(uint8_t* dest_buffer, OWASPBaseAction *attack) {
+    dest_buffer[0] = '2'; // Agregar el número 1 después del primer carácter
+    dest_buffer[1] = attack->identifier[0]; // Copiar el primer carácter (el número)
+    for (int i = 1; i < sizeof(attack->identifier); i++) {
+        dest_buffer[i+1] = attack->identifier[i]; // Copiar el resto de los caracteres
+    }
+}
+
 OWASPProfile* getOWASPProfile(int index) {
     if (index >= 0 && index < sizeof(profiles) / sizeof(profiles[0])) {
         return &profiles[index];

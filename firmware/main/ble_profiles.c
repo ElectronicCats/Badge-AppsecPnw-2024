@@ -144,6 +144,13 @@ void get_player_array_uint8(uint8_t* response_information, PlayerInformation pla
     }
 }
 
+void send_ble_data(uint8_t* data, int length) {
+    esp_ble_gatts_send_indicate(gatts_profile_tab[DEVICE_PROFILE].gatts_if,
+                                gatts_profile_tab[DEVICE_PROFILE].conn_id,
+                                gatts_profile_tab[DEVICE_PROFILE].char_handle,
+                                length, data, true);
+}
+
 // ADV Event Handler
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param) {
     switch (event) {

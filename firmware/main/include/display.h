@@ -257,5 +257,7 @@ void ble_game_paring();
 void ble_game_paired();
 void display_ble_owasp_profile();
 void display_ble_owasp_profile_attacks();
+void display_ble_sending_attack();
+void display_waiting_response();
 void display_handle_game_state(ButtonType button);
 #endif // DISPLAY_H
