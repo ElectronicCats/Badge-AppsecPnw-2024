@@ -297,9 +297,9 @@ void display_handle_game_state(ButtonType button){
                     break;
                 case BUTTON_RIGHT: {
                     current_game.profile = getOWASPProfile(selected_option);
-                    // uint8_t *command[sizeof(current_game.profile->vuln->cwe)+1];
-                    // create_owasp_commmand(&command, current_game.profile);
-                    //send_ble_data(&command, sizeof(current_game.profile->vuln->cwe)+1);
+                    uint8_t *command[sizeof(current_game.profile->vuln->cwe)+1];
+                    create_owasp_commmand(&command, current_game.profile);
+                    send_ble_data(&command, sizeof(current_game.profile->vuln->cwe)+1);
                     display_ble_owasp_profile_attacks();
                     break;
                 }
@@ -319,7 +319,7 @@ void display_handle_game_state(ButtonType button){
                 case BUTTON_LEFT:
                     break;
                 case BUTTON_RIGHT:
-                    //display_ble_sending_attack();
+                    display_ble_sending_attack();
                     break;
                 case BUTTON_BOOT:
                 default:
@@ -382,17 +382,18 @@ void display_ble_owasp_profile_attacks() {
 
 void display_ble_sending_attack() {
     current_game.game_state = SEND_ATTACK;
+    ssd1306_fadeout(&dev);
     ssd1306_clear_screen(&dev, false);
     ssd1306_display_text(&dev, 4, "Sending attack", 14, NO_INVERT);
     if (selected_option == 0) {
         uint8_t *command[sizeof(current_game.profile->action1->attack->identifier)+1];
     
-        create_owasp_commmand(&command, current_game.profile->action1->attack->identifier);
+        create_owasp_commmand_identifier(&command, current_game.profile->action1->attack->identifier);
         send_ble_data(&command, sizeof(current_game.profile->action1->attack->identifier)+1);
     }else{
         uint8_t *command[sizeof(current_game.profile->action2->attack->identifier)+1];
     
-        create_owasp_commmand(&command, current_game.profile->action2->attack->identifier);
+        create_owasp_commmand_identifier(&command, current_game.profile->action2->attack->identifier);
         send_ble_data(&command, sizeof(current_game.profile->action2->attack->identifier)+1);
     }
     ESP_LOGI(TAG_SCREEN, "Attack sent");
