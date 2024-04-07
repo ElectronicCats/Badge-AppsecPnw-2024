@@ -4,20 +4,7 @@
 #include "engine.h"
 #include "ble_profiles.h"
 #include "display.h"
-
-// static void button_event_cb(void* arg, void* data);
-// void button_init(uint32_t button_num, uint8_t mask);
-// void keyboard_init();
-// void handle_back();
-// void handle_selected_option();
-// void update_previous_layer();
-// void handle_main_selection();
-// void handle_applications_selection();
-// void handle_settings_selection();
-// void handle_about_selection();
-// void handle_wifi_apps_selection();
-// void handle_bluetooth_apps_selection();
-// void handle_thread_apps_selection();
+#include "memory.h"
 
 bool in_game = false;
 
@@ -56,7 +43,6 @@ static void button_event_cb(void* arg, void* data) {
     uint8_t button_event = ((button_event_t)data) & 0x0F;  // & 0x0F to get the event number without the mask
     const char* button_name_str = button_name_table[button_name];
     const char* button_event_str = button_event_table[button_event];
-    //ESP_LOGI("", "");
     if (button_event != BUTTON_PRESS_DOWN) {
         return;
     }
@@ -67,16 +53,16 @@ static void button_event_cb(void* arg, void* data) {
             break;
         case LEFT:{
             if (button_event == BUTTON_PRESS_DOWN){
-                if(in_game){
-                    handle_keyboard_events(BUTTON_LEFT);
+                if(keyboard_state.in_app){
+                    keyboard_state.app_handler(BUTTON_LEFT);
                     return;
                 }
                 handle_back();
             }break;
         }case RIGHT:{
             if (button_event == BUTTON_PRESS_DOWN){
-                if(in_game){
-                    handle_keyboard_events(BUTTON_RIGHT);
+                if(keyboard_state.in_app){
+                    keyboard_state.app_handler(BUTTON_RIGHT);
                     return;
                 }
                 handle_selected_option();
@@ -84,8 +70,8 @@ static void button_event_cb(void* arg, void* data) {
         }case UP:{
             if (button_event == BUTTON_PRESS_DOWN) {
                 selected_option = (selected_option == 0) ? 0 : selected_option - 1;
-                if(in_game){
-                    handle_keyboard_events(BUTTON_UP);
+                if(keyboard_state.in_app){
+                    keyboard_state.app_handler(BUTTON_UP);
                     return;
                 }
                 display_menu();
@@ -94,8 +80,8 @@ static void button_event_cb(void* arg, void* data) {
         }case DOWN:{
             if (button_event == BUTTON_PRESS_DOWN) {
                 selected_option = (selected_option == num_items - 3) ? selected_option : selected_option + 1;
-                if(in_game){
-                    handle_keyboard_events(BUTTON_DOWN);
+                if(keyboard_state.in_app){
+                    keyboard_state.app_handler(BUTTON_DOWN);
                     return;
                 }
                 display_menu();
@@ -266,7 +252,9 @@ void handle_settings_selection() {
             break;
         case SETTINGS_MENU_DEVICE:
             current_layer = LAYER_SETTINGS_DEVICE;
-            display_device_type();
+            //TODO: CLEAR FUNCTIONALITIES
+            display_clear();
+            display_in_development_banner();
             break;
         case SETTINGS_MENU_SOUND:
             current_layer = LAYER_SETTINGS_SOUND;
@@ -318,13 +306,19 @@ void handle_bluetooth_apps_selection() {
             current_layer = LAYER_BLUETOOTH_GAME;
             //display_clear();
             ESP_LOGI(TAG_KEYBOARD, "Entering Bluetooth game");
+            keyboard_state.in_app = true;
+            keyboard_state.app_handler = display_handle_game_state;
             in_game = true;
+            ESP_LOGI(TAG_KEYBOARD, "Selected option TEAM SELECTION: %d", selected_option);
+            selected_option = 0;
+            display_device_game_selection();
             //Server
-            //ble_game_paring();
+            //
             //Client
-            ble_game_pairing_client();
+            //
             break;
     }
+    
 }
 
 void handle_thread_apps_selection() {
@@ -332,34 +326,6 @@ void handle_thread_apps_selection() {
         case THREAD_MENU_CLI:
             current_layer = LAYER_THREAD_CLI;
             //display_thread_cli();
-            break;
-    }
-}
-
-void handle_keyboard_events(ButtonType button){
-    switch (button) {
-        case BUTTON_LEFT:{
-            if(in_game){
-                display_handle_game_state(BUTTON_LEFT);
-            }
-            break;
-        }case BUTTON_RIGHT:{
-            if(in_game){
-                display_handle_game_state(BUTTON_RIGHT);
-            }
-            break;
-        }case BUTTON_UP:{
-            if(in_game){
-                display_handle_game_state(BUTTON_UP);
-            }
-            break;
-        }case BUTTON_DOWN:{
-            if(in_game){
-                display_handle_game_state(BUTTON_DOWN);
-            }
-            break;
-        }case BUTTON_BOOT:
-        default:
             break;
     }
 }

@@ -45,6 +45,8 @@ typedef enum {
     SEND_ATTACK,
     WAITING_RESPONSE,
     FINISHED,
+    GAME_OVER,
+    TEAM_SELECTION,
 } GameState;
 
 

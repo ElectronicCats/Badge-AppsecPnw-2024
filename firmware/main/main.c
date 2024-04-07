@@ -32,6 +32,7 @@
 #include "ble_client_profiles.h"
 #include "keyboard.h"
 #include "button_helper.h"
+#include "memory.h"
 
 #include "sdkconfig.h"
 
@@ -52,8 +53,10 @@ struct gattc_profile_inst gattc_profile_tab[DEVICE_PROFILES] = {
 };
 
 void app_main(void) {
+    init_nvs();
     keyboard_init();
     display_init();
     //display_items(main_items);
+
     //init_ble_task();
 }

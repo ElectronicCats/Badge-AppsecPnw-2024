@@ -24,6 +24,17 @@ typedef enum {
     BUTTON_DOWN,
 } ButtonType;
 
+typedef struct {
+    bool in_app;
+    void (*app_handler)(ButtonType button_pressed);
+} KeyboardState;
+
+
+static KeyboardState keyboard_state = {
+    .in_app = false,
+    .app_handler = NULL,
+};
+
 static void button_event_cb(void* arg, void* data);
 void button_init(uint32_t button_num, uint8_t mask);
 void keyboard_init();

@@ -9,7 +9,7 @@
 #include "esp_gattc_api.h"
 #include "engine.h"
 
-#define TAG_BLE "EC_APPSECPWN_BLE_CLIENT"
+#define TAG_BLE_CLIENT "EC_APPSECPWN_BLE_CLIENT"
 
 #define REMOTE_BOARD_ID "EC_APPSECPWN_RED"
 //GATT Client

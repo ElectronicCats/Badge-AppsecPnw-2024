@@ -20,8 +20,8 @@
 #include "ble_client_profiles.h"
 #include "engine.h"
 #include "keyboard.h"
-#include "nvs_flash.h"
-#include "nvs.h"
+#include "memory.h"
+
 
 #define TAG_SCREEN "DISPLAY"
 
@@ -64,6 +64,7 @@ void display_show() {
 /// @brief Display text on the screen
 /// @param text
 /// @param text_size
+
 /// @param page
 /// @param invert
 void display_text(const char* text, int x, int page, int invert) {
@@ -315,6 +316,35 @@ void ble_game_client_profile_show() {
 
 }
 
+void display_handle_device(ButtonType button) {
+    switch (button){
+        case BUTTON_UP:
+            display_device_game_selection();
+            break;
+        case BUTTON_DOWN:
+            display_device_game_selection();
+            break;
+        case BUTTON_LEFT:
+            current_layer = SETTINGS_MENU_SYSTEM;
+            display_menu();
+            break;
+        case BUTTON_RIGHT:
+            ESP_LOGI(TAG_SCREEN, "TEAM Selected option: %d", selected_option);
+            int32_t *selected_team = (int32_t)selected_option;
+            write_int32_nvs(&selected_option);
+            if (selected_option == 0){
+                ble_game_pairing_client();
+            }else{
+                ble_game_paring();
+            }
+            break;
+        case BUTTON_BOOT:
+        default:
+            break;
+    }
+    
+}
+
 void display_handle_game_state(ButtonType button){
     switch (current_game.game_state) {
         case PAIRING:
@@ -369,12 +399,37 @@ void display_handle_game_state(ButtonType button){
                     break;
             }
             break;
+        case TEAM_SELECTION: {
+            switch (button){
+                case BUTTON_UP:
+                    display_device_game_selection();
+                    break;
+                case BUTTON_DOWN:
+                    display_device_game_selection();
+                    break;
+                case BUTTON_LEFT:
+                    break;
+                case BUTTON_RIGHT:
+                    ESP_LOGI(TAG_SCREEN, "TEAM Selected option: %d", selected_option);
+                    
+                    if (selected_option == 0){
+                        // BLUE TEAM
+                        ble_game_pairing_client();
+                    }else{
+                        // RED TEAM
+                        ble_game_paring();
+                    }
+                    break;
+                case BUTTON_BOOT:
+                default:
+                    break;
+            }
+            break;
+        }
         case SEND_ATTACK:
-            break;
         case WAITING_RESPONSE:
-            break;
         case FINISHED:
-            break;
+        case GAME_OVER:
         default:
             break;
     }
@@ -456,22 +511,51 @@ void display_waiting_response() {
     ssd1306_display_text(&dev, 4, "Waiting response", 16, NO_INVERT);
 }
 
+void display_blue_team_selection() {
+    ssd1306_display_text(&dev, 1, "Select Team", 12, NO_INVERT);
+    ssd1306_bitmaps(&dev, 48, 16, epd_bitmap_blue_team_logo, 32, 32, NO_INVERT);
+
+    ssd1306_display_text(&dev, 6, "    BLUE TEAM   ", 16, INVERT);
+    ssd1306_display_text(&dev, 7, "    Defenders   ", 16, NO_INVERT);
+}
+
+void display_read_team_selection() {
+    ssd1306_display_text(&dev, 1, "Select Team", 12, NO_INVERT);
+    ssd1306_bitmaps(&dev, 48, 16, epd_bitmap_red_team_logo, 32, 32, NO_INVERT);
+
+    ssd1306_display_text(&dev, 6, "    RED  TEAM   ", 16, INVERT);
+    ssd1306_display_text(&dev, 7, "    Attackers   ", 16, NO_INVERT);
+}
+
+
+
+void display_device_game_selection() {
+    current_game.game_state = TEAM_SELECTION;
+    ssd1306_clear_screen(&dev, false);
+
+    ESP_LOGI(TAG_SCREEN, "Selected option TEAM SELECTION: %d", selected_option);
+
+    if (selected_option > 1 || selected_option < 0) {
+        selected_option = 0;
+    }
+
+    if (selected_option == 0) {
+        display_blue_team_selection();
+    } else {
+        display_read_team_selection();
+    }
+
+}
 
 void display_device_type() {
     ssd1306_clear_screen(&dev, false);
-    if (selected_option > 2) {
+    if (selected_option > 1 || selected_option < 0) {
         selected_option = 0;
     }    
 
     if (selected_option == 0) {
-        ssd1306_display_text(&dev, 2, "RED", 3, INVERT);
-        ssd1306_display_text(&dev, 4, "BLUE", 4, NO_INVERT);
-    }else{
-        ssd1306_display_text(&dev, 2, "RED", 3, NO_INVERT);
-        ssd1306_display_text(&dev, 4, "BLUE", 4, INVERT);
+        display_blue_team_selection();
+    } else {
+        display_read_team_selection();
     }
-}
-
-void handle_device_selection() {
-    display_device_type();
 }
