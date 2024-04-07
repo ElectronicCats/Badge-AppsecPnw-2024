@@ -62,13 +62,18 @@ menu "Configuration"
             depends on XTAL_FREQ_32 || XTAL_FREQ_AUTO
     endchoice
 
-    config EXAMPLE_MIN_CPU_FREQ_MHZ
-        int
-        default 40 if EXAMPLE_MIN_CPU_FREQ_40M
-        default 20 if EXAMPLE_MIN_CPU_FREQ_20M
-        default 10 if EXAMPLE_MIN_CPU_FREQ_10M
-        default 26 if EXAMPLE_MIN_CPU_FREQ_26M
-        default 13 if EXAMPLE_MIN_CPU_FREQ_13M
-        default 32 if EXAMPLE_MIN_CPU_FREQ_32M
-
+    choice BLE_DEVICE_TEAM
+        prompt "DEVICE TEAM"
+        default RED_TEAM
+        help
+            Select the device team to use 1 RED or 2 BLUE.
+        config RED_TEAM
+            bool "Read team"
+            help
+                Read is server.
+        config BLUE_TEAM
+            bool "Blue Team"
+            help
+                Blue is client.
+    endchoice
 endmenu

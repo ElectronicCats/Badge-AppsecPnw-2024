@@ -157,12 +157,8 @@ void handle_selected_option() {
             handle_bluetooth_apps_selection();
             break;
         case LAYER_ZIGBEE_APPS:
-            break;
         case LAYER_THREAD_APPS:
-            //handle_thread_apps_selection();
-            break;
         case LAYER_MATTER_APPS:
-            break;
         case LAYER_WIFI_ANALIZER:
             break;
         default:
@@ -268,6 +264,10 @@ void handle_settings_selection() {
             display_clear();
             display_in_development_banner();
             break;
+        case SETTINGS_MENU_DEVICE:
+            current_layer = LAYER_SETTINGS_DEVICE;
+            display_device_type();
+            break;
         case SETTINGS_MENU_SOUND:
             current_layer = LAYER_SETTINGS_SOUND;
             display_clear();
@@ -275,8 +275,6 @@ void handle_settings_selection() {
             break;
         case SETTINGS_MENU_SYSTEM:
             current_layer = LAYER_SETTINGS_SYSTEM;
-            display_clear();
-            display_in_development_banner();
             break;
     }
 }
@@ -321,7 +319,10 @@ void handle_bluetooth_apps_selection() {
             //display_clear();
             ESP_LOGI(TAG_KEYBOARD, "Entering Bluetooth game");
             in_game = true;
-            ble_game_paring();
+            //Server
+            //ble_game_paring();
+            //Client
+            ble_game_pairing_client();
             break;
     }
 }

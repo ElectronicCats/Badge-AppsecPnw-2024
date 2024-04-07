@@ -17,8 +17,11 @@
 #include "font8x8_basic.h"
 #include "display.h"
 #include "ble_profiles.h"
+#include "ble_client_profiles.h"
 #include "engine.h"
 #include "keyboard.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 
 #define TAG_SCREEN "DISPLAY"
 
@@ -260,7 +263,7 @@ void display_menu() {
 // }
 
 void display_in_development_banner() {
-    display_text(" In development", 0, 3, NO_INVERT);
+    ssd1306_display_text(&dev, 4, "In development", 15, NO_INVERT);
 }
 
 void ble_game_paring() {
@@ -273,12 +276,43 @@ void ble_game_paring() {
     init_ble_task();
 }
 
+void ble_game_pairing_client() {
+    current_game.game_state = PAIRING;
+
+    ssd1306_fadeout(&dev);
+    ssd1306_clear_screen(&dev, false);
+    ssd1306_bitmaps(&dev, 0, 0, epd_bitmap_ble_logo, 16, 16, NO_INVERT);
+    ssd1306_display_text(&dev, 4, "Pairing server...", 17, NO_INVERT);
+    init_ble_client_task();
+
+}
+
 void ble_game_paired() {
     ssd1306_clear_screen(&dev, false);
-    ssd1306_display_text(&dev, 4, "BLE Device", 11, NO_INVERT);
+    ssd1306_display_text(&dev, 4, "BLUE Device", 11, NO_INVERT);
     ssd1306_display_text(&dev, 5, "Paired", 6, NO_INVERT);
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    ssd1306_fadeout(&dev);
+    ssd1306_bitmaps(&dev, 0, 0, epd_bitmap_vs_logo, 128, 64, NO_INVERT);
     display_ble_owasp_profile();
+}
+
+void ble_game_paired_client() {
+    ssd1306_clear_screen(&dev, false);
+    ssd1306_display_text(&dev, 4, "RED Device", 11, NO_INVERT);
+    ssd1306_display_text(&dev, 5, "Paired", 6, NO_INVERT);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    ssd1306_fadeout(&dev);
+    ssd1306_bitmaps(&dev, 0, 0, epd_bitmap_vs_logo, 128, 64, NO_INVERT);
+    display_ble_client_waiting_profile();
+}
+
+
+void ble_game_client_profile_show() {
+    ssd1306_clear_screen(&dev, false);
+    ssd1306_display_text(&dev, 4, "Profile", 7, NO_INVERT);
+    ssd1306_display_text(&dev, 5, "Selection", 10, NO_INVERT);
+
 }
 
 void display_handle_game_state(ButtonType button){
@@ -297,9 +331,16 @@ void display_handle_game_state(ButtonType button){
                     break;
                 case BUTTON_RIGHT: {
                     current_game.profile = getOWASPProfile(selected_option);
-                    uint8_t *command[sizeof(current_game.profile->vuln->cwe)+1];
-                    create_owasp_commmand(&command, current_game.profile);
-                    send_ble_data(&command, sizeof(current_game.profile->vuln->cwe)+1);
+                    // uint8_t *command[sizeof(current_game.profile->vuln->cwe)+1];
+                    // create_owasp_commmand(&command, current_game.profile);
+                    // Create Command:
+                    // 0x01 - Command
+                    // 0x02 - OWASP Index
+                    uint8_t *command[sizeof(2)];
+                    command[0] = 1;
+                    command[1] = selected_option;
+                    ESP_LOGI(TAG_SCREEN, "Selected option: %d", selected_option);
+                    send_ble_data(&command, sizeof(2));
                     display_ble_owasp_profile_attacks();
                     break;
                 }
@@ -361,6 +402,13 @@ void display_ble_owasp_profile() {
     }
 }
 
+void display_ble_client_waiting_profile() {
+    current_game.game_state = PROFILE_SELECTOR;
+    ssd1306_display_text(&dev, 3,"Waiting", 8, NO_INVERT);
+    ssd1306_display_text(&dev, 4,"Profile", 8, NO_INVERT);
+    ssd1306_display_text(&dev, 5,"Selection", 10, NO_INVERT);
+}
+
 void display_ble_owasp_profile_attacks() {
     current_game.game_state = WAITING_ATTACK;
     ssd1306_clear_screen(&dev, false);
@@ -404,4 +452,24 @@ void display_waiting_response() {
     current_game.game_state = WAITING_RESPONSE;
     ssd1306_clear_screen(&dev, false);
     ssd1306_display_text(&dev, 4, "Waiting response", 16, NO_INVERT);
+}
+
+
+void display_device_type() {
+    ssd1306_clear_screen(&dev, false);
+    if (selected_option > 2) {
+        selected_option = 0;
+    }    
+
+    if (selected_option == 0) {
+        ssd1306_display_text(&dev, 2, "RED", 3, INVERT);
+        ssd1306_display_text(&dev, 4, "BLUE", 4, NO_INVERT);
+    }else{
+        ssd1306_display_text(&dev, 2, "RED", 3, NO_INVERT);
+        ssd1306_display_text(&dev, 4, "BLUE", 4, INVERT);
+    }
+}
+
+void handle_device_selection() {
+    display_device_type();
 }

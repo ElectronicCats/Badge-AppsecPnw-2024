@@ -32,6 +32,7 @@ enum MenuLayer {
     LAYER_ABOUT_LEGAL,
     /* Settings items */
     LAYER_SETTINGS_DISPLAY,
+    LAYER_SETTINGS_DEVICE,
     LAYER_SETTINGS_SOUND,
     LAYER_SETTINGS_SYSTEM,
     /* About submenus */
@@ -56,8 +57,10 @@ enum ApplicationsMenuItem {
 
 enum SettingsMenuItem {
     SETTINGS_MENU_DISPLAY = 0,
+    SETTINGS_MENU_DEVICE,
     SETTINGS_MENU_SOUND,
     SETTINGS_MENU_SYSTEM,
+    
 };
 
 enum AboutMenuItem {
@@ -104,9 +107,15 @@ static char* applications_items[] = {
 
 static char* settings_items[] = {
     "Display",
+    "Device",
     "Sound",
     "System",
     NULL,
+};
+
+ static char* settings_system_items[] = {
+    "Team",
+    NULL
 };
 
 static char* about_items[] = {
@@ -123,7 +132,7 @@ static char* version_text[] = {
     "",
     "",
     "",
-    " Minino v1.3.0",
+    " APPSEC v1.0.0",
     "     BETA",
     NULL,
 };
@@ -231,6 +240,7 @@ static char** menu_items[] = {
     legal_text,
     /* Settings items */
     empty_items,  // Display
+    empty_items,  //device
     empty_items,  // Sound
     empty_items,  // System
 };

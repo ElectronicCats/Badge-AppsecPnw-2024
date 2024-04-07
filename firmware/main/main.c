@@ -29,6 +29,7 @@
 #include "engine.h"
 #include "display.h"
 #include "ble_profiles.h"
+#include "ble_client_profiles.h"
 #include "keyboard.h"
 #include "button_helper.h"
 
@@ -40,6 +41,13 @@ struct gatts_profile_inst gatts_profile_tab[DEVICE_PROFILES] = {
     [DEVICE_PROFILE] = {
         .gatts_cb = gatts_profiles_event_handler,
         .gatts_if = ESP_GATT_IF_NONE,
+    }
+};
+
+struct gattc_profile_inst gattc_profile_tab[DEVICE_PROFILES] = {
+    [DEVICE_PROFILE] = {
+        .gattc_cb = gattc_profiles_event_handler,
+        .gattc_if = ESP_GATT_IF_NONE,
     }
 };
 
