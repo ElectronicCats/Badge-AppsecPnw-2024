@@ -336,11 +336,13 @@ void display_handle_game_state(ButtonType button){
                     // Create Command:
                     // 0x01 - Command
                     // 0x02 - OWASP Index
-                    uint8_t *command[sizeof(2)];
+                    uint8_t command[2];
                     command[0] = 1;
                     command[1] = selected_option;
-                    ESP_LOGI(TAG_SCREEN, "Selected option: %d", selected_option);
-                    send_ble_data(&command, sizeof(2));
+                    //command[0] = '1';
+                    //command[1] = selected_option;
+                    ESP_LOGI(TAG_SCREEN, "-Selected option: %d", selected_option);
+                    send_ble_data(&command, sizeof(command));
                     display_ble_owasp_profile_attacks();
                     break;
                 }

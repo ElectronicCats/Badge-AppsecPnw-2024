@@ -261,15 +261,15 @@ void gattc_profiles_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gatt
         esp_log_buffer_char(TAG_BLE, p_data->notify.value, p_data->notify.value_len);
         
         const char *ble_recived = (const char *)p_data->notify.value;
-        int ble_command = ble_recived[0] - '0';
+        int ble_command = ble_recived[0];
+        int command_value = ble_recived[1];
         
         ESP_LOGI(TAG_BLE, "notify value %s", ble_recived);
         ESP_LOGI(TAG_BLE, "command value %d", ble_command);
+        ESP_LOGI(TAG_BLE, "value %d", command_value);
 
         if (ble_command == 1) {
             ESP_LOGI(TAG_BLE, "OWASP Profile");
-            int owasp_profile = ble_recived[1] - '0';
-            ESP_LOGI(TAG_BLE, "OWASP Profile %d", owasp_profile);
         }else if (ble_command == 2) {
             ESP_LOGI(TAG_BLE, "OWASP Attack");
             // Response the command attack
