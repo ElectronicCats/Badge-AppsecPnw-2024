@@ -6,8 +6,8 @@
 	(paper "A4")
 	(title_block
 		(title "ApsecPnw-2024")
-		(date "2024-04-01")
-		(rev "v1.0")
+		(date "2024-04-10")
+		(rev "v2.0")
 		(company "Electronic Cats")
 	)
 	(lib_symbols
@@ -7572,7 +7572,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC#" "C191782"
+		(property "LCSC#" "C311919"
 			(at 267.208 45.72 0)
 			(effects
 				(font
@@ -8662,7 +8662,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC#" "C191782"
+		(property "LCSC#" "C311919"
 			(at 267.208 48.26 0)
 			(effects
 				(font
