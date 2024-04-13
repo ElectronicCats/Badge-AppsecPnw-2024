@@ -88,7 +88,7 @@ outputs:
           name: Proveedor
         - field: manf#
           name: manf#
- 
+
   - name: 'position'
     comment: "Pick and place file"
     type: position
@@ -104,17 +104,17 @@ outputs:
     type: step
     dir: .
     options:
-      no_virtual: false 
+      no_virtual: false
       origin: grid
       output: '%f_step.%x'
       metric_units: true
-  
+
   - name: general
     comment: General files
     type: compress
-    options: 
+    options:
       format: ZIP
-      files: 
+      files:
         - from_output: print_front
           dest: /
         - from_output: print_bottom
@@ -130,9 +130,9 @@ outputs:
   - name: iBom
     comment: iBom file
     type: compress
-    options: 
+    options:
       format: ZIP
-      files: 
+      files:
         - from_output: interactive_bom
           dest: /
       output: 'iBom.%x'
@@ -140,9 +140,9 @@ outputs:
   - name: PDFSchematic
     comment: Schematic file
     type: compress
-    options: 
+    options:
       format: ZIP
-      files: 
+      files:
         - from_output: print_sch
           dest: /
       output: 'Schematic.%x'
@@ -150,9 +150,9 @@ outputs:
   - name: csv
     comment: csv file
     type: compress
-    options: 
+    options:
       format: ZIP
-      files: 
+      files:
         - from_output: bom_csv
           dest: /
       output: 'Bom_csv.%x'
