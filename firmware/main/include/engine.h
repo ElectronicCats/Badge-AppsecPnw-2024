@@ -1,13 +1,14 @@
+#include <stdint.h>
 #ifndef ENGINE_H
-#define ENGINE_H
-#define USERNAME_LENGTH 8
+  #define ENGINE_H
+  #define USERNAME_LENGTH 8
 
-#define GAME_RED_TEAM            0
-#define GAME_BLUE_TEAM           1
-#define GAME_DEFAULT_LIFE_POINTS 25
+  #define GAME_RED_TEAM            0
+  #define GAME_BLUE_TEAM           1
+  #define GAME_DEFAULT_LIFE_POINTS 25
 
-#define OWASP_IDENTIFIER_LENGTH 8
-#define OWASP_NAME_MAX_LENGTH   50
+  #define OWASP_IDENTIFIER_LENGTH 8
+  #define OWASP_NAME_MAX_LENGTH   50
 
 typedef enum { RED, BLUE } TeamColor;
 typedef struct {
@@ -59,6 +60,7 @@ typedef struct {
   OWASPProfile* opponent_profile;
   int attacker_action;
   int opponent_action;
+  TeamColor team;
 } GameInformation;
 
 extern OWASPProfile OWASPA01;

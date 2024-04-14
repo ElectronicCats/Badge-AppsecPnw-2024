@@ -351,3 +351,14 @@ void handle_thread_apps_selection() {
       break;
   }
 }
+
+void reset_keyboard_state() {
+  ESP_LOGI(TAG_KEYBOARD, "Resetting keyboard state");
+  keyboard_state.in_app = false;
+  keyboard_state.app_handler = NULL;
+  in_game = false;
+  current_layer = LAYER_MAIN_MENU;
+  previous_layer = LAYER_MAIN_MENU;
+  selected_option = 0;
+  handle_selected_option();
+}

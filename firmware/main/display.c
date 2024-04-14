@@ -47,6 +47,10 @@ void display_init(void) {
 
   // wifi_sniffer_register_cb(display_wifi_sniffer);
   // bluetooth_scanner_register_cb(display_bluetooth_scanner);
+
+  current_game.attacker.life_points = 20;
+  current_game.opponent.life_points = 20;
+
   ssd1306_bitmaps(&dev, 0, 0, epd_bitmap_owasp_logo, 128, 64, NO_INVERT);
 }
 
@@ -394,6 +398,7 @@ void display_handle_game_state(ButtonType button) {
           display_ble_owasp_profile_attacks();
           break;
         case BUTTON_LEFT:
+          display_ble_owasp_profile();
           break;
         case BUTTON_RIGHT:
           display_ble_sending_attack();
@@ -419,9 +424,11 @@ void display_handle_game_state(ButtonType button) {
           if (selected_option == 0) {
             // BLUE TEAM
             ble_game_pairing_client();
+            current_game.team = BLUE;
           } else {
             // RED TEAM
             ble_game_paring();
+            current_game.team = RED;
           }
           break;
         case BUTTON_BOOT:
@@ -474,15 +481,19 @@ void display_handle_game_state(ButtonType button) {
           if (current_game.attacker_action == current_game.opponent_action) {
             display_clear();
             command[1] = BLUE;
-            display_winner_round(BLUE);
-            current_game.attacker.life_points -= 10;
             send_ble_client_data(&command, 2);
+            display_winner_round(BLUE);
+
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            display_points_life(BLUE);
           } else {
             display_clear();
             command[1] = RED;
-            display_winner_round(RED);
-            current_game.opponent.life_points -= 10;
             send_ble_client_data(&command, 2);
+            display_winner_round(RED);
+
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
+            display_points_life(RED);
           }
 
           vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -592,7 +603,7 @@ void display_ble_owasp_profile_attacks(void) {
            current_game.attacker_profile->vuln->name);
   ssd1306_display_text(&dev, 1, "Select attack", 13, NO_INVERT);
 
-  if (selected_option > 2) {
+  if (selected_option > 1) {
     selected_option = 0;
   }
 
@@ -671,7 +682,7 @@ void display_blue_team_logo(void) {
 }
 void display_red_team_logo(void) {
   ssd1306_bitmaps(&dev, 48, 16, epd_bitmap_red_team_logo, 32, 32, NO_INVERT);
-  ssd1306_display_text(&dev, 6, "    RED  TEAM   ", 16, INVERT);
+  ssd1306_display_text(&dev, 6, "     RED TEAM   ", 16, INVERT);
 }
 
 void display_blue_team_selection(void) {
@@ -688,13 +699,50 @@ void display_read_team_selection(void) {
 
 void display_winner_round(TeamColor team_color) {
   display_clear();
+
   if (team_color == RED) {
     display_red_team_logo();
-    ssd1306_display_text(&dev, 7, "     PWNED   ", 16, NO_INVERT);
+    ssd1306_display_text(&dev, 7, "      PWNED   ", 16, NO_INVERT);
+    current_game.opponent.life_points -= 10;
+    if (current_game.opponent.life_points <= 0) {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      display_winner_game(RED);
+    }
   } else {
     display_blue_team_logo();
     ssd1306_display_text(&dev, 7, "     DEFENDED   ", 16, NO_INVERT);
+    current_game.attacker.life_points -= 10;
+    if (current_game.attacker.life_points <= 0) {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      display_winner_game(BLUE);
+    }
   }
+}
+
+void display_winner_game(TeamColor team_color) {
+  display_clear();
+
+  if (team_color == RED) {
+    display_red_team_logo();
+  } else {
+    display_blue_team_logo();
+  }
+  ssd1306_display_text(&dev, 7, "     WINNER", 16, NO_INVERT);
+  vTaskDelay(2000 / portTICK_PERIOD_MS);
+  ssd1306_fadeout(&dev);
+
+  // if (current_game.team == RED) {
+  //   stop_ble_task();
+  // }else {
+  //   stop_ble_client_task();
+  // }
+
+  // current_layer = LAYER_MAIN_MENU;
+  // reset_keyboard_state();
+
+  // current_game.game_state = GAME_OVER;
+  // vTaskDelay(4000 / portTICK_PERIOD_MS);
+  esp_restart();
 }
 
 void display_device_game_selection(void) {
@@ -738,4 +786,25 @@ void update_attacker_action(int action) {
 
 void update_opponent_action(int response) {
   current_game.opponent_action = response;
+}
+
+void display_points_life(TeamColor team_color) {
+  ssd1306_clear_screen(&dev, false);
+  if (team_color == RED) {
+    ssd1306_display_text(&dev, 0, "BLUE TEAM", 9, NO_INVERT);
+    ssd1306_display_text(&dev, 1, "Point Life", 10, NO_INVERT);
+    char* life_points = (char*) malloc(2);
+    sprintf(life_points, "%d", current_game.opponent.life_points);
+
+    ssd1306_display_text_x3(&dev, 4, life_points, 2, NO_INVERT);
+    free(life_points);
+  } else {
+    ssd1306_display_text(&dev, 0, "RED TEAM", 9, NO_INVERT);
+    ssd1306_display_text(&dev, 1, "Point Life", 10, NO_INVERT);
+    char* life_points = (char*) malloc(2);
+    sprintf(life_points, "%d", current_game.attacker.life_points);
+
+    ssd1306_display_text_x3(&dev, 4, life_points, 2, NO_INVERT);
+    free(life_points);
+  }
 }

@@ -370,6 +370,8 @@ void gatts_profiles_event_handler(esp_gatts_cb_event_t event,
         if (ble_command == ACTION_RESPONSE) {
           display_winner_round(command_value);
           vTaskDelay(2000 / portTICK_PERIOD_MS);
+          display_points_life(command_value);
+          vTaskDelay(2000 / portTICK_PERIOD_MS);
           display_ble_owasp_profile();
         }
 
@@ -665,6 +667,7 @@ void init_ble_task(void) {
 
 void stop_ble_task(void) {
   ble_running_service = false;
+  ESP_LOGI(TAG_BLE, "Stopping BLE task");
   esp_bluedroid_disable();
   esp_bluedroid_deinit();
   esp_bt_controller_disable();

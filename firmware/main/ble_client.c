@@ -603,3 +603,11 @@ void init_ble_client_task(void) {
              local_mtu_ret);
   }
 }
+
+void stop_ble_client_task(void) {
+  ESP_LOGI(TAG_BLE_CLIENT, "stop_ble_client_task");
+  esp_bluedroid_disable();
+  esp_bluedroid_deinit();
+  esp_bt_controller_disable();
+  esp_bt_controller_deinit();
+}

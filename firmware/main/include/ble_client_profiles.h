@@ -1,5 +1,3 @@
-#ifndef BLE_CLIENT_PROFILES_H
-#define BLE_CLIENT_PROFILES_H
 #include "engine.h"
 #include "esp_bt.h"
 #include "esp_bt_defs.h"
@@ -8,16 +6,18 @@
 #include "esp_gatt_common_api.h"
 #include "esp_gattc_api.h"
 #include "esp_gatts_api.h"
+#ifndef BLE_CLIENT_PROFILES_H
+  #define BLE_CLIENT_PROFILES_H
 
-#define TAG_BLE_CLIENT "EC_APPSECPWN_BLE_CLIENT"
+  #define TAG_BLE_CLIENT "EC_APPSECPWN_BLE_CLIENT"
 
-#define REMOTE_BOARD_ID "EC_APPSECPWN_RED"
-// GATT Client
-#define REMOTE_SERVICE_USERNAME_UUID 0x00FF
-#define REMOTE_NOTIFY_CHAR_UUID      0xFF01
-#define DEVICE_PROFILE               0
-#define INVALID_HANDLE               0
-#define DEVICE_PROFILES              1
+  #define REMOTE_BOARD_ID "EC_APPSECPWN_RED"
+  // GATT Client
+  #define REMOTE_SERVICE_USERNAME_UUID 0x00FF
+  #define REMOTE_NOTIFY_CHAR_UUID      0xFF01
+  #define DEVICE_PROFILE               0
+  #define INVALID_HANDLE               0
+  #define DEVICE_PROFILES              1
 
 struct gattc_profile_inst {
   esp_gattc_cb_t gattc_cb;
@@ -53,4 +53,5 @@ extern void gattc_profiles_event_handler(esp_gattc_cb_event_t event,
                                          esp_ble_gattc_cb_param_t* param);
 
 void init_ble_client_task(void);
+void stop_ble_client_task(void);
 #endif  // BLE_CLIENT_PROFILES_H

@@ -1,7 +1,8 @@
+#include "esp_err.h"
 #ifndef MEMORY_H
-#define MEMORY_H
+  #define MEMORY_H
 
-#define STORAGE_NAMESPACE "storage"
+  #define STORAGE_NAMESPACE "storage"
 
 /**
  * @brief Initialize the non-volatile storage (NVS) partition

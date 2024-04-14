@@ -48,4 +48,5 @@ void handle_wifi_apps_selection();
 void handle_bluetooth_apps_selection();
 void handle_thread_apps_selection();
 void handle_keyboard_events(ButtonType button);
+void reset_keyboard_state();
 #endif  // KEYBOARD_H
