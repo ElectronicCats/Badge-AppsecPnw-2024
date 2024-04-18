@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "drivers/memory_driver.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,12 +7,12 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 
-#define TAG_NVS "EC_APPSECPWN_NVS"
+#define TAG_NVS "MEMORY_DRIVER"
 
 esp_err_t return_err;
 nvs_handle_t nvs_handler;
 
-void init_nvs() {
+void memory_driver_begin() {
   // Initialize NVS
   return_err = nvs_flash_init();
   if (return_err == ESP_ERR_NVS_NO_FREE_PAGES ||
@@ -25,20 +25,20 @@ void init_nvs() {
   ESP_LOGI(TAG_NVS, "Opening Non-Volatile Storage (NVS) handle...");
 }
 
-esp_err_t open_nvs() {
+esp_err_t memory_driver_open_nvs() {
   // Open
   return_err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &nvs_handler);
   return return_err;
 }
 
-void close_nvs() {
+void memory_driver_close_nvs() {
   nvs_close(nvs_handler);
   ESP_LOGI(TAG_NVS, "NVS handle closed...");
 }
 
-esp_err_t write_int32_nvs(int32_t* value) {
+esp_err_t memory_driver_write_int32_nvs(int32_t* value) {
   // ESP_LOGI(TAG_NVS, "Setting %s to %d", key, value);
-  return_err = open_nvs();
+  return_err = memory_driver_open_nvs();
   if (return_err != ESP_OK) {
     ESP_LOGE(TAG_NVS, "Error opening NVS handle...");
     return return_err;
@@ -54,12 +54,12 @@ esp_err_t write_int32_nvs(int32_t* value) {
   }
 
   // ESP_LOGI(TAG_NVS, "Write %"PRIu32 "\n", value);
-  close_nvs();
+  memory_driver_close_nvs();
   return return_err;
 }
 
-esp_err_t read_int32_nvs(int32_t* buffer_int32) {
-  return_err = open_nvs();
+esp_err_t memory_driver_read_int32_nvs(int32_t* buffer_int32) {
+  return_err = memory_driver_open_nvs();
   if (return_err != ESP_OK) {
     ESP_LOGE(TAG_NVS, "Error opening NVS handle...");
     return return_err;
@@ -69,6 +69,6 @@ esp_err_t read_int32_nvs(int32_t* buffer_int32) {
   if (return_err != ESP_OK) {
     ESP_LOGE(TAG_NVS, "Error (%s) reading!", esp_err_to_name(return_err));
   }
-  close_nvs();
+  memory_driver_close_nvs();
   return return_err;
 }

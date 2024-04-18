@@ -1,10 +1,8 @@
 #include <stddef.h>
-#ifndef DISPLAY_HELPER_H
-  #define DISPLAY_HELPER_H
+#ifndef SCREENS_MODULE_H
+  #define SCREENS_MODULE_H
 
-  #define SCROLLING_TEXT "scrollable"
-
-enum MenuLayer {
+enum menu_layer_t {
   LAYER_MAIN_MENU = 0,
   LAYER_APPLICATIONS,
   LAYER_SETTINGS,
@@ -39,15 +37,15 @@ enum MenuLayer {
   /* About submenus */
 };
 
-typedef enum MenuLayer Layer;
+typedef enum menu_layer_t screen_module_layer_t;
 
-enum MainMenuItem {
+enum menu_layer_main_items_t {
   MAIN_MENU_APPLICATIONS = 0,
   MAIN_MENU_SETTINGS,
   MAIN_MENU_ABOUT,
 };
 
-enum ApplicationsMenuItem {
+enum menu_layer_applications_items_t {
   APPLICATIONS_MENU_WIFI = 0,
   APPLICATIONS_MENU_BLUETOOTH,
   APPLICATIONS_MENU_ZIGBEE,
@@ -56,7 +54,7 @@ enum ApplicationsMenuItem {
   APPLICATIONS_MENU_GPS,
 };
 
-enum SettingsMenuItem {
+enum menu_layer_settings_items_t {
   SETTINGS_MENU_DISPLAY = 0,
   SETTINGS_MENU_DEVICE,
   SETTINGS_MENU_SOUND,
@@ -64,27 +62,27 @@ enum SettingsMenuItem {
 
 };
 
-enum AboutMenuItem {
+enum menu_layer_about_items_t {
   ABOUT_MENU_VERSION = 0,
   ABOUT_MENU_LICENSE,
   ABOUT_MENU_CREDITS,
   ABOUT_MENU_LEGAL,
 };
 
-enum WifiMenuItem {
+enum menu_layer_wifi_items_t {
   WIFI_MENU_ANALIZER = 0,
 };
 
-enum BluetoothMenuItem {
+enum menu_layer_bluetooth_items_t {
   BLUETOOTH_MENU_AIRTAGS_SCAN = 0,
   BLUETOOTH_MENU_GAME,
 };
 
-enum ThreadMenuItem {
+enum menu_layer_zigbee_items_t {
   THREAD_MENU_CLI = 0,
 };
 
-enum GpsMenuItem {
+enum menu_layer_thread_items_t {
   GPS_MENU_DATE_TIME = 0,
   GPS_MENU_LOCATION,
 };
@@ -111,57 +109,23 @@ static char* about_items[] = {
 };
 
 static char* version_text[] = {
-    SCROLLING_TEXT,
-    /***************/
-    "",
-    "",
-    "",
-    " APPSEC v1.0.0",
-    "     BETA",
-    NULL,
+    "", "", "", " APPSEC v1.0.0", "     BETA", NULL,
 };
 
 static char* license_text[] = {
-    SCROLLING_TEXT,
-    /***************/
-    "",
-    "",
-    "",
-    "  GNU GPL 3.0",
-    NULL,
+    "", "", "", "  GNU GPL 3.0", NULL,
 };
 
 static char* credits_text[] = {
-    SCROLLING_TEXT,
-    /***************/
-    "Developed by",
-    "Electronic Cats",
-    "",
-    "This product is",
-    "in a BETA stage",
-    "use at your own",
-    NULL,
+    "Developed by",    "Electronic Cats", "",   "This product is",
+    "in a BETA stage", "use at your own", NULL,
 };
 
 static char* legal_text[] = {
-    SCROLLING_TEXT,
-    /***************/
-    "The user",
-    "assumes all",
-    "responsibility",
-    "for the use of",
-    "MININO and",
-    "agrees to use",
-    "it legally and",
-    "ethically,",
-    "avoiding any",
-    "activities that",
-    "may cause harm,",
-    "interference,",
-    "or unauthorized",
-    "access to",
-    "systems or data.",
-    NULL,
+    "The user",        "assumes all",     "responsibility",   "for the use of",
+    "APPSEC and",      "agrees to use",   "it legally and",   "ethically,",
+    "avoiding any",    "activities that", "may cause harm,",  "interference,",
+    "or unauthorized", "access to",       "systems or data.", NULL,
 };
 
 static char* wifi_items[] = {
@@ -221,5 +185,4 @@ static char** menu_items[] = {
     empty_items,  // Sound
     empty_items,  // System
 };
-
-#endif  // DISPLAY_HELPER_H
+#endif  // SCREENS_MODULE_H

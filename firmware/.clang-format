@@ -12,5 +12,5 @@ UseTab: Never
 AlignTrailingComments: true
 #  #define SHORT_NAME       42
 #  #define LONGER_NAME      0x007f   # does nice spacing for macros
-AlignConsecutiveMacros: Consecutive
+AlignConsecutiveMacros: true
 IndentPPDirectives: BeforeHash

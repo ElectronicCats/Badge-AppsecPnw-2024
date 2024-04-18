@@ -1,47 +1,30 @@
-#include "ble_profiles.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "display.h"
-#include "engine.h"
+
+#include "modules/ble_server_module.h"
 #include "esp_bt.h"
-#include "esp_bt_defs.h"
-#include "esp_bt_main.h"
-#include "esp_err.h"
-#include "esp_gap_ble_api.h"
-#include "esp_gatt_common_api.h"
-#include "esp_gatts_api.h"
 #include "esp_log.h"
-#include "esp_system.h"
-#include "esp_vfs_eventfd.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "nvs_flash.h"
+#include "inttypes.h"
+#include "modules/game_engine_module.h"
+
+struct gatts_profile_inst ble_server_gatt_profile_tab[DEVICE_PROFILES] = {
+    [DEVICE_PROFILE] = {
+        .gatts_cb = ble_server_gatt_profiles_event_handler,
+        .gatts_if = ESP_GATT_IF_NONE,
+    }};
 
 static uint8_t adv_config_done = 0;
 static uint8_t test_manufacturer[BOARD_MANUFACTURER_DATA_LEN] = {0x12, 0x23,
                                                                  0x45, 0x56};
-static uint8_t char1_str[] = {0x11, 0x22, 0x33};
+static uint8_t char_value[] = {0x61, 0x70, 0x70, 0x73, 0x65, 0x63};
 static esp_gatt_char_prop_t username_property = 0;
 static prepare_type_env_t a_prepare_write_env;
 
-bool ble_running_service = false;
-
-static esp_attr_value_t gatts_demo_char1_val = {
+static esp_attr_value_t ble_server_gatt_char_val = {
     .attr_max_len = GATTS_DEVICE_CHAR_VAL_LEN_MAX,
-    .attr_len = sizeof(char1_str),
-    .attr_value = char1_str,
+    .attr_len = sizeof(char_value),
+    .attr_value = char_value,
 };
 
-PlayerInformation red_player_information = {
-    .username = "RED0000",
-    .life_points = GAME_DEFAULT_LIFE_POINTS,
-    .team = RED};
-
-static uint8_t adv_service_uuid128[32] = {
-    /* LSB
-       <-------------------------------------------------------------------------------->
-       MSB */
+static uint8_t ble_server_adv_service_uuid128[32] = {
     // first uuid, 16bit, [12],[13] is the value
     0xfb,
     0x34,
@@ -77,8 +60,9 @@ static uint8_t adv_service_uuid128[32] = {
     0x00,
     0x00,
 };
+
 // ADV Data
-static esp_ble_adv_data_t adv_data = {
+static esp_ble_adv_data_t ble_server_adv_data = {
     .set_scan_rsp = false,
     .include_name = true,
     .include_txpower = true,
@@ -87,19 +71,17 @@ static esp_ble_adv_data_t adv_data = {
     .max_interval = 0x0010,  // slave connection max interval, Time =
                              // max_interval * 1.25 msec
     .appearance = 0x00,
-    .manufacturer_len =
-        0,  // BOARD_MANUFACTURER_DATA_LEN, //TEST_MANUFACTURER_DATA_LEN,
-    .p_manufacturer_data =
-        NULL,  //&test_manufacturer[0], //&test_manufacturer[0],
+    .manufacturer_len = 0,
+    .p_manufacturer_data = NULL,
     .service_data_len = 0,
     .p_service_data = NULL,
-    .service_uuid_len = sizeof(adv_service_uuid128),
-    .p_service_uuid = adv_service_uuid128,
+    .service_uuid_len = sizeof(ble_server_adv_service_uuid128),
+    .p_service_uuid = ble_server_adv_service_uuid128,
     .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
 };
 
 // Scan response data
-static esp_ble_adv_data_t scan_rsp_data = {
+static esp_ble_adv_data_t ble_server_scan_rsp_data = {
     .set_scan_rsp = true,
     .include_name = true,
     .include_txpower = true,
@@ -109,12 +91,12 @@ static esp_ble_adv_data_t scan_rsp_data = {
     .p_manufacturer_data = &test_manufacturer[0],  //&test_manufacturer[0],
     .service_data_len = 0,
     .p_service_data = NULL,
-    .service_uuid_len = sizeof(adv_service_uuid128),
-    .p_service_uuid = adv_service_uuid128,
+    .service_uuid_len = sizeof(ble_server_adv_service_uuid128),
+    .p_service_uuid = ble_server_adv_service_uuid128,
     .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
 };
 
-static esp_ble_adv_params_t adv_params = {
+static esp_ble_adv_params_t ble_server_adv_params = {
     .adv_int_min = 0x20,
     .adv_int_max = 0x40,
     .adv_type = ADV_TYPE_IND,
@@ -125,74 +107,47 @@ static esp_ble_adv_params_t adv_params = {
     .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
 };
 
-void get_player_array(esp_gatt_rsp_t* response_information,
-                      PlayerInformation player) {
-  for (int i = 0; i < sizeof(player.username); i++) {
-    response_information->attr_value.value[i] = player.username[i];
-  }
-}
-
-void get_profile_owasp_array(esp_gatt_rsp_t* response_information,
-                             OWASPProfile* profile) {
-  for (int i = 0; i < sizeof(profile->vuln->cwe); i++) {
-    response_information->attr_value.value[i] = profile->vuln->cwe[i];
-  }
-}
-
-void get_profile_owasp_uint8(uint8_t* response_information,
-                             OWASPProfile* profile) {
-  for (int i = 0; i < sizeof(profile->vuln->cwe); i++) {
-    response_information[i] = profile->vuln->cwe[i];
-  }
-}
-
-void get_player_array_uint8(uint8_t* response_information,
-                            PlayerInformation player) {
-  for (int i = 0; i < sizeof(player.username); i++) {
-    response_information[i] = player.username[i];
-  }
-}
-
-void send_ble_data(uint8_t* data, int length) {
-  esp_ble_gatts_send_indicate(gatts_profile_tab[DEVICE_PROFILE].gatts_if,
-                              gatts_profile_tab[DEVICE_PROFILE].conn_id,
-                              gatts_profile_tab[DEVICE_PROFILE].char_handle,
-                              length, data, true);
+void ble_server_send_data(uint8_t* data, int length) {
+  esp_ble_gatts_send_indicate(
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].gatts_if,
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].conn_id,
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].char_handle, length, data,
+      true);
 }
 
 // ADV Event Handler
-static void gap_event_handler(esp_gap_ble_cb_event_t event,
-                              esp_ble_gap_cb_param_t* param) {
+static void ble_server_gap_event_handler(esp_gap_ble_cb_event_t event,
+                                         esp_ble_gap_cb_param_t* param) {
   switch (event) {
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
       adv_config_done &= (~adv_config_flag);
       if (adv_config_done == 0) {
-        esp_ble_gap_start_advertising(&adv_params);
+        esp_ble_gap_start_advertising(&ble_server_adv_params);
       }
       break;
     case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
       adv_config_done &= (~scan_rsp_config_flag);
       if (adv_config_done == 0) {
-        esp_ble_gap_start_advertising(&adv_params);
+        esp_ble_gap_start_advertising(&ble_server_adv_params);
       }
       break;
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
       // advertising start complete event to indicate advertising start
       // successfully or failed
       if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
-        ESP_LOGE(TAG_BLE, "Advertising start failed\n");
+        ESP_LOGE(TAG_BLE_SERVER_MODULE, "Advertising start failed\n");
       }
       break;
     case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
       if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS) {
-        ESP_LOGE(TAG_BLE, "Advertising stop failed\n");
+        ESP_LOGE(TAG_BLE_SERVER_MODULE, "Advertising stop failed\n");
       } else {
-        ESP_LOGI(TAG_BLE, "Stop ADV successfully\n");
+        ESP_LOGI(TAG_BLE_SERVER_MODULE, "Stop ADV successfully\n");
       }
       break;
     case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
       ESP_LOGI(
-          TAG_BLE,
+          TAG_BLE_SERVER_MODULE,
           "update connection params status = %d, min_int = %d, max_int = "
           "%d,conn_int = %d,latency = %d, timeout = %d",
           param->update_conn_params.status, param->update_conn_params.min_int,
@@ -204,19 +159,20 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event,
   }
 }
 
-void board_write_event(esp_gatt_if_t gatts_if,
-                       prepare_type_env_t* prepare_write_env,
-                       esp_ble_gatts_cb_param_t* param) {
+void ble_server_write_event(esp_gatt_if_t gatts_if,
+                            prepare_type_env_t* prepare_write_env,
+                            esp_ble_gatts_cb_param_t* param) {
   esp_gatt_status_t status = ESP_GATT_OK;
   if (param->write.need_rsp) {
     if (param->write.is_prep) {
       if (param->write.offset > PREPARE_BUF_MAX_SIZE) {
-        ESP_LOGW(TAG_BLE, "invalid prepare write, offset = %d, value len = %d",
+        ESP_LOGW(TAG_BLE_SERVER_MODULE,
+                 "invalid prepare write, offset = %d, value len = %d",
                  param->write.offset, param->write.len);
         status = ESP_GATT_INVALID_OFFSET;
       } else if ((param->write.offset + param->write.len) >
                  PREPARE_BUF_MAX_SIZE) {
-        ESP_LOGW(TAG_BLE,
+        ESP_LOGW(TAG_BLE_SERVER_MODULE,
                  "invalid prepare write, invalid length, offset = %d, value "
                  "len = %d",
                  param->write.offset, param->write.len);
@@ -229,7 +185,7 @@ void board_write_event(esp_gatt_if_t gatts_if,
         prepare_write_env->prepare_len = 0;
 
         if (prepare_write_env->prepare_buf == NULL) {
-          ESP_LOGE(TAG_BLE, "Gatt_server prep no mem");
+          ESP_LOGE(TAG_BLE_SERVER_MODULE, "Gatt_server prep no mem");
           status = ESP_GATT_NO_RESOURCES;
         }
       }
@@ -248,11 +204,12 @@ void board_write_event(esp_gatt_if_t gatts_if,
             gatts_if, param->write.conn_id, param->write.trans_id, status,
             gatt_rsp);
         if (response_err != ESP_OK) {
-          ESP_LOGE(TAG_BLE, "Send response error");
+          ESP_LOGE(TAG_BLE_SERVER_MODULE, "Send response error");
         }
         free(gatt_rsp);
       } else {
-        ESP_LOGE(TAG_BLE, "Gatt_server malloc failled, no resources");
+        ESP_LOGE(TAG_BLE_SERVER_MODULE,
+                 "Gatt_server malloc failled, no resources");
         status = ESP_GATT_NO_RESOURCES;
       }
 
@@ -265,21 +222,22 @@ void board_write_event(esp_gatt_if_t gatts_if,
       prepare_write_env->prepare_len += param->write.len;
 
     } else {
-      ESP_LOGI(TAG_BLE, "board_write_event, Not prep");
+      ESP_LOGI(TAG_BLE_SERVER_MODULE, "ble_server_write_event, Not prep");
       esp_ble_gatts_send_response(gatts_if, param->write.conn_id,
                                   param->write.trans_id, status, NULL);
     }
   }
 }
 
-void board_exce_write_event(prepare_type_env_t* prepare_write_env,
-                            esp_ble_gatts_cb_param_t* param) {
+void ble_server_exce_write_event(prepare_type_env_t* prepare_write_env,
+                                 esp_ble_gatts_cb_param_t* param) {
   if (param->exec_write.exec_write_flag == ESP_GATT_PREP_WRITE_EXEC) {
-    esp_log_buffer_hex(TAG_BLE, prepare_write_env->prepare_buf,
+    esp_log_buffer_hex(TAG_BLE_SERVER_MODULE, prepare_write_env->prepare_buf,
                        prepare_write_env->prepare_len);
-    esp_log_buffer_char(TAG_BLE, param->write.value, param->write.len);
+    esp_log_buffer_char(TAG_BLE_SERVER_MODULE, param->write.value,
+                        param->write.len);
   } else {
-    ESP_LOGI(TAG_BLE, "ESP_GATT_PREP_WRITE_CANCEL");
+    ESP_LOGI(TAG_BLE_SERVER_MODULE, "ESP_GATT_PREP_WRITE_CANCEL");
   }
 
   // Clean up prepare buffer
@@ -291,113 +249,83 @@ void board_exce_write_event(prepare_type_env_t* prepare_write_env,
   prepare_write_env->prepare_len = 0;
 }
 
-void gatts_profiles_event_handler(esp_gatts_cb_event_t event,
-                                  esp_gatt_if_t gatts_if,
-                                  esp_ble_gatts_cb_param_t* param) {
+void ble_server_gatt_profiles_event_handler(esp_gatts_cb_event_t event,
+                                            esp_gatt_if_t gatts_if,
+                                            esp_ble_gatts_cb_param_t* param) {
   switch (event) {
     case ESP_GATTS_REG_EVT:
-      ESP_LOGI(TAG_BLE, "REGISTER_APP_EVT, status %d, app_id %d\n",
-               param->reg.status, param->reg.app_id);
-      gatts_profile_tab[DEVICE_PROFILE].service_id.is_primary = true;
-      gatts_profile_tab[DEVICE_PROFILE].service_id.id.inst_id = 0x00;
-      gatts_profile_tab[DEVICE_PROFILE].service_id.id.uuid.len =
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
+               "REGISTER_APP_EVT, status %d, app_id %d\n", param->reg.status,
+               param->reg.app_id);
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].service_id.is_primary = true;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].service_id.id.inst_id = 0x00;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].service_id.id.uuid.len =
           ESP_UUID_LEN_16;
-      gatts_profile_tab[DEVICE_PROFILE].service_id.id.uuid.uuid.uuid16 =
-          GATTS_SERVICE_UUID_USERNAME;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE]
+          .service_id.id.uuid.uuid.uuid16 = GATTS_SERVICE_UUID_USERNAME;
 
       esp_err_t set_device_name =
           esp_ble_gap_set_device_name(BOARD_RED_DEVICE_NAME);
       if (set_device_name) {
-        ESP_LOGE(TAG_BLE, "Set device name failed, error code = %x",
-                 set_device_name);
+        ESP_LOGE(TAG_BLE_SERVER_MODULE,
+                 "Set device name failed, error code = %x", set_device_name);
       }
 
       // Configure ADV data
-      esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
+      esp_err_t ret = esp_ble_gap_config_adv_data(&ble_server_adv_data);
       if (ret) {
-        ESP_LOGE(TAG_BLE, "Config ADV failed, error code: %x", ret);
+        ESP_LOGE(TAG_BLE_SERVER_MODULE, "Config ADV failed, error code: %x",
+                 ret);
       }
 
       adv_config_done |= adv_config_flag;
       // Config scan response data
-      ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
+      ret = esp_ble_gap_config_adv_data(&ble_server_scan_rsp_data);
       if (ret) {
-        ESP_LOGE(TAG_BLE, "Config scan response data failed, error code: %x",
-                 ret);
+        ESP_LOGE(TAG_BLE_SERVER_MODULE,
+                 "Config scan response data failed, error code: %x", ret);
       }
 
       adv_config_done |= scan_rsp_config_flag;
 
       esp_ble_gatts_create_service(
-          gatts_if, &gatts_profile_tab[DEVICE_PROFILE].service_id,
+          gatts_if, &ble_server_gatt_profile_tab[DEVICE_PROFILE].service_id,
           GATTS_NUM_HANDLE_USERNAME);
       break;
     case ESP_GATTS_READ_EVT: {
-      ESP_LOGI(TAG_BLE,
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
                "GATT_READ_EVT, conn_id %d, trans_id %" PRIu32 ", handle %d",
                param->read.conn_id, param->read.trans_id, param->read.handle);
-      esp_gatt_rsp_t response;
-      memset(&response, 0, sizeof(esp_gatt_rsp_t));
-      response.attr_value.handle = param->read.handle;
-      response.attr_value.len = USERNAME_LENGTH;
-
-      get_player_array(&response, red_player_information);
-
-      // response.attr_value.value = player_array_username;
-      esp_ble_gatts_send_response(gatts_if, param->read.conn_id,
-                                  param->read.trans_id, ESP_GATT_OK, &response);
-
       break;
     }
     case ESP_GATTS_WRITE_EVT: {
-      ESP_LOGI(TAG_BLE,
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
                "GATT_WRITE_EVT, conn_id %d, trans_id %" PRIu32 ", handle %d",
                param->write.conn_id, param->write.trans_id,
                param->write.handle);
       if (!param->write.is_prep) {
-        ESP_LOGI(TAG_BLE,
+        ESP_LOGI(TAG_BLE_SERVER_MODULE,
                  "GATT_WRITE_EVT, value len %d, value :", param->write.len);
-        esp_log_buffer_hex(TAG_BLE, param->write.value, param->write.len);
-        esp_log_buffer_char(TAG_BLE, param->write.value, param->write.len);
-        const char* ble_recived = (const char*) param->write.value;
-        int ble_command = ble_recived[0];
-        int command_value = ble_recived[1];
+        esp_log_buffer_hex(TAG_BLE_SERVER_MODULE, param->write.value,
+                           param->write.len);
+        esp_log_buffer_char(TAG_BLE_SERVER_MODULE, param->write.value,
+                            param->write.len);
+        char* ble_recived = (char*) param->write.value;
+        // Send the ble data to the game engine
+        game_engine_handle_server_data(ble_recived);
 
-        ESP_LOGI(TAG_BLE, "notify value %s", ble_recived);
-        ESP_LOGI(TAG_BLE, "command value %d", ble_command);
-        ESP_LOGI(TAG_BLE, "value %d", command_value);
-
-        if (ble_command == ACTION_RESPONSE) {
-          display_winner_round(command_value);
-          vTaskDelay(2000 / portTICK_PERIOD_MS);
-          display_points_life(command_value);
-          vTaskDelay(2000 / portTICK_PERIOD_MS);
-          display_ble_owasp_profile();
-        }
-
-        if (gatts_profile_tab[DEVICE_PROFILE].descr_handle ==
+        if (ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_handle ==
                 param->write.handle &&
             param->write.len == 2) {
           uint16_t descr_value =
               param->write.value[1] << 8 | param->write.value[0];
           if (descr_value == 0x0001) {
             if (username_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY) {
-              ESP_LOGI(TAG_BLE, "notify enable");
-              uint8_t notify_data[sizeof(red_player_information.username)];
-              for (int i = 0; i < sizeof(red_player_information.username);
-                   i++) {
-                notify_data[i] = red_player_information.username[i];
-              }
-              // the size of notify_data[] need less than MTU size
-              ESP_LOGI(TAG_BLE, "SENDING USERNAME");
-              esp_ble_gatts_send_indicate(
-                  gatts_if, param->write.conn_id,
-                  gatts_profile_tab[DEVICE_PROFILE].char_handle,
-                  sizeof(notify_data), notify_data, false);
+              ESP_LOGI(TAG_BLE_SERVER_MODULE, "notify enable");
             }
           } else if (descr_value == 0x0002) {
             if (username_property & ESP_GATT_CHAR_PROP_BIT_INDICATE) {
-              ESP_LOGI(TAG_BLE, "indicate enable");
+              ESP_LOGI(TAG_BLE_SERVER_MODULE, "indicate enable");
               uint8_t indicate_data[15];
               for (int i = 0; i < sizeof(indicate_data); ++i) {
                 indicate_data[i] = i % 0xff;
@@ -405,63 +333,69 @@ void gatts_profiles_event_handler(esp_gatts_cb_event_t event,
               // the size of indicate_data[] need less than MTU size
               esp_ble_gatts_send_indicate(
                   gatts_if, param->write.conn_id,
-                  gatts_profile_tab[DEVICE_PROFILE].char_handle,
+                  ble_server_gatt_profile_tab[DEVICE_PROFILE].char_handle,
                   sizeof(indicate_data), indicate_data, true);
             }
           } else if (descr_value == 0x0000) {
-            ESP_LOGI(TAG_BLE, "notify/indicate disable ");
+            ESP_LOGI(TAG_BLE_SERVER_MODULE, "notify/indicate disable ");
           } else {
-            ESP_LOGE(TAG_BLE, "unknown descr value");
-            esp_log_buffer_hex(TAG_BLE, param->write.value, param->write.len);
+            ESP_LOGE(TAG_BLE_SERVER_MODULE, "unknown descr value");
+            esp_log_buffer_hex(TAG_BLE_SERVER_MODULE, param->write.value,
+                               param->write.len);
           }
         }
       }
-      board_write_event(gatts_if, &a_prepare_write_env, param);
+      ble_server_write_event(gatts_if, &a_prepare_write_env, param);
       break;
     }
     case ESP_GATTS_EXEC_WRITE_EVT:
-      ESP_LOGI(TAG_BLE, "ESP_GATTS_EXEC_WRITE_EVT");
+      ESP_LOGI(TAG_BLE_SERVER_MODULE, "ESP_GATTS_EXEC_WRITE_EVT");
       esp_ble_gatts_send_response(gatts_if, param->write.conn_id,
                                   param->write.trans_id, ESP_GATT_OK, NULL);
-      board_exce_write_event(&a_prepare_write_env, param);
+      ble_server_exce_write_event(&a_prepare_write_env, param);
       break;
     case ESP_GATTS_MTU_EVT:
-      ESP_LOGI(TAG_BLE, "ESP_GATTS_MTU_EVT, MTU %d", param->mtu.mtu);
+      ESP_LOGI(TAG_BLE_SERVER_MODULE, "ESP_GATTS_MTU_EVT, MTU %d",
+               param->mtu.mtu);
       break;
     case ESP_GATTS_UNREG_EVT:
       break;
     case ESP_GATTS_CREATE_EVT: {
-      ESP_LOGI(TAG_BLE, "CREATE_SERVICE_EVT, status %d,  service_handle %d",
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
+               "CREATE_SERVICE_EVT, status %d,  service_handle %d",
                param->create.status, param->create.service_handle);
-      gatts_profile_tab[DEVICE_PROFILE].service_handle =
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].service_handle =
           param->create.service_handle;
-      gatts_profile_tab[DEVICE_PROFILE].char_uuid.len = ESP_UUID_LEN_16;
-      gatts_profile_tab[DEVICE_PROFILE].char_uuid.uuid.uuid16 =
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].char_uuid.len =
+          ESP_UUID_LEN_16;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].char_uuid.uuid.uuid16 =
           GATTS_CHAR_UUID_USERNAME;
-      gatts_profile_tab[DEVICE_PROFILE].descr_uuid.len = ESP_UUID_LEN_16;
-      gatts_profile_tab[DEVICE_PROFILE].descr_uuid.uuid.uuid16 =
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_uuid.len =
+          ESP_UUID_LEN_16;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_uuid.uuid.uuid16 =
           GATTS_DESCR_UUID_USERNAME;
 
       esp_ble_gatts_start_service(
-          gatts_profile_tab[DEVICE_PROFILE].service_handle);
+          ble_server_gatt_profile_tab[DEVICE_PROFILE].service_handle);
       username_property = ESP_GATT_CHAR_PROP_BIT_READ |
                           ESP_GATT_CHAR_PROP_BIT_WRITE_NR |
                           ESP_GATT_CHAR_PROP_BIT_NOTIFY;
       // username_property = ESP_GATT_CHAR_PROP_BIT_READ;
       esp_err_t add_chart_ret = esp_ble_gatts_add_char(
-          gatts_profile_tab[DEVICE_PROFILE].service_handle,
-          &gatts_profile_tab[DEVICE_PROFILE].char_uuid,
+          ble_server_gatt_profile_tab[DEVICE_PROFILE].service_handle,
+          &ble_server_gatt_profile_tab[DEVICE_PROFILE].char_uuid,
           ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, username_property,
-          &gatts_demo_char1_val, NULL);
+          &ble_server_gatt_char_val, NULL);
       if (add_chart_ret) {
-        ESP_LOGE(TAG_BLE, "add char failed, error code =%x", add_chart_ret);
+        ESP_LOGE(TAG_BLE_SERVER_MODULE, "add char failed, error code =%x",
+                 add_chart_ret);
       }
       break;
     }
     case ESP_GATTS_ADD_INCL_SRVC_EVT:
       break;
     case ESP_GATTS_ADD_CHAR_EVT: {
-      ESP_LOGI(TAG_BLE,
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
                "ADD_CHAR_EVT, status %d,  attr_handle %d, service_handle %d",
                param->add_char.status, param->add_char.attr_handle,
                param->add_char.service_handle);
@@ -469,52 +403,56 @@ void gatts_profiles_event_handler(esp_gatts_cb_event_t event,
       uint16_t length = 0;
       const uint8_t* preference_char;
 
-      gatts_profile_tab[DEVICE_PROFILE].char_handle =
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].char_handle =
           param->add_char.attr_handle;
-      gatts_profile_tab[DEVICE_PROFILE].descr_uuid.len = ESP_UUID_LEN_16;
-      gatts_profile_tab[DEVICE_PROFILE].descr_uuid.uuid.uuid16 =
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_uuid.len =
+          ESP_UUID_LEN_16;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_uuid.uuid.uuid16 =
           ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
 
       esp_err_t get_attr_ret = esp_ble_gatts_get_attr_value(
           param->add_char.attr_handle, &length, &preference_char);
       if (get_attr_ret == ESP_FAIL) {
-        ESP_LOGE(TAG_BLE, "ILEGAL HANDLE");
+        ESP_LOGE(TAG_BLE_SERVER_MODULE, "ILEGAL HANDLE");
       }
 
-      ESP_LOGI(TAG_BLE, "the gatts username char length = %d", length);
+      ESP_LOGI(TAG_BLE_SERVER_MODULE, "the gatts username char length = %d",
+               length);
       for (int i = 0; i < length; i++) {
-        ESP_LOGI(TAG_BLE, "preference_char[%d] = %x", i, preference_char[i]);
+        ESP_LOGI(TAG_BLE_SERVER_MODULE, "preference_char[%d] = %x", i,
+                 preference_char[i]);
       }
 
       esp_err_t add_description_ret = esp_ble_gatts_add_char_descr(
-          gatts_profile_tab[DEVICE_PROFILE].service_handle,
-          &gatts_profile_tab[DEVICE_PROFILE].descr_uuid,
+          ble_server_gatt_profile_tab[DEVICE_PROFILE].service_handle,
+          &ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_uuid,
           ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, NULL, NULL);
       if (add_description_ret) {
-        ESP_LOGE(TAG_BLE, "add char descr failed, error code =%x",
+        ESP_LOGE(TAG_BLE_SERVER_MODULE, "add char descr failed, error code =%x",
                  add_description_ret);
       }
       break;
     }
     case ESP_GATTS_ADD_CHAR_DESCR_EVT: {
-      ESP_LOGI(TAG_BLE,
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
                "ADD_DESCR_EVT, status %d, attr_handle %d, service_handle %d",
                param->add_char.status, param->add_char.attr_handle,
                param->add_char.service_handle);
-      gatts_profile_tab[DEVICE_PROFILE].descr_handle =
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].descr_handle =
           param->add_char.attr_handle;
       break;
     }
     case ESP_GATTS_DELETE_EVT:
       break;
     case ESP_GATTS_START_EVT:
-      ESP_LOGI(TAG_BLE, "SERVICE_START_EVT, status %d, service_handle %d",
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
+               "SERVICE_START_EVT, status %d, service_handle %d",
                param->start.status, param->start.service_handle);
       break;
     case ESP_GATTS_STOP_EVT:
       break;
     case ESP_GATTS_CONNECT_EVT: {
-      ESP_LOGI(TAG_BLE,
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
                "CONNECT_EVT, conn_id %d, remote %02x:%02x:%02x:%02x:%02x:%02x:",
                param->connect.conn_id, param->connect.remote_bda[0],
                param->connect.remote_bda[1], param->connect.remote_bda[2],
@@ -530,28 +468,32 @@ void gatts_profiles_event_handler(esp_gatts_cb_event_t event,
       connection_params.min_int = 0x10;  // min_int = 0x10*1.25ms = 20ms
       connection_params.timeout = 400;   // timeout = 400*10ms = 4000ms
 
-      gatts_profile_tab[DEVICE_PROFILE].conn_id = param->connect.conn_id;
+      ble_server_gatt_profile_tab[DEVICE_PROFILE].conn_id =
+          param->connect.conn_id;
 
       // Sent update connection parameters to the peer device
       esp_ble_gap_update_conn_params(&connection_params);
 
-      // show_ble_connection(param->connect.remote_bda);
-
-      ble_game_paired();
+      game_engine_cb_paired_devices(GAME_TEAM_RED);
       break;
     }
     case ESP_GATTS_DISCONNECT_EVT:
-      ESP_LOGI(TAG_BLE, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x",
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
+               "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x",
                param->disconnect.reason);
-      esp_ble_gap_start_advertising(&adv_params);
+      esp_ble_gap_start_advertising(&ble_server_adv_params);
       break;
     case ESP_GATTS_CONF_EVT: {
-      ESP_LOGI(TAG_BLE, "ESP_GATTS_CONF_EVT, status %d attr_handle %d",
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
+               "ESP_GATTS_CONF_EVT, status %d attr_handle %d",
                param->conf.status, param->conf.handle);
       if (param->conf.status != ESP_GATT_OK) {
-        ESP_LOGW(TAG_BLE, "Confirm error, status %d", param->conf.status);
-        esp_log_buffer_hex(TAG_BLE, param->conf.value, param->conf.len);
-        esp_log_buffer_char(TAG_BLE, param->conf.value, param->conf.len);
+        ESP_LOGW(TAG_BLE_SERVER_MODULE, "Confirm error, status %d",
+                 param->conf.status);
+        esp_log_buffer_hex(TAG_BLE_SERVER_MODULE, param->conf.value,
+                           param->conf.len);
+        esp_log_buffer_char(TAG_BLE_SERVER_MODULE, param->conf.value,
+                            param->conf.len);
       }
       break;
     }
@@ -570,9 +512,10 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
                                 esp_ble_gatts_cb_param_t* param) {
   if (event == ESP_GATTS_REG_EVT) {
     if (param->reg.status == ESP_GATT_OK) {
-      gatts_profile_tab[param->reg.app_id].gatts_if = gatts_if;
+      ble_server_gatt_profile_tab[param->reg.app_id].gatts_if = gatts_if;
     } else {
-      ESP_LOGI(TAG_BLE, "Register app failed, app_id %04x, status %d\n",
+      ESP_LOGI(TAG_BLE_SERVER_MODULE,
+               "Register app failed, app_id %04x, status %d\n",
                param->reg.app_id, param->reg.status);
       return;
     }
@@ -583,30 +526,18 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
     int id_profile;
     for (id_profile = 0; id_profile < DEVICE_PROFILES; id_profile++) {
       if (gatts_if == ESP_GATT_IF_NONE ||
-          gatts_if == gatts_profile_tab[id_profile].gatts_if) {
-        if (gatts_profile_tab[id_profile].gatts_cb) {
-          gatts_profile_tab[id_profile].gatts_cb(event, gatts_if, param);
+          gatts_if == ble_server_gatt_profile_tab[id_profile].gatts_if) {
+        if (ble_server_gatt_profile_tab[id_profile].gatts_cb) {
+          ble_server_gatt_profile_tab[id_profile].gatts_cb(event, gatts_if,
+                                                           param);
         }
       }
     }
   } while (0);
 }
 
-void init_ble_task(void) {
-  if (ble_running_service) {
-    return;
-  }
-
+void ble_server_task_begin(void) {
   esp_err_t ret;
-
-  // Initialize NVS
-  // ret = nvs_flash_init();
-  // if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret ==
-  // ESP_ERR_NVS_NEW_VERSION_FOUND) {
-  //     ESP_ERROR_CHECK(nvs_flash_erase());
-  //     ret = nvs_flash_init();
-  // }
-  // ESP_ERROR_CHECK(ret);
 
   ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
 
@@ -614,14 +545,14 @@ void init_ble_task(void) {
       BT_CONTROLLER_INIT_CONFIG_DEFAULT();
   ret = esp_bt_controller_init(&bluetooth_config);
   if (ret) {
-    ESP_LOGE(TAG_BLE, "%s initialize controller failed: %s", __func__,
-             esp_err_to_name(ret));
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "%s initialize controller failed: %s",
+             __func__, esp_err_to_name(ret));
     return;
   }
 
   ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
   if (ret) {
-    ESP_LOGE(TAG_BLE, "%s enable controller failed: %s", __func__,
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "%s enable controller failed: %s", __func__,
              esp_err_to_name(ret));
     return;
   }
@@ -629,45 +560,45 @@ void init_ble_task(void) {
   esp_bluedroid_config_t bluedroid_config = BT_BLUEDROID_INIT_CONFIG_DEFAULT();
   ret = esp_bluedroid_init_with_cfg(&bluedroid_config);
   if (ret) {
-    ESP_LOGE(TAG_BLE, "%s initialize bluedroid failed: %s", __func__,
-             esp_err_to_name(ret));
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "%s initialize bluedroid failed: %s",
+             __func__, esp_err_to_name(ret));
     return;
   }
   ret = esp_bluedroid_enable();
   if (ret) {
-    ESP_LOGE(TAG_BLE, "%s enable bluetooth failed: %s", __func__,
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "%s enable bluetooth failed: %s", __func__,
              esp_err_to_name(ret));
     return;
   }
 
   ret = esp_ble_gatts_register_callback(gatts_event_handler);
   if (ret) {
-    ESP_LOGE(TAG_BLE, "gatts register error, error code = %x", ret);
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "gatts register error, error code = %x",
+             ret);
     return;
   }
-  ret = esp_ble_gap_register_callback(gap_event_handler);
+  ret = esp_ble_gap_register_callback(ble_server_gap_event_handler);
   if (ret) {
-    ESP_LOGE(TAG_BLE, "gap register error, error code = %x", ret);
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "gap register error, error code = %x", ret);
     return;
   }
 
   ret = esp_ble_gatts_app_register(DEVICE_PROFILE);
   if (ret) {
-    ESP_LOGE(TAG_BLE, "gatts app register error, error code = %x", ret);
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "gatts app register error, error code = %x",
+             ret);
     return;
   }
 
   esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
   if (local_mtu_ret) {
-    ESP_LOGE(TAG_BLE, "set local  MTU failed, error code = %x", local_mtu_ret);
+    ESP_LOGE(TAG_BLE_SERVER_MODULE, "set local  MTU failed, error code = %x",
+             local_mtu_ret);
   }
-
-  ble_running_service = true;
 }
 
-void stop_ble_task(void) {
-  ble_running_service = false;
-  ESP_LOGI(TAG_BLE, "Stopping BLE task");
+void ble_server_task_stop(void) {
+  ESP_LOGI(TAG_BLE_SERVER_MODULE, "Stopping BLE task");
   esp_bluedroid_disable();
   esp_bluedroid_deinit();
   esp_bt_controller_disable();
