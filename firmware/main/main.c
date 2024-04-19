@@ -12,7 +12,7 @@
 void app_main(void) {
   memory_driver_begin();
   module_keyboard_begin();
-  bluetooth_scanner_init();
+  trackers_scanner_init();
   screen_module_begin();
   screen_module_set_main_menu();
   screen_module_display_badge_logo();

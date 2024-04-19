@@ -14,9 +14,9 @@ typedef struct {
 void app_screen_state_machine_init(int app_selected);
 void app_screen_select_app(void);
 void app_screen_state_machine(button_event_t button_pressed);
-void screen_app_display_bluetooth_scanner(bluetooth_scanner_record_t record);
+void screen_app_display_bluetooth_scanner(tracker_profile_t record);
 void screen_app_task_display_devices();
 void screen_app_task_start_display_devices();
 void screen_app_task_stop_display_devices();
-void screen_app_display_modal(airtag_profile_t profile);
+void screen_app_display_modal(tracker_profile_t profile);
 #endif  // APP_SCREEN_MODULE_H

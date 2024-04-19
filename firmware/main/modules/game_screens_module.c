@@ -103,10 +103,15 @@ void screen_module_display_game_points_life(int life_points) {
 void screen_module_display_attacker_profile(game_owasp_profile_t* profile) {
   oled_driver_display_fadeout();
   oled_driver_clear(OLED_DISPLAY_NORMAL);
+  char* cwe = (char*) malloc(OWASP_CWE_LENGTH);
+  char* cwe_text = (char*) malloc(OWASP_NAME_MAX_LENGTH);
+  sprintf(cwe, "%s", profile->vuln->cwe);
+  sprintf(cwe_text, "%s", profile->vuln->name);
   oled_driver_display_text(0, "Red Team Profile", 17, OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(2, &profile->vuln->cwe, strlen(&profile->vuln->cwe),
-                           OLED_DISPLAY_NORMAL);
+  oled_driver_display_text(2, cwe, strlen(cwe), OLED_DISPLAY_NORMAL);
   int started_page = 3;
-  oled_driver_display_text_splited(&profile->vuln->name, &started_page,
+  oled_driver_display_text_splited(cwe_text, &started_page,
                                    OLED_DISPLAY_NORMAL);
+  free(cwe);
+  free(cwe_text);
 }

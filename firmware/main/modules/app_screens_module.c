@@ -13,34 +13,8 @@ int airtag_count = 0;
 int device_selection = 0;
 bool is_displaying = false;
 bool is_modal_displaying = false;
-airtag_profile_t* scanned_airtags = NULL;
+tracker_profile_t* scanned_airtags = NULL;
 TaskHandle_t screen_app_task_display_records = NULL;
-
-void add_profile(airtag_profile_t** profiles,
-                 int* num_profiles,
-                 uint8_t mac_address[6],
-                 int rssi,
-                 const char* name) {
-  *profiles =
-      realloc(*profiles, (*num_profiles + 1) * sizeof(airtag_profile_t));
-
-  (*profiles)[*num_profiles].rssi = rssi;
-  (*profiles)[*num_profiles].name = name;
-  memcpy((*profiles)[*num_profiles].mac_address, mac_address, 6);
-
-  (*num_profiles)++;
-}
-
-int find_profile_by_mac(airtag_profile_t* profiles,
-                        int num_profiles,
-                        uint8_t mac_address[6]) {
-  for (int i = 0; i < num_profiles; i++) {
-    if (memcmp(profiles[i].mac_address, mac_address, 6) == 0) {
-      return i;  // Se encontró el perfil
-    }
-  }
-  return -1;  // No se encontró el perfil
-}
 
 void app_screen_state_machine_init(int app_selected) {
   ESP_LOGI(TAG_APP_SCREEN_MODULE, "Initializing screen state machine");
@@ -55,9 +29,9 @@ void app_screen_select_app() {
   switch (app_screen_state_information.app_selected) {
     case BLUETOOTH_MENU_AIRTAGS_SCAN:
       bluetooth_devices_count = 0;
-      bluetooth_scanner_register_cb(screen_app_display_bluetooth_scanner);
+      trackers_scanner_register_cb(screen_app_display_bluetooth_scanner);
       screen_app_task_start_display_devices();
-      bluetooth_scanner_start();
+      trackers_scanner_start();
       break;
     default:
       break;
@@ -85,7 +59,7 @@ void app_screen_state_machine(button_event_t button_pressed) {
           }
 
           screen_app_task_stop_display_devices();
-          bluetooth_scanner_stop();
+          trackers_scanner_stop();
           module_keyboard_update_state(false, NULL);
           screen_module_exit_submenu();
           break;
@@ -119,14 +93,18 @@ void app_screen_state_machine(button_event_t button_pressed) {
   }
 }
 
-void screen_app_display_bluetooth_scanner(bluetooth_scanner_record_t record) {
-  ESP_LOGI(TAG_APP_SCREEN_MODULE, "Airtag detected");
-  int has_device =
-      find_profile_by_mac(scanned_airtags, airtag_count, record.mac_address);
+void screen_app_display_bluetooth_scanner(tracker_profile_t record) {
+  int has_device = trackers_scanner_find_profile_by_mac(
+      scanned_airtags, airtag_count, record.mac_address);
   if (has_device == -1) {
-    add_profile(&scanned_airtags, &airtag_count, record.mac_address,
-                record.rssi, record.name);
-    return;
+    trackers_scanner_add_tracker_profile(&scanned_airtags, &airtag_count,
+                                         record.mac_address, record.rssi,
+                                         record.name);
+  } else {
+    scanned_airtags[has_device].rssi = record.rssi;
+    if (is_modal_displaying) {
+      screen_app_display_modal(scanned_airtags[device_selection]);
+    }
   }
 }
 
@@ -139,11 +117,10 @@ void screen_app_task_start_display_devices() {
 void screen_app_task_stop_display_devices() {
   is_displaying = false;
   vTaskSuspend(screen_app_task_display_records);
-  // free(scanned_airtags);
-  ESP_LOGI(TAG_APP_SCREEN_MODULE, "Task stopped");
 }
 
 void screen_app_task_display_devices() {
+  // #TODO: Implement the scrolling of the devices
   char* name_str = (char*) malloc(50);
   oled_driver_display_text(0, "Trackers Scanner", 17, OLED_DISPLAY_INVERTED);
   while (is_displaying) {
@@ -164,28 +141,50 @@ void screen_app_task_display_devices() {
   free(name_str);
 }
 
-void screen_app_display_modal(airtag_profile_t profile) {
+void screen_app_display_modal(tracker_profile_t profile) {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   int started_page = 1;
-  char* name = (char*) malloc(18);
-  char* rssi = (char*) malloc(18);
-  char* mac_addrs = (char*) malloc(18);
+  char* name = (char*) malloc(MAX_LINE_CHAR);
+  char* rssi = (char*) malloc(MAX_LINE_CHAR);
+  char* mac_addrs = (char*) malloc(20);
+  // char*    mac_addrs_s  = (char*) malloc(10);
+  char* str_adv_data = (char*) malloc(64);
 
-  oled_driver_display_text_center(0, "APPLE", OLED_DISPLAY_NORMAL);
-  sprintf(name, "Name: %s", profile.name);
+  memset(str_adv_data, 0, 64);
+  sprintf(name, "%s", profile.name);
   sprintf(rssi, "RSSI: %d dBM", profile.rssi);
-  sprintf(mac_addrs, "%02X:%02X:%02X:%02X:%02X:%02X", profile.mac_address[0],
+  sprintf(mac_addrs, "%02X:%02X:%02X:%02X:%02X%02X", profile.mac_address[0],
           profile.mac_address[1], profile.mac_address[2],
           profile.mac_address[3], profile.mac_address[4],
           profile.mac_address[5]);
-  oled_driver_display_text_splited(name, &started_page, OLED_DISPLAY_NORMAL);
+  // sprintf(mac_addrs_s, "%02X:%02X:%02X ", profile.mac_address[3],
+  // profile.mac_address[4],
+  //         profile.mac_address[5]);
+
+  ESP_LOGI(
+      TAG_APP_SCREEN_MODULE,
+      "Displaying modal with the following data %d:", profile.adv_data_length);
+  sprintf(str_adv_data, "ADV: ");
+  for (int i = 96; i < 112; i++) {
+    sprintf(str_adv_data + strlen(str_adv_data), "%02X ", profile.adv_data[i]);
+  }
+  // esp_log_buffer_hex(TAG_APP_SCREEN_MODULE, adv_data, 62);
+  // oled_driver_display_text_center(0, vendor, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, name, OLED_DISPLAY_NORMAL);
+  // oled_driver_display_text_splited(name, &started_page, OLED_DISPLAY_NORMAL);
   oled_driver_display_text_splited(rssi, &started_page, OLED_DISPLAY_NORMAL);
-  started_page++;
   oled_driver_display_text_center(started_page, "MAC Address",
                                   OLED_DISPLAY_NORMAL);
-  oled_driver_display_text_splited(mac_addrs, &started_page,
+  started_page++;
+  oled_driver_display_text_center(started_page, mac_addrs, OLED_DISPLAY_NORMAL);
+  started_page++;
+  // oled_driver_display_text_center(started_page,mac_addrs_s,
+  // OLED_DISPLAY_NORMAL); started_page++;
+  oled_driver_display_text_splited(str_adv_data, &started_page,
                                    OLED_DISPLAY_NORMAL);
   free(name);
   free(rssi);
   free(mac_addrs);
+  // free(mac_addrs_s);
+  free(str_adv_data);
 }

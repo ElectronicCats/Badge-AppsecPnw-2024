@@ -3,7 +3,7 @@
   #define OLED_DRIVER_H
   #define TAG_OLED_DRIVER  "OLED_DRIVER"
   #define MAX_PAGE         8
-  #define MAX_LINE_CHAR    16
+  #define MAX_LINE_CHAR    17
   #define MAX_WORDS_SCREEN 6
 /**
  * @brief Emum for the OLED invert state.

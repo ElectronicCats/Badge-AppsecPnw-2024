@@ -1,10 +1,8 @@
 #include "modules/ble/airtags_module.h"
-// #include "freertos/FreeRTOS.h"
 #include "esp_bt.h"
 #include "esp_log.h"
 #include "inttypes.h"
 
-// static const char remote_device_name[] = "ESP_GATTS_DEMO";
 static bool connect = false;
 static bool get_server = false;
 static bool scan_active = false;
@@ -16,15 +14,6 @@ static bluetooth_scanner_cb_t scanner_cb = NULL;
 TaskHandle_t scan_timer_task_handle = NULL;
 
 bool tag_finded = false;
-
-bluetooth_scanner_record_t record = {
-    .mac_address = {0},
-    .rssi = 0,
-    .name = "",
-    .is_airtag = false,
-    .count = 0,
-    .has_finished = true,
-};
 
 static esp_bt_uuid_t remote_filter_service_uuid = {
     .len = ESP_UUID_LEN_16,
@@ -76,7 +65,7 @@ void timer_task(void* arg) {
     scan_timer++;
 
     if (scan_timer >= AIRTAG_SCAN_DURATION) {
-      bluetooth_scanner_stop();
+      trackers_scanner_stop();
     }
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
@@ -350,8 +339,6 @@ void gattc_profile_event_handler(esp_gattc_cb_event_t event,
 }
 
 void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param) {
-  uint8_t* adv_name = NULL;
-  uint8_t adv_name_len = 0;
   switch (event) {
     case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
       ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Start scanning...");
@@ -377,162 +364,24 @@ void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param) {
           if (!scan_active) {
             break;
           }
+          tracker_profile_t tracker_record = {
+              .rssi = 0,
+              .name = "",
+              .vendor = "",
+              .mac_address = {0},
+              .adv_data = {0},
+              .adv_data_length = 0,
+              .is_airtag = false,
+          };
           if (scan_result->scan_rst.adv_data_len > 0) {
-            // ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Address:
-            // %02X:%02X:%02X:%02X:%02X:%02X",
-            //         scan_result->scan_rst.bda[5],
-            //         scan_result->scan_rst.bda[4],
-            //         scan_result->scan_rst.bda[3],
-            //         scan_result->scan_rst.bda[2],
-            //         scan_result->scan_rst.bda[1],
-            //         scan_result->scan_rst.bda[0]);
-            // // esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-            // scan_result->scan_rst.bda, 6); ESP_LOGI(TAG_BLE_CLIENT_MODULE,
-            // "searched Adv Data Len %d, Scan Response Len %d",
-            //         scan_result->scan_rst.adv_data_len,
-            //         scan_result->scan_rst.scan_rsp_len);
-            // adv_name =
-            // esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
-            //                                     ESP_BLE_AD_TYPE_NAME_CMPL,
-            //                                     &adv_name_len);
-            // ESP_LOGI(TAG_BLE_CLIENT_MODULE, "searched Device Name Len %d",
-            // adv_name_len); esp_log_buffer_char(TAG_BLE_CLIENT_MODULE,
-            // adv_name, adv_name_len); ESP_LOGI(TAG_BLE_CLIENT_MODULE, " ");
-            if (scan_result->scan_rst.bda[0] == 0xcf) {
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Tile----------------");
-              ESP_LOGI(
-                  TAG_BLE_CLIENT_MODULE,
-                  "Address: %02X:%02X:%02X:%02X:%02X:%02X",
-                  scan_result->scan_rst.bda[0], scan_result->scan_rst.bda[1],
-                  scan_result->scan_rst.bda[2], scan_result->scan_rst.bda[3],
-                  scan_result->scan_rst.bda[4], scan_result->scan_rst.bda[5]);
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE,
-                       "searched Adv Data Len %d, Scan Response Len %d",
-                       scan_result->scan_rst.adv_data_len,
-                       scan_result->scan_rst.scan_rsp_len);
-              adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
-                                                  ESP_BLE_AD_TYPE_NAME_CMPL,
-                                                  &adv_name_len);
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE, "searched Device Name Len %d",
-                       adv_name_len);
-              esp_log_buffer_char(TAG_BLE_CLIENT_MODULE, adv_name,
-                                  adv_name_len);
-              esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-                                 &scan_result->scan_rst.ble_adv[0],
-                                 scan_result->scan_rst.adv_data_len);
-              esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-                                 &scan_result->scan_rst.ble_adv[1],
-                                 scan_result->scan_rst.adv_data_len);
-              esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-                                 &scan_result->scan_rst.ble_adv[2],
-                                 scan_result->scan_rst.adv_data_len);
-              esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-                                 &scan_result->scan_rst.ble_adv[3],
-                                 scan_result->scan_rst.adv_data_len);
-            }
-            // https://adamcatley.com/AirTag
-            //  REGISTERED
-            if (scan_result->scan_rst.ble_adv[0] == 0x1E &&
-                scan_result->scan_rst.ble_adv[1] == 0xFF &&
-                scan_result->scan_rst.ble_adv[2] == 0x4C &&
-                scan_result->scan_rst.ble_adv[3] == 0x00) {
-              tag_finded = true;
-              record.name = "ATag";
-            }
-            // UNREGISTERED
-            if (scan_result->scan_rst.ble_adv[0] == 0x4C &&
-                scan_result->scan_rst.ble_adv[1] == 0x00 &&
-                scan_result->scan_rst.ble_adv[2] == 0x12 &&
-                scan_result->scan_rst.ble_adv[3] == 0x19) {
-              tag_finded = true;
-              record.name = "UATag";
-            }
-            if (scan_result->scan_rst.ble_adv[0] == 0x02 &&
-                scan_result->scan_rst.ble_adv[1] == 0x01 &&
-                scan_result->scan_rst.ble_adv[2] == 0x06 &&
-                scan_result->scan_rst.ble_adv[3] == 0x0D) {
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Tile==========");
-              tag_finded = true;
-              record.name = "Tile";
-            }
+            tracker_dissector(scan_result, &tracker_record);
 
-            if (tag_finded) {
-              memcpy(record.mac_address, scan_result->scan_rst.bda, 6);
-              record.rssi = scan_result->scan_rst.rssi;
-              // record.name         = "Unknown";
-              record.is_airtag = false;
-              record.count = devices_found_count++;
-              record.has_finished = false;
-
-              ESP_LOGI(
-                  TAG_BLE_CLIENT_MODULE,
-                  "Address: %02X:%02X:%02X:%02X:%02X:%02X",
-                  scan_result->scan_rst.bda[5], scan_result->scan_rst.bda[4],
-                  scan_result->scan_rst.bda[3], scan_result->scan_rst.bda[2],
-                  scan_result->scan_rst.bda[1], scan_result->scan_rst.bda[0]);
-              // esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-              // scan_result->scan_rst.bda, 6);
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE,
-                       "searched Adv Data Len %d, Scan Response Len %d",
-                       scan_result->scan_rst.adv_data_len,
-                       scan_result->scan_rst.scan_rsp_len);
-              adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
-                                                  ESP_BLE_AD_TYPE_NAME_CMPL,
-                                                  &adv_name_len);
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE, "searched Device Name Len %d",
-                       adv_name_len);
-              esp_log_buffer_char(TAG_BLE_CLIENT_MODULE, adv_name,
-                                  adv_name_len);
-
-              record.is_airtag = true;
-
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE, "adv data:");
-              esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE,
-                                 &scan_result->scan_rst.ble_adv[0],
-                                 scan_result->scan_rst.adv_data_len);
-              esp_log_buffer_char(TAG_BLE_CLIENT_MODULE,
-                                  &scan_result->scan_rst.ble_adv[0],
-                                  scan_result->scan_rst.adv_data_len);
+            if (tracker_record.is_airtag) {
               if (scanner_cb) {
-                scanner_cb(record);
+                scanner_cb(tracker_record);
               }
-              ESP_LOGI(TAG_BLE_CLIENT_MODULE, " ");
             }
-            tag_finded = false;
           }
-          // if (scan_result->scan_rst.scan_rsp_len > 0) {
-          //   ESP_LOGI(TAG_BLE_CLIENT_MODULE, "scan resp:");
-          //   esp_log_buffer_hex(
-          //       TAG_BLE_CLIENT_MODULE,
-          //       &scan_result->scan_rst
-          //            .ble_adv[scan_result->scan_rst.adv_data_len],
-          //       scan_result->scan_rst.scan_rsp_len);
-          // }
-          // #endif
-
-          // if (adv_name != NULL) {
-          ////   if (strlen(remote_device_name) == adv_name_len &&
-          ////       strncmp((char*) adv_name, remote_device_name, adv_name_len)
-          ///==
-          //           0) {
-          ////     ESP_LOGI(TAG_BLE_CLIENT_MODULE, "searched device %s",
-          /// remote_device_name);
-          //     if (connect == false) {
-          //       connect = true;
-          //       ESP_LOGI(TAG_BLE_CLIENT_MODULE, "connect to the remote
-          //       device.");
-          //       //esp_ble_gap_stop_scanning();
-          //       esp_ble_gattc_open(gl_profile_tab[AIRTAG_PROFILE_A_APP_ID].gattc_if,
-          //                          scan_result->scan_rst.bda,
-          //                          scan_result->scan_rst.ble_addr_type,
-          //                          true);
-          //     }
-          //   }
-          // }
-
-          // if (record.is_airtag) {
-          //   bluetooth_scanner_stop();
-          // }
           break;
         case ESP_GAP_SEARCH_INQ_CMPL_EVT:
           break;
@@ -543,12 +392,6 @@ void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param) {
     }
 
     case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
-      if (scanner_cb) {
-        record.has_finished = true;
-        scanner_cb(record);
-        ESP_LOGI(TAG_BLE_CLIENT_MODULE, "%s", record.name);
-      }
-
       if (param->scan_stop_cmpl.status != ESP_BT_STATUS_SUCCESS) {
         ESP_LOGE(TAG_BLE_CLIENT_MODULE, "scan stop failed, error status = %x",
                  param->scan_stop_cmpl.status);
@@ -611,7 +454,7 @@ void esp_gattc_cb(esp_gattc_cb_event_t event,
   } while (0);
 }
 
-void bluetooth_scanner_init() {
+void trackers_scanner_init() {
   // Initialize NVS.
   esp_err_t ret;
 
@@ -677,14 +520,14 @@ void bluetooth_scanner_init() {
   xTaskCreate(timer_task, "timer_task", 2048, NULL, 10,
               &scan_timer_task_handle);
   vTaskSuspend(scan_timer_task_handle);
-  bluetooth_scanner_stop();
+  trackers_scanner_stop();
 }
 
-void bluetooth_scanner_register_cb(bluetooth_scanner_cb_t callback) {
+void trackers_scanner_register_cb(bluetooth_scanner_cb_t callback) {
   scanner_cb = callback;
 }
 
-void bluetooth_scanner_start() {
+void trackers_scanner_start() {
   ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Starting Bluetooth scanner");
   scan_active = true;
   devices_found_count = 0;
@@ -693,14 +536,14 @@ void bluetooth_scanner_start() {
   vTaskResume(scan_timer_task_handle);
 }
 
-void bluetooth_scanner_stop() {
+void trackers_scanner_stop() {
   scan_active = false;
   esp_ble_gap_stop_scanning();
   vTaskSuspend(scan_timer_task_handle);
   // bluetooth_scanner_deinit();
 }
 
-void bluetooth_scanner_deinit() {
+void trackers_scanner_deinit() {
   esp_bluedroid_disable();
   esp_bluedroid_deinit();
   esp_bt_controller_disable();
@@ -708,6 +551,69 @@ void bluetooth_scanner_deinit() {
   esp_bt_controller_mem_release(ESP_BT_MODE_BLE);
 }
 
-bool bluetooth_scanner_is_active() {
+void tracker_dissector(esp_ble_gap_cb_param_t* scan_rst,
+                       tracker_profile_t* tracker_record) {
+  // https://adamcatley.com/AirTag
+  tracker_adv_cmp_t trackers[] = {
+      {.name = "ATag", .vendor = "Apple", .adv_cmp = {0x1E, 0xFF, 0x4C, 0x00}},
+      {.name = "UATag", .vendor = "Apple", .adv_cmp = {0x4C, 0x00, 0x12, 0x19}},
+      {.name = "Tile", .vendor = "Tile", .adv_cmp = {0x02, 0x01, 0x06, 0x0D}}};
+
+  for (int i = 0; i < 3; i++) {
+    if (scan_rst->scan_rst.ble_adv[0] == trackers[i].adv_cmp[0] &&
+        scan_rst->scan_rst.ble_adv[1] == trackers[i].adv_cmp[1] &&
+        scan_rst->scan_rst.ble_adv[2] == trackers[i].adv_cmp[2] &&
+        scan_rst->scan_rst.ble_adv[3] == trackers[i].adv_cmp[3]) {
+      tracker_record->is_airtag = true;
+      tracker_record->name = trackers[i].name;
+      tracker_record->vendor = trackers[i].vendor;
+      tracker_record->adv_data_length = scan_rst->scan_rst.adv_data_len;
+      tracker_record->rssi = scan_rst->scan_rst.rssi;
+      memcpy(tracker_record->mac_address, scan_rst->scan_rst.bda, 6);
+      memcpy(tracker_record->adv_data, scan_rst->scan_rst.ble_adv,
+             sizeof(tracker_record->adv_data));
+
+      ESP_LOGI(TAG_BLE_CLIENT_MODULE, "AirTag found");
+      ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Address: %02X:%02X:%02X:%02X:%02X:%02X",
+               scan_rst->scan_rst.bda[5], scan_rst->scan_rst.bda[4],
+               scan_rst->scan_rst.bda[3], scan_rst->scan_rst.bda[2],
+               scan_rst->scan_rst.bda[1], scan_rst->scan_rst.bda[0]);
+      ESP_LOGI(TAG_BLE_CLIENT_MODULE,
+               "ADV data %d:", scan_rst->scan_rst.adv_data_len);
+      esp_log_buffer_hex(TAG_BLE_CLIENT_MODULE, &scan_rst->scan_rst.ble_adv,
+                         scan_rst->scan_rst.adv_data_len);
+      ESP_LOGI(TAG_BLE_CLIENT_MODULE, " ");
+      break;
+    }
+  }
+}
+
+void trackers_scanner_add_tracker_profile(tracker_profile_t** profiles,
+                                          int* num_profiles,
+                                          uint8_t mac_address[6],
+                                          int rssi,
+                                          const char* name) {
+  *profiles =
+      realloc(*profiles, (*num_profiles + 1) * sizeof(tracker_profile_t));
+
+  (*profiles)[*num_profiles].rssi = rssi;
+  (*profiles)[*num_profiles].name = name;
+  memcpy((*profiles)[*num_profiles].mac_address, mac_address, 6);
+
+  (*num_profiles)++;
+}
+
+int trackers_scanner_find_profile_by_mac(tracker_profile_t* profiles,
+                                         int num_profiles,
+                                         uint8_t mac_address[6]) {
+  for (int i = 0; i < num_profiles; i++) {
+    if (memcmp(profiles[i].mac_address, mac_address, 6) == 0) {
+      return i;  // Se encontró el perfil
+    }
+  }
+  return -1;  // No se encontró el perfil
+}
+
+bool trackers_scanner_is_active() {
   return scan_active;
 }

@@ -9,6 +9,7 @@
   #define GAME_BLE_COMMAND_LENGTH    2
 
   #define OWASP_IDENTIFIER_LENGTH 8
+  #define OWASP_CWE_LENGTH        3
   #define OWASP_NAME_MAX_LENGTH   50
 
 /**
