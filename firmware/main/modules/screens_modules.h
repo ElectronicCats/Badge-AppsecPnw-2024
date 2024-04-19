@@ -95,7 +95,10 @@ static char* main_items[] = {
 };
 
 static char* applications_items[] = {
-    "WiFi", "Bluetooth", "Zigbee", "Thread", "Matter", "GPS", NULL,
+    "WiFi",
+    "Bluetooth",
+    "Zigbee",
+    NULL,
 };
 
 static char* settings_items[] = {
@@ -134,7 +137,7 @@ static char* wifi_items[] = {
 };
 
 static char* bluetooth_items[] = {
-    "Airtags scan",
+    "Trackers scan",
     "Game",
     NULL,
 };

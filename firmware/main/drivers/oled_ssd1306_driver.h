@@ -101,6 +101,32 @@ void oled_driver_display_text_scroll_right(int page,
                                            bool invert);
 
 /**
+ * @brief Clear the line on the OLED display
+ *
+ * @param page The page to clear
+ * @param invert Invert the background and foreground color of the OLED display
+ */
+void oled_driver_clear_line(int page, bool invert);
+
+/**
+ * @brief Software scroll the OLED display. If the end page is greater than 0,
+ * the OLED display will scroll from the start page to the end page. Otherwise,
+ * the OLED display will scroll from the start page to the last page.
+ *
+ * @param page_start Start page to scroll the OLED display
+ * @param page_end End page to scroll the OLED display
+ */
+void oled_driver_software_scroll(int page_start, int page_end);
+
+/**
+ * @brief Software scroll display the text on the OLED display
+ *
+ * @param text Text to display on the OLED display
+ * @param invert Invert the background and foreground color of the OLED display
+ */
+void oled_driver_display_scroll_text(char* text, bool invert);
+
+/**
  * @brief Display and split the text on the OLED display
  *
  * @param p_text Pointer of the text to display on the OLED display
@@ -111,4 +137,13 @@ void oled_driver_display_text_scroll_right(int page,
 void oled_driver_display_text_splited(const char* p_text,
                                       int* p_started_page,
                                       int invert);
+
+/**
+ * @brief Display the text on the center of the OLED display
+ *
+ * @param page Page to display the text on the OLED display
+ * @param text Text to display on the OLED display
+ * @param invert Invert the background and foreground color of the OLED display
+ */
+void oled_driver_display_text_center(int page, char* text, bool invert);
 #endif  // OLED_DRIVER_H

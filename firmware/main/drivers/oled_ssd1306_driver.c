@@ -90,6 +90,42 @@ void oled_driver_display_text_scroll_right(int page,
   ssd1306_hardware_scroll(&p_driver_screen, SCROLL_STOP);
 }
 
+void oled_driver_software_scroll(int page_start, int page_end) {
+  if (page_end > 0) {
+    ssd1306_software_scroll(&p_driver_screen, page_start, page_end);
+  } else {
+    ssd1306_software_scroll(&p_driver_screen, page_start,
+                            (p_driver_screen._pages - 1));
+  }
+}
+
+void oled_driver_display_scroll_text(char* text, bool invert) {
+  ssd1306_scroll_text(&p_driver_screen, text, strlen(text), invert);
+}
+
+void oled_driver_clear_line(int page, bool invert) {
+  ssd1306_clear_line(&p_driver_screen, page, invert);
+}
+
+void oled_driver_display_text_center(int page, char* text, bool invert) {
+  int text_length = strlen(text);
+  int max_char_len = MAX_LINE_CHAR;
+  if (text_length > max_char_len) {
+    ESP_LOGE(TAG_OLED_DRIVER, "Text too long to center");
+    oled_driver_display_text(page, text, text_length, invert);
+    return;
+  }
+
+  // We need to know if the text is odd or even
+  int text_center = (max_char_len - text_length) / 2;
+  char text_centered[MAX_LINE_CHAR] = "";
+  for (int i = 0; i < text_center; i++) {
+    strcat(text_centered, " ");
+  }
+  strcat(text_centered, text);
+  oled_driver_display_text(page, text_centered, strlen(text_centered), invert);
+}
+
 void oled_driver_display_text_splited(const char* p_text,
                                       int* p_started_page,
                                       int invert) {

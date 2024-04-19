@@ -14,7 +14,8 @@ void module_keyboard_button_event_cb(void* arg, void* data) {
       0x0F;  // & 0x0F to get the event number without the mask
   const char* button_name_str = button_names[button_name];
   const char* button_event_str = button_events_name[button_event];
-  if (button_event != BUTTON_PRESS_DOWN) {
+  if (button_event != BUTTON_SINGLE_CLICK &&
+      button_event != BUTTON_DOUBLE_CLICK) {
     return;
   }
 
@@ -30,16 +31,29 @@ void module_keyboard_button_event_cb(void* arg, void* data) {
 
   switch (button_name) {
     case BUTTON_LEFT:
+      if (button_event == BUTTON_DOUBLE_CLICK) {
+        break;
+      }
+      ESP_LOGI(TAG_CROSS_KEYBOARD_MODULE, "Single click detected");
       screen_module_exit_submenu();
       break;
     case BUTTON_RIGHT:
+      if (button_event == BUTTON_DOUBLE_CLICK) {
+        break;
+      }
       screen_module_enter_submenu();
       break;
     case BUTTON_UP:
+      if (button_event == BUTTON_DOUBLE_CLICK) {
+        break;
+      }
       screen_module_decrement_index_item();
       screen_module_display_menu();
       break;
     case BUTTON_DOWN:
+      if (button_event == BUTTON_DOUBLE_CLICK) {
+        break;
+      }
       screen_module_increment_index_item();
       screen_module_display_menu();
       break;

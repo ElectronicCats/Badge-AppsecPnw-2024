@@ -3,6 +3,7 @@
 #include <string.h>
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
+#include "modules/app_screen_module.h"
 #include "modules/game_engine_module.h"
 
 screen_module_layer_t previous_layer;
@@ -67,8 +68,6 @@ void screen_module_display_menu_items(char** items) {
                            OLED_DISPLAY_NORMAL);
   page++;
   int items_list = submenu_items - 2;
-  // if (items[i + 1] == NULL) {
-  //     break;
 
   for (int i = 0; i < items_list; i++) {
     char* name = (char*) malloc(20);
@@ -166,6 +165,7 @@ void screen_module_update_previous_layer() {
       break;
     /* Bluetooth applications */
     case LAYER_BLUETOOTH_AIRTAGS_SCAN:
+    case LAYER_BLUETOOTH_GAME:
       previous_layer = LAYER_BLUETOOTH_APPS;
       break;
     /* GPS applications */
@@ -218,8 +218,11 @@ void screen_module_enter_submenu() {
     case LAYER_BLUETOOTH_APPS:
       switch (selected_item) {
         case BLUETOOTH_MENU_AIRTAGS_SCAN:
+          current_layer = LAYER_BLUETOOTH_AIRTAGS_SCAN;
+          app_screen_state_machine_init(selected_item);
           break;
         case BLUETOOTH_MENU_GAME:
+          current_layer = LAYER_BLUETOOTH_GAME;
           game_engine_state_machine_init();
           break;
         default:
@@ -236,6 +239,7 @@ void screen_module_enter_submenu() {
   }
 
   previous_layer = current_layer;
+  selected_item = 0;
   if (!app_state.in_app) {
     screen_module_display_menu();
   }
@@ -258,4 +262,8 @@ void module_keyboard_update_state(
 
 app_state_t screen_module_get_app_state() {
   return app_state;
+}
+
+screen_module_layer_t screen_module_get_current_layer() {
+  return current_layer;
 }

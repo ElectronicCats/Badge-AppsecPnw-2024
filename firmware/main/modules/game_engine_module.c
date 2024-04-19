@@ -38,7 +38,13 @@ void game_engine_state_machine(button_event_t button_pressed) {
       ESP_LOGI(TAG_GAME_ENGINE_MODULE, "GAME_STATE_TEAM_SELECTION");
       switch (button_name) {
         case BUTTON_LEFT:
-          ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button left pressed");
+          if (button_event == BUTTON_DOUBLE_CLICK) {
+            ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button left pressed");
+            module_keyboard_update_state(false, NULL);
+            screen_module_exit_submenu();
+            break;
+          }
+
           break;
         case BUTTON_RIGHT:
           ESP_LOGI(TAG_GAME_ENGINE_MODULE,

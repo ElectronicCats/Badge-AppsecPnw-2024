@@ -51,7 +51,8 @@ extern struct gattc_profile_inst gattc_profile_tab[DEVICE_PROFILES];
  *
  * @return void
  */
-void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param);
+void ble_client_esp_gap_cb(esp_gap_ble_cb_event_t event,
+                           esp_ble_gap_cb_param_t* param);
 /**
  * @brief GATT Client event handler
  *
@@ -61,9 +62,9 @@ void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t* param);
  *
  * @return void
  */
-void esp_gattc_cb(esp_gattc_cb_event_t event,
-                  esp_gatt_if_t gattc_if,
-                  esp_ble_gattc_cb_param_t* param);
+void ble_client_esp_gattc_cb(esp_gattc_cb_event_t event,
+                             esp_gatt_if_t gattc_if,
+                             esp_ble_gattc_cb_param_t* param);
 /**
  * @brief Send data to the remote device
  *
