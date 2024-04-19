@@ -28,3 +28,8 @@ fp-info-cache
 hardware/Template-KiCAD-Project-CI-backups/
 
 hardware/AppsecPnw-2024-backups/
+
+.devcontainer/*
+.vscode/*
+build/*
+managed_components/*
