@@ -25,6 +25,7 @@ fp-info-cache
 *.xml
 *.csv
 
+
 hardware/Template-KiCAD-Project-CI-backups/
 
 hardware/AppsecPnw-2024-backups/
@@ -33,3 +34,4 @@ hardware/AppsecPnw-2024-backups/
 .vscode/*
 build/*
 managed_components/*
+!partitions.csv

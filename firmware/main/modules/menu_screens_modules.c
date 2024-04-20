@@ -64,7 +64,7 @@ void screen_module_display_menu_items(char** items) {
   // Page 5: Option 3
   int page = 1;
   char* terminal_user = "appsec@pwn";
-  oled_driver_display_text(page, terminal_user, strlen(terminal_user),
+  oled_driver_display_text(page, terminal_user,
                            OLED_DISPLAY_NORMAL);
   page++;
   int items_list = submenu_items - 2;
@@ -79,10 +79,10 @@ void screen_module_display_menu_items(char** items) {
       char item_text[strlen(prefix) + strlen(name) + 1];
       strcpy(item_text, prefix);
       strcat(item_text, name);
-      oled_driver_display_text(page, item_text, strlen(item_text),
+      oled_driver_display_text(page, item_text, 
                                OLED_DISPLAY_INVERTED);
     } else {
-      oled_driver_display_text(page, name, strlen(name), OLED_DISPLAY_NORMAL);
+      oled_driver_display_text(page, name, OLED_DISPLAY_NORMAL);
     }
     page += 2;
   }
@@ -106,7 +106,7 @@ void screen_module_set_main_menu() {
 
 void screen_module_display_in_progress() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(4, "In Progress", 13, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(4, "In Progress", OLED_DISPLAY_NORMAL);
 }
 
 void screen_module_increment_index_item() {

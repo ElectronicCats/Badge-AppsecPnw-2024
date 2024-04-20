@@ -8,6 +8,7 @@
 #include "modules/cross_keyboard_module.h"
 #include "modules/game_screens_module.h"
 #include "modules/menu_screens_modules.h"
+#include "modules/wifi/wifi_scanner_module.h"
 
 void app_main(void) {
   memory_driver_begin();
