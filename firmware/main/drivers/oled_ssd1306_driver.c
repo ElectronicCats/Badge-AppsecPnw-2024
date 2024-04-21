@@ -49,8 +49,7 @@ void oled_driver_display_text(int page, char* text, bool invert) {
   ssd1306_display_text(&p_driver_screen, page, text, strlen(text), invert);
 }
 
-void oled_driver_display_text_large(int page,
-                                    char* text,bool invert) {
+void oled_driver_display_text_large(int page, char* text, bool invert) {
   ssd1306_display_text_x3(&p_driver_screen, page, text, strlen(text), invert);
 }
 
@@ -68,18 +67,14 @@ void oled_driver_display_fadeout(void) {
   ssd1306_fadeout(&p_driver_screen);
 }
 
-void oled_driver_display_text_scroll_left(int page,
-                                          char* text,
-                                          bool invert) {
+void oled_driver_display_text_scroll_left(int page, char* text, bool invert) {
   oled_driver_display_text(page, text, invert);
   ssd1306_hardware_scroll(&p_driver_screen, SCROLL_LEFT);
   vTaskDelay(2000 / portTICK_PERIOD_MS);
   ssd1306_hardware_scroll(&p_driver_screen, SCROLL_STOP);
 }
 
-void oled_driver_display_text_scroll_right(int page,
-                                           char* text,
-                                           bool invert) {
+void oled_driver_display_text_scroll_right(int page, char* text, bool invert) {
   oled_driver_display_text(page, text, invert);
   ssd1306_hardware_scroll(&p_driver_screen, SCROLL_RIGHT);
   vTaskDelay(2000 / portTICK_PERIOD_MS);
@@ -119,6 +114,10 @@ void oled_driver_display_text_center(int page, char* text, bool invert) {
     strcat(text_centered, " ");
   }
   strcat(text_centered, text);
+  int text_centered_len = strlen(text_centered);
+  for (int i = text_centered_len; i < max_char_len; i++) {
+    strcat(text_centered, " ");
+  }
   oled_driver_display_text(page, text_centered, invert);
 }
 

@@ -53,7 +53,8 @@ void app_screen_state_machine(button_event_t button_pressed) {
           if (is_modal_displaying) {
             is_modal_displaying = false;
             oled_driver_clear(OLED_DISPLAY_NORMAL);
-            oled_driver_display_text_center(0, "Trackers Scanner", OLED_DISPLAY_INVERTED);
+            oled_driver_display_text_center(0, "Trackers Scanner",
+                                            OLED_DISPLAY_INVERTED);
             break;
           }
 
@@ -142,15 +143,15 @@ void screen_app_task_display_devices() {
 
 void screen_app_display_modal(tracker_profile_t profile) {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  int   started_page = 1;
-  char* name         = (char*) malloc(MAX_LINE_CHAR);
-  char* rssi         = (char*) malloc(MAX_LINE_CHAR);
-  char* mac_addrs    = (char*) malloc(20);
+  int started_page = 1;
+  char* name = (char*) malloc(MAX_LINE_CHAR);
+  char* rssi = (char*) malloc(MAX_LINE_CHAR);
+  char* mac_addrs = (char*) malloc(20);
   char* str_adv_data = (char*) malloc(64);
 
   memset(str_adv_data, 0, 64);
   sprintf(name, "%s", profile.name);
-  sprintf(rssi, "RSSI: %d dBM", profile.rssi);
+  sprintf(rssi, "RSSI: %d dBm", profile.rssi);
   sprintf(mac_addrs, "%02X:%02X:%02X:%02X:%02X%02X", profile.mac_address[0],
           profile.mac_address[1], profile.mac_address[2],
           profile.mac_address[3], profile.mac_address[4],

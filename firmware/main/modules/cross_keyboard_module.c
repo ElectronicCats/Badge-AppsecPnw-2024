@@ -34,7 +34,6 @@ void module_keyboard_button_event_cb(void* arg, void* data) {
       if (button_event == BUTTON_DOUBLE_CLICK) {
         break;
       }
-      ESP_LOGI(TAG_CROSS_KEYBOARD_MODULE, "Single click detected");
       screen_module_exit_submenu();
       break;
     case BUTTON_RIGHT:

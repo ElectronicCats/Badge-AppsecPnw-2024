@@ -278,10 +278,11 @@ void game_engine_handle_server_data(char* ble_data) {
           game_engine_get_owasp_profile(command_value);
       oled_driver_display_fadeout();
       oled_driver_clear(OLED_DISPLAY_NORMAL);
-      oled_driver_display_text_center(0, "Red Team Profile", OLED_DISPLAY_NORMAL);
-      oled_driver_display_text(
-          2, current_game_state.opponent_profile->vuln->cwe,
-          OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(0, "Red Team Profile",
+                                      OLED_DISPLAY_NORMAL);
+      oled_driver_display_text(2,
+                               current_game_state.opponent_profile->vuln->cwe,
+                               OLED_DISPLAY_NORMAL);
       int started_page = 4;
       oled_driver_display_text_splited(
           current_game_state.opponent_profile->vuln->name, &started_page,
@@ -372,11 +373,11 @@ void game_engine_display_owasp_profile_selection() {
       char item_text[strlen(prefix) + strlen(profile->vuln->cwe) + 1];
       strcpy(item_text, prefix);
       strcat(item_text, profile->vuln->cwe);
-      oled_driver_display_text((i + 1) - (int) current_option, item_text, OLED_DISPLAY_INVERTED);
+      oled_driver_display_text((i + 1) - (int) current_option, item_text,
+                               OLED_DISPLAY_INVERTED);
     } else {
       oled_driver_display_text((i + 1) - (int) current_option,
-                               profile->vuln->cwe,
-                               OLED_DISPLAY_NORMAL);
+                               profile->vuln->cwe, OLED_DISPLAY_NORMAL);
     }
   }
 }

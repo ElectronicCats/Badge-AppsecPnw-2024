@@ -2,7 +2,7 @@
 #include "ssd1306.h"
 #ifndef OLED_DRIVER_H
   #define OLED_DRIVER_H
-  #define TAG_OLED_DRIVER  "OLED_DRIVER"
+  #define TAG_OLED_DRIVER  "driver:oled"
   #define MAX_PAGE         8
   #define MAX_LINE_CHAR    17
   #define MAX_WORDS_SCREEN 6
@@ -44,9 +44,7 @@ void oled_driver_display_text(int page, char* text, bool invert);
  * @param text Text to display on the OLED display
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_large(int page,
-                                    char* text,
-                                    bool invert);
+void oled_driver_display_text_large(int page, char* text, bool invert);
 
 /**
  * @brief Display bitmap on the OLED display
@@ -79,9 +77,7 @@ void oled_driver_display_fadeout(void);
  * @param text Text to display on the OLED display
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_scroll_left(int page,
-                                          char* text,
-                                          bool invert);
+void oled_driver_display_text_scroll_left(int page, char* text, bool invert);
 
 /**
  * @brief Display scrolling right text on the OLED display
@@ -90,9 +86,7 @@ void oled_driver_display_text_scroll_left(int page,
  * @param text Text to display on the OLED display
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_scroll_right(int page,
-                                           char* text,
-                                           bool invert);
+void oled_driver_display_text_scroll_right(int page, char* text, bool invert);
 
 /**
  * @brief Clear the line on the OLED display

@@ -6,6 +6,11 @@
   #define TAG_MENU_SCREEN_MODULE    "MENU_SCREEN_MODULE"
   #define MAX_MENU_ITEMS_PER_SCREEN 3
 
+typedef enum {
+  SCREEN_IN_NAVIGATION = 0,
+  SCREEN_IN_APP,
+} screen_module_controls_type_t;
+
 /**
  * @brief Initialize the screen module
  */
