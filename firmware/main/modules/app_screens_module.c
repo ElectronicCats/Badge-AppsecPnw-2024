@@ -53,8 +53,8 @@ void app_screen_state_machine(button_event_t button_pressed) {
           if (is_modal_displaying) {
             is_modal_displaying = false;
             oled_driver_clear(OLED_DISPLAY_NORMAL);
-            oled_driver_display_text(0, "Trackers Scanner", 17,
-                                     OLED_DISPLAY_INVERTED);
+            oled_driver_display_text_center(0, "Trackers Scanner",
+                                            OLED_DISPLAY_INVERTED);
             break;
           }
 
@@ -122,7 +122,7 @@ void screen_app_task_stop_display_devices() {
 void screen_app_task_display_devices() {
   // #TODO: Implement the scrolling of the devices
   char* name_str = (char*) malloc(50);
-  oled_driver_display_text(0, "Trackers Scanner", 17, OLED_DISPLAY_INVERTED);
+  oled_driver_display_text_center(0, "Trackers Scanner", OLED_DISPLAY_INVERTED);
   while (is_displaying) {
     if (!is_modal_displaying) {
       int started_page = 2;
@@ -147,44 +147,31 @@ void screen_app_display_modal(tracker_profile_t profile) {
   char* name = (char*) malloc(MAX_LINE_CHAR);
   char* rssi = (char*) malloc(MAX_LINE_CHAR);
   char* mac_addrs = (char*) malloc(20);
-  // char*    mac_addrs_s  = (char*) malloc(10);
   char* str_adv_data = (char*) malloc(64);
 
   memset(str_adv_data, 0, 64);
   sprintf(name, "%s", profile.name);
-  sprintf(rssi, "RSSI: %d dBM", profile.rssi);
+  sprintf(rssi, "RSSI: %d dBm", profile.rssi);
   sprintf(mac_addrs, "%02X:%02X:%02X:%02X:%02X%02X", profile.mac_address[0],
           profile.mac_address[1], profile.mac_address[2],
           profile.mac_address[3], profile.mac_address[4],
           profile.mac_address[5]);
-  // sprintf(mac_addrs_s, "%02X:%02X:%02X ", profile.mac_address[3],
-  // profile.mac_address[4],
-  //         profile.mac_address[5]);
 
-  ESP_LOGI(
-      TAG_APP_SCREEN_MODULE,
-      "Displaying modal with the following data %d:", profile.adv_data_length);
   sprintf(str_adv_data, "ADV: ");
   for (int i = 96; i < 112; i++) {
     sprintf(str_adv_data + strlen(str_adv_data), "%02X ", profile.adv_data[i]);
   }
-  // esp_log_buffer_hex(TAG_APP_SCREEN_MODULE, adv_data, 62);
-  // oled_driver_display_text_center(0, vendor, OLED_DISPLAY_NORMAL);
   oled_driver_display_text_center(0, name, OLED_DISPLAY_NORMAL);
-  // oled_driver_display_text_splited(name, &started_page, OLED_DISPLAY_NORMAL);
   oled_driver_display_text_splited(rssi, &started_page, OLED_DISPLAY_NORMAL);
   oled_driver_display_text_center(started_page, "MAC Address",
                                   OLED_DISPLAY_NORMAL);
   started_page++;
   oled_driver_display_text_center(started_page, mac_addrs, OLED_DISPLAY_NORMAL);
   started_page++;
-  // oled_driver_display_text_center(started_page,mac_addrs_s,
-  // OLED_DISPLAY_NORMAL); started_page++;
   oled_driver_display_text_splited(str_adv_data, &started_page,
                                    OLED_DISPLAY_NORMAL);
   free(name);
   free(rssi);
   free(mac_addrs);
-  // free(mac_addrs_s);
   free(str_adv_data);
 }

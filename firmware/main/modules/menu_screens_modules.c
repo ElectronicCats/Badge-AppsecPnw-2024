@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "modules/app_screen_module.h"
 #include "modules/game_engine_module.h"
+#include "modules/wifi/wifi_module.h"
 
 screen_module_layer_t previous_layer;
 screen_module_layer_t current_layer;
@@ -62,10 +63,9 @@ void screen_module_display_menu_items(char** items) {
   // Page 1: Option 1
   // Page 3: Option 2 -> selected option
   // Page 5: Option 3
-  int page = 1;
+  int page = 0;
   char* terminal_user = "appsec@pwn";
-  oled_driver_display_text(page, terminal_user, strlen(terminal_user),
-                           OLED_DISPLAY_NORMAL);
+  oled_driver_display_text(page, terminal_user, OLED_DISPLAY_NORMAL);
   page++;
   int items_list = submenu_items - 2;
 
@@ -79,10 +79,9 @@ void screen_module_display_menu_items(char** items) {
       char item_text[strlen(prefix) + strlen(name) + 1];
       strcpy(item_text, prefix);
       strcat(item_text, name);
-      oled_driver_display_text(page, item_text, strlen(item_text),
-                               OLED_DISPLAY_INVERTED);
+      oled_driver_display_text(page, item_text, OLED_DISPLAY_INVERTED);
     } else {
-      oled_driver_display_text(page, name, strlen(name), OLED_DISPLAY_NORMAL);
+      oled_driver_display_text(page, name, OLED_DISPLAY_NORMAL);
     }
     page += 2;
   }
@@ -106,7 +105,7 @@ void screen_module_set_main_menu() {
 
 void screen_module_display_in_progress() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(4, "In Progress", 13, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(4, "In Progress", OLED_DISPLAY_NORMAL);
 }
 
 void screen_module_increment_index_item() {
@@ -161,6 +160,7 @@ void screen_module_update_previous_layer() {
       break;
     /* WiFi applications */
     case LAYER_WIFI_ANALIZER:
+    case LAYER_WIFI_DEAUTH:
       previous_layer = LAYER_WIFI_APPS;
       break;
     /* Bluetooth applications */
@@ -180,6 +180,8 @@ void screen_module_update_previous_layer() {
 }
 
 void screen_module_enter_submenu() {
+  ESP_LOGI(TAG_MENU_SCREEN_MODULE, "Last submenu: Layer %d - Selected: %d",
+           current_layer, selected_item);
   switch (current_layer) {
     case LAYER_MAIN_MENU: {
       switch (selected_item) {
@@ -191,6 +193,9 @@ void screen_module_enter_submenu() {
           break;
         case MAIN_MENU_ABOUT:
           current_layer = LAYER_ABOUT;
+          break;
+        default:
+          current_layer = LAYER_MAIN_MENU;
           break;
       }
       break;
@@ -208,14 +213,29 @@ void screen_module_enter_submenu() {
         case APPLICATIONS_MENU_MATTER:
         case APPLICATIONS_MENU_GPS:
         default:
+          current_layer = LAYER_APPLICATIONS;
           break;
       }
       break;
     }
-    case LAYER_SETTINGS:
-    case LAYER_ABOUT:
-    case LAYER_WIFI_APPS:
-    case LAYER_BLUETOOTH_APPS:
+    case LAYER_WIFI_APPS: {
+      switch (selected_item) {
+        ESP_LOGI(TAG_MENU_SCREEN_MODULE, "wifi:Selected item: %d",
+                 selected_item);
+        case WIFI_MENU_ANALIZER:
+          current_layer = LAYER_WIFI_ANALIZER;
+          screen_module_display_in_progress();
+          break;
+        case WIFI_MENU_DEAUTH:
+          current_layer = LAYER_WIFI_DEAUTH;
+          wifi_module_begin();
+          break;
+        default:
+          break;
+      }
+      break;
+    }
+    case LAYER_BLUETOOTH_APPS: {
       switch (selected_item) {
         case BLUETOOTH_MENU_AIRTAGS_SCAN:
           current_layer = LAYER_BLUETOOTH_AIRTAGS_SCAN;
@@ -228,10 +248,13 @@ void screen_module_enter_submenu() {
         default:
           break;
       }
+      break;
+    }
+    case LAYER_SETTINGS:
+    case LAYER_ABOUT:
     case LAYER_ZIGBEE_APPS:
     case LAYER_THREAD_APPS:
     case LAYER_MATTER_APPS:
-    case LAYER_WIFI_ANALIZER:
       break;
     default:
       ESP_LOGE(TAG_MENU_SCREEN_MODULE, "Invalid layer");
@@ -247,7 +270,8 @@ void screen_module_enter_submenu() {
 
 void screen_module_exit_submenu() {
   ESP_LOGI(TAG_MENU_SCREEN_MODULE, "Exiting submenu");
-  ESP_LOGI(TAG_MENU_SCREEN_MODULE, "Previous layer: %d", previous_layer);
+  ESP_LOGI(TAG_MENU_SCREEN_MODULE, "Previous layer: %d Current: %d",
+           previous_layer, current_layer);
   current_layer = previous_layer;
   selected_item = 0;
   screen_module_display_menu();

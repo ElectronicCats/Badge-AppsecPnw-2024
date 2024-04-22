@@ -16,6 +16,7 @@ enum menu_layer_t {
   LAYER_GPS,
   /* WiFi applications */
   LAYER_WIFI_ANALIZER,
+  LAYER_WIFI_DEAUTH,
   /* Bluetooth applications */
   LAYER_BLUETOOTH_AIRTAGS_SCAN,
   LAYER_BLUETOOTH_GAME,
@@ -71,6 +72,7 @@ enum menu_layer_about_items_t {
 
 enum menu_layer_wifi_items_t {
   WIFI_MENU_ANALIZER = 0,
+  WIFI_MENU_DEAUTH,
 };
 
 enum menu_layer_bluetooth_items_t {
@@ -133,6 +135,7 @@ static char* legal_text[] = {
 
 static char* wifi_items[] = {
     "Analizer",
+    "Deauth",
     NULL,
 };
 
@@ -168,13 +171,15 @@ static char** menu_items[] = {
     /* Applications */
     wifi_items, bluetooth_items,
     empty_items,  // Zigbee
-    thread_items,
+    empty_items,
     empty_items,  // Matter
-    gps_items,
+    empty_items,
     /* WiFi applications */
     empty_items,  // WiFi Analizer
+    empty_items,  // WiFi Deauth
     /* Bluetooth applications */
     empty_items,  // Bluetooth Airtags scan
+    empty_items,  // Bluetooth Game
     /* Thread applications */
     empty_items,  // Thread CLI
     /* GPS applications */

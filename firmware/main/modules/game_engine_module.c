@@ -206,7 +206,7 @@ void game_engine_handle_game_over() {
   } else {
     screen_module_display_game_blue_team_logo();
   }
-  oled_driver_display_text(7, "     WINNER", 16, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(7, "     WINNER", OLED_DISPLAY_NORMAL);
   vTaskDelay(2000 / portTICK_PERIOD_MS);
   oled_driver_display_fadeout();
   esp_restart();
@@ -218,10 +218,10 @@ void game_engine_handle_battle_round_winner() {
       current_game_state.attacker_action) {
     current_game_state.opponent.life_points -= GAME_DEFAULT_ATTACK_POINTS;
     screen_module_display_game_blue_team_logo();
-    oled_driver_display_text(7, "    DEFENDED    ", 16, OLED_DISPLAY_NORMAL);
+    oled_driver_display_text_center(7, "    DEFENDED    ", OLED_DISPLAY_NORMAL);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    oled_driver_display_text(0, "Attacker", 8, OLED_DISPLAY_NORMAL);
+    oled_driver_display_text(0, "Attacker", OLED_DISPLAY_NORMAL);
     screen_module_display_game_points_life(
         current_game_state.opponent.life_points);
     if (current_game_state.opponent.life_points <= 0) {
@@ -232,10 +232,10 @@ void game_engine_handle_battle_round_winner() {
   } else {
     current_game_state.attacker.life_points -= GAME_DEFAULT_ATTACK_POINTS;
     screen_module_display_game_red_team_logo();
-    oled_driver_display_text(7, "      PWNED   ", 16, OLED_DISPLAY_NORMAL);
+    oled_driver_display_text_center(7, "      PWNED   ", OLED_DISPLAY_NORMAL);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    oled_driver_display_text(0, "Defender", 8, OLED_DISPLAY_NORMAL);
+    oled_driver_display_text(0, "Defender", OLED_DISPLAY_NORMAL);
     screen_module_display_game_points_life(
         current_game_state.attacker.life_points);
     if (current_game_state.attacker.life_points <= 0) {
@@ -278,11 +278,11 @@ void game_engine_handle_server_data(char* ble_data) {
           game_engine_get_owasp_profile(command_value);
       oled_driver_display_fadeout();
       oled_driver_clear(OLED_DISPLAY_NORMAL);
-      oled_driver_display_text(0, "Red Team Profile", 17, OLED_DISPLAY_NORMAL);
-      oled_driver_display_text(
-          2, current_game_state.opponent_profile->vuln->cwe,
-          strlen(current_game_state.opponent_profile->vuln->cwe),
-          OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(0, "Red Team Profile",
+                                      OLED_DISPLAY_NORMAL);
+      oled_driver_display_text(2,
+                               current_game_state.opponent_profile->vuln->cwe,
+                               OLED_DISPLAY_NORMAL);
       int started_page = 4;
       oled_driver_display_text_splited(
           current_game_state.opponent_profile->vuln->name, &started_page,
@@ -292,7 +292,7 @@ void game_engine_handle_server_data(char* ble_data) {
       ESP_LOGI(TAG_GAME_ENGINE_MODULE, "BLE_COMMAND_ATTACK_SELECTED");
       current_game_state.attacker_action = command_value;
       oled_driver_clear(OLED_DISPLAY_NORMAL);
-      oled_driver_display_text(0, "Red Team used", 17, OLED_DISPLAY_NORMAL);
+      oled_driver_display_text(0, "Red Team used", OLED_DISPLAY_NORMAL);
       int started_page = 1;
       if (command_value == 0) {
         oled_driver_display_text_splited(
@@ -344,14 +344,14 @@ void game_engine_display_team_selection() {
   if (current_option > 1) {
     current_option = 0;
   }
-  oled_driver_display_text(0, "Select Team", 12, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "Select Team", OLED_DISPLAY_NORMAL);
 
   if (current_option == 0) {
     screen_module_display_game_blue_team_logo();
-    oled_driver_display_text(7, "    Defender   ", 16, OLED_DISPLAY_NORMAL);
+    oled_driver_display_text_center(7, "Defender", OLED_DISPLAY_NORMAL);
   } else {
     screen_module_display_game_red_team_logo();
-    oled_driver_display_text(7, "    Attackers   ", 16, OLED_DISPLAY_NORMAL);
+    oled_driver_display_text_center(7, "Attackers", OLED_DISPLAY_NORMAL);
   }
 }
 
@@ -363,7 +363,7 @@ void game_engine_display_owasp_profile_selection() {
   }
 
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(0, "Select Profile", 16, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text(0, "Select Profile", OLED_DISPLAY_NORMAL);
 
   for (int i = (int) current_option; i < limit_page + (int) current_option;
        i++) {
@@ -374,18 +374,17 @@ void game_engine_display_owasp_profile_selection() {
       strcpy(item_text, prefix);
       strcat(item_text, profile->vuln->cwe);
       oled_driver_display_text((i + 1) - (int) current_option, item_text,
-                               strlen(item_text), OLED_DISPLAY_INVERTED);
+                               OLED_DISPLAY_INVERTED);
     } else {
       oled_driver_display_text((i + 1) - (int) current_option,
-                               profile->vuln->cwe, strlen(profile->vuln->cwe),
-                               OLED_DISPLAY_NORMAL);
+                               profile->vuln->cwe, OLED_DISPLAY_NORMAL);
     }
   }
 }
 
 void game_engine_display_owasp_profile_attacks() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(0, "Select Attack", 13, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text(0, "Select Attack", OLED_DISPLAY_NORMAL);
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "attack1 %s",
            current_game_state.attacker_profile->action1->attack->name);
   int started_page = 1;
@@ -401,7 +400,7 @@ void game_engine_display_owasp_profile_attacks() {
 
 void game_engine_display_owasp_profile_response() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(0, "Select Response", 17, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text(0, "Select Response", OLED_DISPLAY_NORMAL);
   int started_page = 1;
   oled_driver_display_text_splited(
       current_game_state.attacker_profile->action1->response->name,
@@ -419,15 +418,4 @@ game_owasp_profile_t* game_engine_get_owasp_profile(int index) {
     return &owasp_game_profiles[index];
   }
   return &owasp_game_profiles[0];
-}
-
-void string_split(const char* str, char* str_array[], const char* delimiter) {
-  char* token;
-  int i = 0;
-  token = strtok(str, delimiter);
-  while (token != NULL) {
-    str_array[i] = token;
-    token = strtok(NULL, delimiter);
-    i++;
-  }
 }

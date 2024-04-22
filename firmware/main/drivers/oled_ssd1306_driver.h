@@ -1,7 +1,8 @@
+
 #include "ssd1306.h"
 #ifndef OLED_DRIVER_H
   #define OLED_DRIVER_H
-  #define TAG_OLED_DRIVER  "OLED_DRIVER"
+  #define TAG_OLED_DRIVER  "driver:oled"
   #define MAX_PAGE         8
   #define MAX_LINE_CHAR    17
   #define MAX_WORDS_SCREEN 6
@@ -32,23 +33,18 @@ void oled_driver_clear(bool invert);
  *
  * @param page Page to display the text on the OLED display
  * @param text Text to display on the OLED display
- * @param size Size of the text
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text(int page, char* text, int size, bool invert);
+void oled_driver_display_text(int page, char* text, bool invert);
 
 /**
  * @brief Display large text on the OLED display
  *
  * @param page Page to display the text on the OLED display
  * @param text Text to display on the OLED display
- * @param size Size of the text
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_large(int page,
-                                    char* text,
-                                    int size,
-                                    bool invert);
+void oled_driver_display_text_large(int page, char* text, bool invert);
 
 /**
  * @brief Display bitmap on the OLED display
@@ -79,26 +75,18 @@ void oled_driver_display_fadeout(void);
  *
  * @param page Page to display the text on the OLED display
  * @param text Text to display on the OLED display
- * @param size Size of the text
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_scroll_left(int page,
-                                          char* text,
-                                          int size,
-                                          bool invert);
+void oled_driver_display_text_scroll_left(int page, char* text, bool invert);
 
 /**
  * @brief Display scrolling right text on the OLED display
  *
  * @param page Page to display the text on the OLED display
  * @param text Text to display on the OLED display
- * @param size Size of the text
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_scroll_right(int page,
-                                           char* text,
-                                           int size,
-                                           bool invert);
+void oled_driver_display_text_scroll_right(int page, char* text, bool invert);
 
 /**
  * @brief Clear the line on the OLED display
@@ -134,7 +122,7 @@ void oled_driver_display_scroll_text(char* text, bool invert);
  * the OLED display
  * @param invert Invert the background and foreground color of the OLED display
  */
-void oled_driver_display_text_splited(const char* p_text,
+void oled_driver_display_text_splited(char* p_text,
                                       int* p_started_page,
                                       int invert);
 
