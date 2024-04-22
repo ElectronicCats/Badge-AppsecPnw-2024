@@ -38,9 +38,15 @@ void wifi_screens_module_scanning(void) {
   }
 }
 
-void wifi_screens_module_attacking(void) {
+void wifi_screens_module_animate_attacking(wifi_ap_record_t* ap_record) {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
+  char* ssid = (char*) malloc(33);
+  memset(ssid, 0, 33);
+  sprintf(ssid, "%s", (char*) ap_record->ssid);
+
   oled_driver_display_text_center(0, "TARGETING", OLED_DISPLAY_INVERTED);
+  oled_driver_display_text_center(1, ssid, OLED_DISPLAY_INVERTED);
+
   while (true) {
     for (int i = 0; i < wifi_bitmap_allArray_LEN; i++) {
       oled_driver_display_bitmap(48, 16, wifi_bitmap_allArray[i], 32, 32,
@@ -49,6 +55,7 @@ void wifi_screens_module_attacking(void) {
     }
     vTaskDelay(500 / portTICK_PERIOD_MS);
   }
+  free(ssid);
 }
 
 void wifi_screens_module_display_scanned_networks(wifi_ap_record_t* ap_records,

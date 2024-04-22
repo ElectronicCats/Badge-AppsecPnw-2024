@@ -6,6 +6,10 @@
   #define WIFI_MODULE_H
   #define TAG_WIFI_MODULE "module:wifi"
 
+/**
+ * @brief Enum with the wifi module states
+ *
+ */
 typedef enum {
   WIFI_STATE_SCANNING = 0,
   WIFI_STATE_SCANNED,
@@ -14,13 +18,37 @@ typedef enum {
   WIFI_STATE_ATTACK
 } wifi_state_t;
 
+/**
+ * @brief Structure to store the wifi module data
+ *
+ */
 typedef struct {
   wifi_state_t state;
   wifi_config_t wifi_config;
 } wifi_module_t;
 
+/**
+ * @brief List to the names of attacks
+ *
+ */
 static char* wifi_attacks[] = {"Broadcast", "Rouge AP", "Combine"};
 
+/**
+ * @brief Start the wifi module
+ *
+ */
 void wifi_module_begin(void);
+
+/**
+ * @brief Stop the wifi module
+ *
+ */
+void wifi_module_exit(void);
+
+/**
+ * @brief State machine for the wifi module
+ *
+ * @param button_pressed The button pressed
+ */
 void wifi_module_state_machine(button_event_t button_pressed);
 #endif  // WIFI_MODULE_H

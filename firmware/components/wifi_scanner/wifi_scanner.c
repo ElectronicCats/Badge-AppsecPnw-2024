@@ -1,9 +1,7 @@
-#include "modules/wifi/wifi_scanner_module.h"
+#include "wifi_scanner.h"
 #include <string.h>
-#include "esp_event.h"
 #include "esp_log.h"
 #include "esp_wifi.h"
-#include "freertos/FreeRTOS.h"
 
 /**
  * @brief Stores last scanned AP records into linked list.
@@ -23,11 +21,11 @@ void wifi_scanner_module_scan() {
   ESP_LOGD(TAG_WIFI_SCANNER_MODULE, "Scan done.");
 }
 
-const wifi_scanner_ap_records_t* wifi_scanner_get_ap_records() {
+wifi_scanner_ap_records_t* wifi_scanner_get_ap_records() {
   return &ap_records;
 }
 
-const wifi_ap_record_t* wifi_scanner_get_ap_record(unsigned index) {
+wifi_ap_record_t* wifi_scanner_get_ap_record(unsigned index) {
   if (index > ap_records.count) {
     ESP_LOGE(TAG_WIFI_SCANNER_MODULE,
              "Index out of bounds! %u records available, but %u requested",

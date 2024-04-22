@@ -1,10 +1,10 @@
-#include "modules/wifi/wifi_attacks_module.h"
+#include "wifi_attacks.h"
 #include <string.h>
-#include "drivers/wifi_driver.h"
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
+#include "wifi_controller.h"
 
 static TaskHandle_t task_brod_attack = NULL;
 static TaskHandle_t task_rogue_attack = NULL;
@@ -26,6 +26,10 @@ static const uint8_t deauth_frame_default[] = {
  * @see Project with original idea/implementation
  * https://github.com/GANESH-ICMC/esp32-deauther
  */
+// This function overrides the original one at compilation time
+// To  work with the CMakeList file need to add at the end of the file
+// target_link_libraries(${COMPONENT_LIB}  -Wl,-zmuldefs)
+// This will allow the linker to use the last defined function
 int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3) {
   return 0;
 }
@@ -52,7 +56,6 @@ void wifi_attack_brod_send_deauth_frame(wifi_ap_record_t* ap_target) {
     attack_brodcast_send_raw_frame(deauth_frame, sizeof(deauth_frame));
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
-  ESP_LOGI(TAG_WIFI_ATTACK_MODULE, "Broadcast attack stopped");
   vTaskSuspend(task_brod_attack);
 }
 
@@ -73,7 +76,6 @@ void wifi_attack_rogueap(const wifi_ap_record_t* ap_record) {
   while (true) {
     vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
-  ESP_LOGI(TAG_WIFI_ATTACK_MODULE, "Rogue AP stopped");
   vTaskSuspend(task_rogue_attack);
 }
 
@@ -85,11 +87,11 @@ void wifi_attacks_module_stop() {
   if (task_rogue_attack != NULL) {
     wifi_config_t default_ap = wifi_driver_access_point_begin();
     wifi_driver_restore_ap_mac();
-    vTaskDelete(task_rogue_attack);
   }
 }
 
-void wifi_attack_handle_attacks(int attack_type, wifi_ap_record_t* ap_target) {
+void wifi_attack_handle_attacks(wifi_attacks_types_t attack_type,
+                                wifi_ap_record_t* ap_target) {
   running_broadcast_attack = true;
   switch (attack_type) {
     case WIFI_ATTACK_BROADCAST:

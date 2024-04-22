@@ -1,10 +1,11 @@
-#include "drivers/wifi_driver.h"
+#include "wifi_controller.h"
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "string.h"
 
 static bool wifi_driver_initialized = false;
 static uint8_t default_ap_mac[6];
+static esp_err_t err;
 
 wifi_config_t wifi_driver_access_point_begin() {
   // ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -24,9 +25,10 @@ void wifi_driver_ap_start(wifi_config_t* wifi_ap_config) {
   ESP_LOGI(TAG_WIFI_DRIVER, "Starting WiFi Access Point %s",
            wifi_ap_config->ap.ssid);
   if (!wifi_driver_initialized) {
+    ESP_LOGI(TAG_WIFI_DRIVER, "Initializing WiFi Access Point and Station");
     wifi_driver_init_apsta();
   }
-  esp_err_t err;
+
   err = esp_wifi_set_config(ESP_IF_WIFI_AP, wifi_ap_config);
   if (err != ESP_OK) {
     ESP_LOGE(TAG_WIFI_DRIVER,
@@ -83,7 +85,12 @@ void wifi_driver_get_ap_mac(uint8_t* mac_ap) {
 
 void wifi_driver_restore_ap_mac() {
   ESP_LOGD(TAG_WIFI_DRIVER, "Restoring original AP MAC address...");
-  ESP_ERROR_CHECK(esp_wifi_set_mac(WIFI_IF_AP, default_ap_mac));
+  err = esp_wifi_set_mac(WIFI_IF_AP, default_ap_mac);
+
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG_WIFI_DRIVER, "Failed to restore AP MAC address: %s",
+             esp_err_to_name(err));
+  }
 }
 
 void wifi_driver_get_sta_mac(uint8_t* mac_sta) {
