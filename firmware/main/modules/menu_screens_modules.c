@@ -224,11 +224,11 @@ void screen_module_enter_submenu() {
                  selected_item);
         case WIFI_MENU_ANALIZER:
           current_layer = LAYER_WIFI_ANALIZER;
-          wifi_module_begin();
+          screen_module_display_in_progress();
           break;
         case WIFI_MENU_DEAUTH:
           current_layer = LAYER_WIFI_DEAUTH;
-          screen_module_display_in_progress();
+          wifi_module_begin();
           break;
         default:
           break;

@@ -40,10 +40,11 @@ void wifi_screens_module_scanning(void) {
 
 void wifi_screens_module_attacking(void) {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text_center(0, "SENDING FRAMES", OLED_DISPLAY_INVERTED);
+  oled_driver_display_text_center(0, "TARGETING", OLED_DISPLAY_INVERTED);
   while (true) {
-    for (int i = 0; i < 5; i++) {
-      oled_driver_display_bitmap(0, 0, idle[i], 128, 32, OLED_DISPLAY_NORMAL);
+    for (int i = 0; i < wifi_bitmap_allArray_LEN; i++) {
+      oled_driver_display_bitmap(48, 16, wifi_bitmap_allArray[i], 32, 32,
+                                 OLED_DISPLAY_NORMAL);
       vTaskDelay(500 / portTICK_PERIOD_MS);
     }
     vTaskDelay(500 / portTICK_PERIOD_MS);

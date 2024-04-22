@@ -18,6 +18,8 @@ bool valid_records = false;
 static TaskHandle_t task_display_scanning = NULL;
 static TaskHandle_t task_display_attacking = NULL;
 wifi_scanner_ap_records_t* ap_records;
+wifi_ap_record_t* ap_record_targeted;
+static int index_targeted = 0;
 
 static void scanning_task(void* pvParameters) {
   while (!valid_records) {
@@ -97,6 +99,7 @@ void wifi_module_state_machine(button_event_t button_pressed) {
             module_keyboard_update_state(SCREEN_IN_NAVIGATION, NULL);
             screen_module_exit_submenu();
             wifi_driver_ap_stop();
+            free(ap_record_targeted);
             break;
           }
           break;
@@ -107,9 +110,20 @@ void wifi_module_state_machine(button_event_t button_pressed) {
                    current_option);
           show_details = true;
           current_wifi_state.state = WIFI_STATE_DETAILS;
+          ap_record_targeted =
+              (wifi_ap_record_t*) malloc(sizeof(wifi_ap_record_t));
+          if (ap_record_targeted == NULL) {
+            ESP_LOGE(TAG_WIFI_MODULE,
+                     "Failed to allocate memory for ap_record_targeted");
+            break;
+          }
+          memccpy(ap_record_targeted, &ap_records->records[current_option], 1,
+                  sizeof(wifi_ap_record_t));
+          index_targeted = current_option;
+
           current_option = 0;
           wifi_screens_module_display_details_network(
-              &ap_records->records[current_option], current_option);
+              &ap_records->records[index_targeted], current_option);
           break;
         case BUTTON_UP: {
           ESP_LOGI(TAG_WIFI_MODULE, "Button up pressed");
@@ -163,14 +177,14 @@ void wifi_module_state_machine(button_event_t button_pressed) {
           ESP_LOGI(TAG_WIFI_MODULE, "Button up pressed");
           current_option = 0;
           wifi_screens_module_display_details_network(
-              &ap_records->records[current_option], current_option);
+              &ap_records->records[index_targeted], current_option);
           break;
         }
         case BUTTON_DOWN: {
           ESP_LOGI(TAG_WIFI_MODULE, "Button down pressed");
           current_option = 1;
           wifi_screens_module_display_details_network(
-              &ap_records->records[current_option], current_option);
+              &ap_records->records[index_targeted], current_option);
           break;
         }
         case BUTTON_BOOT:
@@ -201,7 +215,7 @@ void wifi_module_state_machine(button_event_t button_pressed) {
                    current_option);
           current_wifi_state.state = WIFI_STATE_ATTACK;
           wifi_attack_handle_attacks(current_option,
-                                     &ap_records->records[current_option]);
+                                     &ap_records->records[index_targeted]);
           xTaskCreate(wifi_screens_module_attacking, "wifi_module_scanning",
                       4096, NULL, 5, &task_display_attacking);
           break;

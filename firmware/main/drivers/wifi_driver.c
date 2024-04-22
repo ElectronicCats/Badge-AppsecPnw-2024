@@ -21,12 +21,20 @@ wifi_config_t wifi_driver_access_point_begin() {
 }
 
 void wifi_driver_ap_start(wifi_config_t* wifi_ap_config) {
-  ESP_LOGI(TAG_WIFI_DRIVER, "Starting WiFi Access Point");
+  ESP_LOGI(TAG_WIFI_DRIVER, "Starting WiFi Access Point %s",
+           wifi_ap_config->ap.ssid);
   if (!wifi_driver_initialized) {
     wifi_driver_init_apsta();
   }
-
-  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, wifi_ap_config));
+  esp_err_t err;
+  err = esp_wifi_set_config(ESP_IF_WIFI_AP, wifi_ap_config);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG_WIFI_DRIVER,
+             "Error setting WiFi Access Point configuration: %s",
+             esp_err_to_name(err));
+    ESP_LOGI(TAG_WIFI_DRIVER, "%s", wifi_ap_config->ap.ssid);
+    return;
+  }
   ESP_LOGI(TAG_WIFI_DRIVER, "WiFi Access Point started SSID: %s",
            wifi_ap_config->ap.ssid);
 }
@@ -58,4 +66,36 @@ void wifi_driver_init_apsta(void) {
   ESP_ERROR_CHECK(esp_wifi_get_mac(WIFI_IF_AP, default_ap_mac));
   ESP_ERROR_CHECK(esp_wifi_start());
   wifi_driver_initialized = true;
+}
+
+void wifi_driver_sta_disconnect() {
+  ESP_ERROR_CHECK(esp_wifi_disconnect());
+}
+
+void wifi_driver_set_ap_mac(const uint8_t* mac_ap) {
+  ESP_LOGD(TAG_WIFI_DRIVER, "Changing AP MAC address...");
+  ESP_ERROR_CHECK(esp_wifi_set_mac(WIFI_IF_AP, mac_ap));
+}
+
+void wifi_driver_get_ap_mac(uint8_t* mac_ap) {
+  esp_wifi_get_mac(WIFI_IF_AP, mac_ap);
+}
+
+void wifi_driver_restore_ap_mac() {
+  ESP_LOGD(TAG_WIFI_DRIVER, "Restoring original AP MAC address...");
+  ESP_ERROR_CHECK(esp_wifi_set_mac(WIFI_IF_AP, default_ap_mac));
+}
+
+void wifi_driver_get_sta_mac(uint8_t* mac_sta) {
+  esp_wifi_get_mac(WIFI_IF_STA, mac_sta);
+}
+
+void wifi_driver_set_channel(uint8_t channel) {
+  if ((channel == 0) || (channel > 13)) {
+    ESP_LOGE(TAG_WIFI_DRIVER,
+             "Channel out of range. Expected value from <1,13> but got %u",
+             channel);
+    return;
+  }
+  esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
 }
