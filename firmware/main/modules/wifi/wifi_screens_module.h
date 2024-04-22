@@ -4,6 +4,7 @@
   #define TAG_WIFI_SCREENS_MODULE "module:wifi_screens"
 
 void wifi_screens_module_scanning(void);
+void wifi_screens_module_attacking(void);
 void wifi_screens_module_display_scanned_networks(wifi_ap_record_t* ap_records,
                                                   int scanned_records,
                                                   int current_option);

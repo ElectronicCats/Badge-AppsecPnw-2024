@@ -17,8 +17,6 @@ typedef enum {
 typedef struct {
   wifi_state_t state;
   wifi_config_t wifi_config;
-  wifi_ap_record_t ap_records[20];
-  int total_scanned;
 } wifi_module_t;
 
 static char* wifi_attacks[] = {"Broadcast", "Rouge AP", "Combine"};

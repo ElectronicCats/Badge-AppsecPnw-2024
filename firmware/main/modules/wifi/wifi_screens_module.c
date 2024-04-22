@@ -38,6 +38,18 @@ void wifi_screens_module_scanning(void) {
   }
 }
 
+void wifi_screens_module_attacking(void) {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "SENDING FRAMES", OLED_DISPLAY_INVERTED);
+  while (true) {
+    for (int i = 0; i < 5; i++) {
+      oled_driver_display_bitmap(0, 0, idle[i], 128, 32, OLED_DISPLAY_NORMAL);
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+  }
+}
+
 void wifi_screens_module_display_scanned_networks(wifi_ap_record_t* ap_records,
                                                   int scanned_records,
                                                   int current_option) {

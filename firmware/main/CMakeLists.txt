@@ -14,7 +14,9 @@ set(modules_ble "modules/ble_server_module.c"
 set(modules_wifi  "modules/wifi/wifi_module.c"
                   "modules/wifi/wifi_scanner_module.c"
                   "modules/wifi/wifi_screens_module.c"
-                  "modules/wifi/wifi_attack_brod_module.c")
+                  "modules/wifi/wifi_attacks_module.c")
 
 idf_component_register(SRCS "main.c" "${drivers}"  "${modules}" "${modules_ble}" "${modules_wifi}"
                     INCLUDE_DIRS ".")
+
+target_link_libraries(${COMPONENT_LIB}  -Wl,-zmuldefs)
