@@ -1,5 +1,7 @@
 set(drivers "drivers/oled_ssd1306_driver.c"
-            "drivers/memory_driver.c")
+            "drivers/memory_driver.c"
+            "bt_gatts/bt_gatts.c"
+            "bt_gattc/bt_gattc.c")
 set(modules "modules/cross_keyboard_module.c"
             "modules/game_screens_module.c"
             "modules/menu_screens_modules.c"

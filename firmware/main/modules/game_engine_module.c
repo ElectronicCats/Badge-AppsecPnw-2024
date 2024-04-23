@@ -1,4 +1,6 @@
 #include "modules/game_engine_module.h"
+#include "bt_gattc/bt_gattc.h"
+#include "bt_gatts/bt_gatts.h"
 #include "modules/ble_client_module.h"
 #include "modules/ble_server_module.h"
 #include "modules/cross_keyboard_module.h"
