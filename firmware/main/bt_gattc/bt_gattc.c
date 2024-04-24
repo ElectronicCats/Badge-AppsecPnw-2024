@@ -3,18 +3,9 @@
 #include "esp_log.h"
 #include "inttypes.h"
 
-static void test_function(esp_gattc_cb_event_t event,
-                          esp_gatt_if_t gattc_if,
-                          esp_ble_gattc_cb_param_t* param);
-
-struct gattc_profile_inst ble_client_gattc_profile_tab[DEVICE_PROFILES] = {
-    [DEVICE_PROFILE] = {
-        .gattc_cb = test_function,
-        .gattc_if = ESP_GATT_IF_NONE,
-    }};
-
 // GATT Client
-static char remote_device_name[] = REMOTE_BOARD;
+static char remote_device_name[MAX_REMOTE_DEVICE_NAME];
+static bool search_by_name = false;
 static bool is_connected = false;
 static bool server_attached = false;
 static esp_gattc_char_elem_t* char_elem_result = NULL;
@@ -25,11 +16,11 @@ static esp_bt_uuid_t ble_client_notify_descr_uuid;
 static esp_ble_scan_params_t ble_client_ble_scan_params;
 static bt_client_event_cb_t bt_client_event_cb;
 
-void test_function(esp_gattc_cb_event_t event,
-                   esp_gatt_if_t gattc_if,
-                   esp_ble_gattc_cb_param_t* param) {
-  ESP_LOGI(TAG_BT_GATTC, "test_function %d", event);
-}
+struct gattc_profile_inst ble_client_gattc_profile_tab[DEVICE_PROFILES] = {
+    [DEVICE_PROFILE] = {
+        .gattc_cb = ble_client_gattc_event_handler,
+        .gattc_if = ESP_GATT_IF_NONE,
+    }};
 
 esp_bt_uuid_t bt_gattc_set_default_ble_filter_service_uuid() {
   esp_bt_uuid_t remote_filter_service_uuid = {
@@ -69,8 +60,8 @@ esp_ble_scan_params_t bt_gattc_set_default_ble_scan_params() {
       .scan_type = BLE_SCAN_TYPE_ACTIVE,
       .own_addr_type = BLE_ADDR_TYPE_PUBLIC,
       .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
-      .scan_interval = 0x50,
-      .scan_window = 0x30,
+      .scan_interval = 0x003,
+      .scan_window = 0x003,
       .scan_duplicate = BLE_SCAN_DUPLICATE_DISABLE};
   return ble_scan_params;
 }
@@ -78,8 +69,7 @@ esp_ble_scan_params_t bt_gattc_set_default_ble_scan_params() {
 void bt_gattc_set_remote_device_name(const char* device_name) {
   memccpy(remote_device_name, device_name, 0, strlen(device_name));
   strcpy(remote_device_name, device_name);
-
-  ESP_LOGI(TAG_BT_GATTC, "remote_device_name: %s|", remote_device_name);
+  search_by_name = true;
 }
 
 void bt_gattc_set_ble_scan_params(gattc_scan_params_t* scan_params) {
@@ -105,7 +95,6 @@ void ble_client_gattc_event_handler(esp_gattc_cb_event_t event,
                                     esp_gatt_if_t gattc_if,
                                     esp_ble_gattc_cb_param_t* param) {
   esp_ble_gattc_cb_param_t* p_data = (esp_ble_gattc_cb_param_t*) param;
-  ESP_LOGI(TAG_BT_GATTC, "ble_client_gattc_event_handler %d", event);
   switch (event) {
     case ESP_GATTC_REG_EVT:
       ESP_LOGI(TAG_BT_GATTC, "REG_EVT");
@@ -355,23 +344,19 @@ void ble_client_gattc_event_handler(esp_gattc_cb_event_t event,
     default:
       break;
   }
-
-  ESP_LOGI(TAG_BT_GATTC, "Check if this cb will be called by the user");
   if (bt_client_event_cb.handler_gattc_cb) {
-    ESP_LOGI(TAG_BT_GATTC, "Calling handler_gatt_cb");
     bt_client_event_cb.handler_gattc_cb(event, param);
   }
 }
 
 void ble_client_esp_gap_cb(esp_gap_ble_cb_event_t event,
                            esp_ble_gap_cb_param_t* param) {
-  ESP_LOGI(TAG_BT_GATTC, "ble_client_esp_gap_cb %d", event);
   uint8_t* adv_name = NULL;
   uint8_t adv_name_len = 0;
   switch (event) {
     case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
       // the unit of the duration is second
-      uint32_t duration = 30;
+      uint32_t duration = SCAN_DURATION;
       esp_ble_gap_start_scanning(duration);
       break;
     }
@@ -387,6 +372,9 @@ void ble_client_esp_gap_cb(esp_gap_ble_cb_event_t event,
       break;
     case ESP_GAP_BLE_SCAN_RESULT_EVT: {
       esp_ble_gap_cb_param_t* scan_result = (esp_ble_gap_cb_param_t*) param;
+      if (!search_by_name) {
+        break;
+      }
       switch (scan_result->scan_rst.search_evt) {
         case ESP_GAP_SEARCH_INQ_RES_EVT:
           esp_log_buffer_hex(TAG_BT_GATTC, scan_result->scan_rst.bda, 6);
@@ -455,7 +443,6 @@ void ble_client_esp_gap_cb(esp_gap_ble_cb_event_t event,
   }
 
   if (bt_client_event_cb.handler_gapc_cb) {
-    ESP_LOGI(TAG_BT_GATTC, "Calling handler_gap_cb");
     bt_client_event_cb.handler_gapc_cb(event, param);
   }
 }
@@ -463,7 +450,6 @@ void ble_client_esp_gap_cb(esp_gap_ble_cb_event_t event,
 void ble_client_esp_gattc_cb(esp_gattc_cb_event_t event,
                              esp_gatt_if_t gattc_if,
                              esp_ble_gattc_cb_param_t* param) {
-  ESP_LOGI(TAG_BT_GATTC, "ble_client_esp_gattc_cb %d", event);
   /* If event is register event, store the gattc_if for each profile */
   if (event == ESP_GATTC_REG_EVT) {
     if (param->reg.status == ESP_GATT_OK) {
@@ -474,7 +460,6 @@ void ble_client_esp_gattc_cb(esp_gattc_cb_event_t event,
       return;
     }
   }
-  ESP_LOGI(TAG_BT_GATTC, "Profile OK %d", event);
   /* If the gattc_if equal to profile A, call profile A cb handler,
    * so here call each profile's callback */
   do {
@@ -482,17 +467,13 @@ void ble_client_esp_gattc_cb(esp_gattc_cb_event_t event,
     for (index_profile = 0; index_profile < DEVICE_PROFILES; index_profile++) {
       if (gattc_if == ESP_GATT_IF_NONE ||
           gattc_if == ble_client_gattc_profile_tab[index_profile].gattc_if) {
-        ESP_LOGI(TAG_BT_GATTC, "Have gattc_if %d", index_profile);
         if (ble_client_gattc_profile_tab[index_profile].gattc_cb) {
-          ESP_LOGI(TAG_BT_GATTC, "Do calback %d", index_profile);
           ble_client_gattc_profile_tab[index_profile].gattc_cb(event, gattc_if,
                                                                param);
         }
       }
     }
   } while (0);
-  // ble_client_gattc_profile_tab[param->reg.app_id].gattc_cb(event, gattc_if,
-  // param);
 }
 
 void bt_gattc_task_begin(void) {
@@ -561,5 +542,5 @@ void bt_gattc_task_stop(void) {
   esp_bluedroid_disable();
   esp_bluedroid_deinit();
   esp_bt_controller_disable();
-  esp_bt_controller_deinit();
+  // esp_bt_controller_deinit();
 }

@@ -15,6 +15,7 @@
   #define DEVICE_PROFILE          0
   #define INVALID_HANDLE          0
   #define MAX_REMOTE_DEVICE_NAME  20
+  #define SCAN_DURATION           60
 
 struct gattc_profile_inst {
   esp_gattc_cb_t gattc_cb;
@@ -26,6 +27,20 @@ struct gattc_profile_inst {
   uint16_t char_handle;
   esp_bd_addr_t remote_bda;
 };
+
+/**
+ * @brief Struct contain the GATT Client profile instance
+ */
+typedef struct {
+  esp_gattc_cb_t gattc_cb;
+  uint16_t gattc_if;
+  uint16_t app_id;
+  uint16_t conn_id;
+  uint16_t service_start_handle;
+  uint16_t service_end_handle;
+  uint16_t char_handle;
+  esp_bd_addr_t remote_bda;
+} gattc_profile_inst;
 
 typedef struct {
   esp_bt_uuid_t remote_filter_service_uuid;
@@ -47,8 +62,6 @@ typedef struct {
   void (*handler_gapc_cb)(esp_gap_ble_cb_event_t event_type,
                           esp_ble_gap_cb_param_t* param);
 } bt_client_event_cb_t;
-
-struct gattc_profile_inst ble_client_gattc_profile_tab[DEVICE_PROFILES];
 
 /**
  * @brief GATT Client event handler
