@@ -1,6 +1,6 @@
 
-#include "modules/ble_client_module.h"
-#include "bt_gattc/bt_gattc.h"
+#include "modules/game/game_ble_client.h"
+#include "bt_gattc.h"
 #include "esp_bt.h"
 #include "esp_log.h"
 #include "inttypes.h"
@@ -28,8 +28,8 @@ void ble_client_task_stop() {
   bt_gattc_task_stop();
 }
 
-void handle_bt_gattc_events(esp_gattc_cb_event_t event_type,
-                            esp_ble_gattc_cb_param_t* param) {
+static void handle_bt_gattc_events(esp_gattc_cb_event_t event_type,
+                                   esp_ble_gattc_cb_param_t* param) {
   ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Event: %d", event_type);
   switch (event_type) {
     case ESP_GATTC_CONNECT_EVT:

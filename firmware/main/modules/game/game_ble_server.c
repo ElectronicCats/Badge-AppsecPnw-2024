@@ -1,5 +1,6 @@
 
-#include "bt_gatts/bt_gatts.h"
+#include "modules/game/game_ble_server.h"
+#include "bt_gatts.h"
 #include "esp_bt.h"
 #include "esp_log.h"
 #include "inttypes.h"
@@ -28,8 +29,8 @@ void ble_server_task_stop() {
   bt_gatts_task_stop();
 }
 
-void hadle_bt_gatts_events(esp_gatts_cb_event_t event_type,
-                           esp_ble_gatts_cb_param_t* param) {
+static void hadle_bt_gatts_events(esp_gatts_cb_event_t event_type,
+                                  esp_ble_gatts_cb_param_t* param) {
   ESP_LOGI("BLE_SERVER_MODULE", "Event: %d", event_type);
   switch (event_type) {
     case ESP_GATTS_CONNECT_EVT:

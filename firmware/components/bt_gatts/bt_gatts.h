@@ -114,8 +114,8 @@ struct gatts_adv_params_t {
 typedef struct {
   void (*handler_gatt_cb)(esp_gatts_cb_event_t event_type,
                           esp_ble_gatts_cb_param_t* param);
-  void (*handler_gap_cb)(esp_gatts_cb_event_t event_type,
-                         esp_ble_gatts_cb_param_t* param);
+  void (*handler_gap_cb)(esp_gap_ble_cb_event_t event_type,
+                         esp_ble_gap_cb_param_t* param);
 } bt_server_event_cb_t;
 
 struct gatts_profile_inst gatts_profile_tab[DEVICE_PROFILES];

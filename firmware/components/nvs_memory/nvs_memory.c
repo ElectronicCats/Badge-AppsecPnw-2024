@@ -1,4 +1,4 @@
-#include "drivers/memory_driver.h"
+#include "nvs_memory.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +7,7 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 
-#define TAG_NVS "MEMORY_DRIVER"
+#define TAG_NVS "nvs_memory:main"
 
 esp_err_t return_err;
 nvs_handle_t nvs_handler;

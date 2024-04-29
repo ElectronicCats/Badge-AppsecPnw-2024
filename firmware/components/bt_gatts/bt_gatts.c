@@ -1,4 +1,4 @@
-#include "bt_gatts/bt_gatts.h"
+#include "bt_gatts.h"
 #include "esp_bt.h"
 #include "esp_log.h"
 #include "inttypes.h"

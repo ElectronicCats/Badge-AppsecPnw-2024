@@ -101,8 +101,6 @@ const uint8_t types[] = {0x27, 0x09, 0x02, 0x1e, 0x2b, 0x2d,
 
 uint8_t int_buff[1];
 
-int random_number = esp_fill_random(&random_number, 1);
-
 static uint8_t adv_raw_data[17] = {
     0x10, 0xFF, 0x4C, 0x00, 0x0F, 0x05, 0xC1, 0x09, 0x09,
     0x02, 0x1E, 0x00, 0x00, 0x10, 0x01, 0x06, 0x20};  // Declarar el arreglo de
@@ -138,7 +136,7 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event,
 static void start_adv() {
   while (true) {
     esp_ble_gap_start_advertising(&ble_adv_params);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
     esp_ble_gap_stop_advertising();
   }
 }

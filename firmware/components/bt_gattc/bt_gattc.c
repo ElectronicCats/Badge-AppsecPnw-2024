@@ -1,4 +1,4 @@
-#include "bt_gattc/bt_gattc.h"
+#include "bt_gattc.h"
 #include "esp_bt.h"
 #include "esp_log.h"
 #include "inttypes.h"
@@ -8,6 +8,7 @@ static char remote_device_name[MAX_REMOTE_DEVICE_NAME];
 static bool search_by_name = false;
 static bool is_connected = false;
 static bool server_attached = false;
+static bool bt_service_init = false;
 static esp_gattc_char_elem_t* char_elem_result = NULL;
 static esp_gattc_descr_elem_t* descr_elem_result = NULL;
 static esp_bt_uuid_t ble_client_remote_filter_service_uuid;
@@ -483,11 +484,14 @@ void bt_gattc_task_begin(void) {
 
   esp_bt_controller_config_t bluetooth_config =
       BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-  ret = esp_bt_controller_init(&bluetooth_config);
-  if (ret) {
-    ESP_LOGE(TAG_BT_GATTC, "%s initialize controller failed: %s", __func__,
-             esp_err_to_name(ret));
-    return;
+
+  if (!bt_service_init) {
+    ret = esp_bt_controller_init(&bluetooth_config);
+    if (ret) {
+      ESP_LOGE(TAG_BT_GATTC, "%s initialize controller failed: %s", __func__,
+               esp_err_to_name(ret));
+      return;
+    }
   }
 
   ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
@@ -543,4 +547,5 @@ void bt_gattc_task_stop(void) {
   esp_bluedroid_deinit();
   esp_bt_controller_disable();
   // esp_bt_controller_deinit();
+  // esp_bt_controller_mem_release(ESP_BT_MODE_BLE);
 }

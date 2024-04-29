@@ -1,6 +1,6 @@
 
-#include "modules/ble/airtags_module.h"
-#include "bt_gattc/bt_gattc.h"
+#include "trackers_scanner.h"
+#include "bt_gattc.h"
 #include "esp_bt.h"
 #include "esp_log.h"
 #include "inttypes.h"
@@ -10,7 +10,15 @@ static bluetooth_scanner_cb_t display_records_cb = NULL;
 static int trackers_scan_duration = 0;
 static bool trackers_scanner_active = false;
 
+// https://adamcatley.com/AirTag
+static tracker_adv_cmp_t trackers[] = {
+    {.name = "ATag", .vendor = "Apple", .adv_cmp = {0x1E, 0xFF, 0x4C, 0x00}},
+    {.name = "UATag", .vendor = "Apple", .adv_cmp = {0x4C, 0x00, 0x12, 0x19}},
+    {.name = "Tile", .vendor = "Tile", .adv_cmp = {0x02, 0x01, 0x06, 0x0D}}};
+
 static void task_tracker_timer();
+static void tracker_dissector(esp_ble_gap_cb_param_t* scan_rst,
+                              tracker_profile_t* tracker_record);
 static void handle_bt_gapc_events(esp_gap_ble_cb_event_t event_type,
                                   esp_ble_gap_cb_param_t* param);
 
@@ -31,8 +39,8 @@ void trackers_scanner_start() {
               &trackers_scan_timer_task);
 }
 
-void handle_bt_gapc_events(esp_gap_ble_cb_event_t event_type,
-                           esp_ble_gap_cb_param_t* param) {
+static void handle_bt_gapc_events(esp_gap_ble_cb_event_t event_type,
+                                  esp_ble_gap_cb_param_t* param) {
   switch (event_type) {
     case ESP_GAP_BLE_SCAN_RESULT_EVT:
       esp_ble_gap_cb_param_t* scan_result = (esp_ble_gap_cb_param_t*) param;
@@ -48,12 +56,12 @@ void handle_bt_gapc_events(esp_gap_ble_cb_event_t event_type,
               .mac_address = {0},
               .adv_data = {0},
               .adv_data_length = 0,
-              .is_airtag = false,
+              .is_tracker = false,
           };
           if (scan_result->scan_rst.adv_data_len > 0) {
             tracker_dissector(scan_result, &tracker_record);
 
-            if (tracker_record.is_airtag) {
+            if (tracker_record.is_tracker) {
               if (display_records_cb) {
                 display_records_cb(tracker_record);
               }
@@ -79,7 +87,7 @@ static void task_tracker_timer() {
   ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Trackers task started");
   trackers_scan_duration = 0;
   while (1) {
-    if (trackers_scan_duration >= AIRTAG_SCAN_DURATION) {
+    if (trackers_scan_duration >= TRACKER_SCAN_DURATION) {
       ESP_LOGI(TAG_BLE_CLIENT_MODULE, "Trackers task stopped");
       trackers_scanner_stop();
     }
@@ -95,23 +103,17 @@ void trackers_scanner_stop() {
   }
   trackers_scan_duration = 0;
   // TODO: When this is called, the BLE stopping bricks the device
-  bt_gattc_task_stop();
+  // bt_gattc_task_stop();
 }
 
-void tracker_dissector(esp_ble_gap_cb_param_t* scan_rst,
-                       tracker_profile_t* tracker_record) {
-  // https://adamcatley.com/AirTag
-  tracker_adv_cmp_t trackers[] = {
-      {.name = "ATag", .vendor = "Apple", .adv_cmp = {0x1E, 0xFF, 0x4C, 0x00}},
-      {.name = "UATag", .vendor = "Apple", .adv_cmp = {0x4C, 0x00, 0x12, 0x19}},
-      {.name = "Tile", .vendor = "Tile", .adv_cmp = {0x02, 0x01, 0x06, 0x0D}}};
-
+static void tracker_dissector(esp_ble_gap_cb_param_t* scan_rst,
+                              tracker_profile_t* tracker_record) {
   for (int i = 0; i < 3; i++) {
     if (scan_rst->scan_rst.ble_adv[0] == trackers[i].adv_cmp[0] &&
         scan_rst->scan_rst.ble_adv[1] == trackers[i].adv_cmp[1] &&
         scan_rst->scan_rst.ble_adv[2] == trackers[i].adv_cmp[2] &&
         scan_rst->scan_rst.ble_adv[3] == trackers[i].adv_cmp[3]) {
-      tracker_record->is_airtag = true;
+      tracker_record->is_tracker = true;
       tracker_record->name = trackers[i].name;
       tracker_record->vendor = trackers[i].vendor;
       tracker_record->adv_data_length = scan_rst->scan_rst.adv_data_len;
@@ -139,7 +141,7 @@ void trackers_scanner_add_tracker_profile(tracker_profile_t** profiles,
                                           int* num_profiles,
                                           uint8_t mac_address[6],
                                           int rssi,
-                                          const char* name) {
+                                          char* name) {
   *profiles =
       realloc(*profiles, (*num_profiles + 1) * sizeof(tracker_profile_t));
 

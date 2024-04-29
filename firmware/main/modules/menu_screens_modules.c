@@ -3,7 +3,7 @@
 #include <string.h>
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
-#include "modules/app_screen_module.h"
+#include "modules/ble/ble_module.h"
 #include "modules/game_engine_module.h"
 #include "modules/wifi/wifi_module.h"
 
@@ -220,8 +220,6 @@ void screen_module_enter_submenu() {
     }
     case LAYER_WIFI_APPS: {
       switch (selected_item) {
-        ESP_LOGI(TAG_MENU_SCREEN_MODULE, "wifi:Selected item: %d",
-                 selected_item);
         case WIFI_MENU_ANALIZER:
           current_layer = LAYER_WIFI_ANALIZER;
           screen_module_display_in_progress();
@@ -239,7 +237,7 @@ void screen_module_enter_submenu() {
       switch (selected_item) {
         case BLUETOOTH_MENU_AIRTAGS_SCAN:
           current_layer = LAYER_BLUETOOTH_AIRTAGS_SCAN;
-          app_screen_state_machine_init(selected_item);
+          ble_module_begin(selected_item);
           break;
         case BLUETOOTH_MENU_GAME:
           current_layer = LAYER_BLUETOOTH_GAME;

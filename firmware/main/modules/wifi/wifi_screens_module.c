@@ -130,10 +130,15 @@ void wifi_screens_module_display_details_network(wifi_ap_record_t* ap_record,
 }
 
 void wifi_screens_module_display_attack_selector(char* attack_options[],
+                                                 int list_count,
                                                  int current_option) {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   oled_driver_display_text_center(0, "Select Attack", OLED_DISPLAY_NORMAL);
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < list_count; i++) {
+    if (attack_options[i] == NULL) {
+      break;
+    }
+
     if (i == current_option) {
       char* prefix = "> ";
       char item_text[strlen(prefix) + strlen(attack_options[i]) + 1];

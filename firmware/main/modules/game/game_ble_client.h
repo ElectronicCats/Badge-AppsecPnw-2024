@@ -1,6 +1,6 @@
-#ifndef BLE_CLIENT_MODULE_H
-#define BLE_CLIENT_MODULE_H
-#define TAG_BLE_CLIENT_MODULE "bt_gattc:ble_client_module"
+#ifndef GAME_BLE_CLIENT_H
+#define GAME_BLE_CLIENT_H
+#define TAG_BLE_CLIENT_MODULE "bt_gattc:game_ble_client"
 
 /**
  * @brief Initialize the GATT Client profile
@@ -14,4 +14,4 @@ void ble_client_task_begin(void);
  * @return void
  */
 void ble_client_task_stop(void);
-#endif  // BLE_CLIENT_MODULE_H
+#endif  // GAME_BLE_CLIENT_H
