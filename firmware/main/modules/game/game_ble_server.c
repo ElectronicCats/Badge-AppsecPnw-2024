@@ -40,6 +40,9 @@ static void hadle_bt_gatts_events(esp_gatts_cb_event_t event_type,
       char* ble_recived = (char*) param->write.value;
       game_engine_handle_server_data(ble_recived);
       break;
+    case ESP_GATTS_DISCONNECT_EVT:
+      game_engine_cb_disconnected_devices(GAME_TEAM_RED);
+      break;
     default:
       break;
   }

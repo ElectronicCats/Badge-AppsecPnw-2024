@@ -73,9 +73,7 @@ static void ble_module_state_machine(button_event_t button_pressed) {
 
           ble_module_task_stop_trackers_display_devices();
           trackers_scanner_stop();
-          ESP_LOGI(TAG_BLE_MODULE, "Exiting bluetooth scanner");
           module_keyboard_update_state(false, NULL);
-          ESP_LOGI(TAG_BLE_MODULE, "Exiting bluetooth scanner 2");
           screen_module_exit_submenu();
           break;
         case BUTTON_RIGHT:
@@ -94,7 +92,7 @@ static void ble_module_state_machine(button_event_t button_pressed) {
           break;
         case BUTTON_DOWN:
           ESP_LOGI(TAG_BLE_MODULE, "Button down pressed");
-          device_selection = (device_selection == trackers_count)
+          device_selection = (device_selection == (trackers_count - 1))
                                  ? device_selection
                                  : device_selection + 1;
           break;

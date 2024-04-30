@@ -171,4 +171,6 @@ void game_engine_handle_game_over(void);
  * @return void
  */
 void game_engine_handle_battle_round_winner(void);
+
+void game_engine_cb_disconnected_devices(game_team_color_t team_device);
 #endif  // GAME_ENGINE_MODULE_H

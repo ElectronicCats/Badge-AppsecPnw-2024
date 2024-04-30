@@ -42,6 +42,14 @@ char** screen_module_add_empty_strings(char** array, int length) {
   return newArray;
 }
 
+int screen_module_get_count_menu_items(char* items[]) {
+  int count = 0;
+  while (items[count] != NULL) {
+    count++;
+  }
+  return count;
+}
+
 char** screen_module_get_menu_items() {
   submenu_items = 0;
   char** submenu = menu_items[current_layer];
@@ -54,6 +62,8 @@ char** screen_module_get_menu_items() {
   if (submenu_items == 0) {
     return NULL;
   }
+
+  ESP_LOGI(TAG_MENU_SCREEN_MODULE, "Submenu items: %d", submenu_items);
 
   return screen_module_add_empty_strings(menu_items[current_layer],
                                          submenu_items);
@@ -94,6 +104,7 @@ void screen_module_display_menu() {
     ESP_LOGW(TAG_MENU_SCREEN_MODULE, "Options is NULL");
     return;
   }
+
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   screen_module_display_menu_items(items);
 }
@@ -114,7 +125,10 @@ void screen_module_increment_index_item() {
     return;
   }
 
-  if (selected_item < MAX_MENU_ITEMS_PER_SCREEN - 1) {
+  ESP_LOGI(TAG_MENU_SCREEN_MODULE, "Selected item: %d - %d", selected_item,
+           submenu_items);
+
+  if (selected_item < submenu_items - 3) {
     selected_item++;
   } else {
     selected_item = 0;
@@ -128,7 +142,7 @@ void screen_module_decrement_index_item() {
   if (selected_item > 0) {
     selected_item--;
   } else {
-    selected_item = MAX_MENU_ITEMS_PER_SCREEN - 1;
+    selected_item = submenu_items - 3;
   }
 }
 

@@ -66,6 +66,7 @@ void game_engine_state_machine(button_event_t button_pressed) {
             ble_server_task_begin();
             screen_module_display_game_pairing_server();
           }
+          current_option = 0;
           break;
         case BUTTON_UP:
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button up pressed");
@@ -129,8 +130,11 @@ void game_engine_state_machine(button_event_t button_pressed) {
       switch (button_name) {
         case BUTTON_LEFT:
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button left pressed");
-          current_game_state.game_state = GAME_STATE_ATTACKER_PROFILE_SELECTION;
-          game_engine_display_owasp_profile_selection();
+          if (current_game_state.team == GAME_TEAM_RED) {
+            current_game_state.game_state =
+                GAME_STATE_ATTACKER_PROFILE_SELECTION;
+            game_engine_display_owasp_profile_selection();
+          }
           break;
         case BUTTON_RIGHT:
           ESP_LOGI(TAG_GAME_ENGINE_MODULE,
@@ -220,7 +224,7 @@ void game_engine_handle_battle_round_winner() {
       current_game_state.attacker_action) {
     current_game_state.opponent.life_points -= GAME_DEFAULT_ATTACK_POINTS;
     screen_module_display_game_blue_team_logo();
-    oled_driver_display_text_center(7, "    DEFENDED    ", OLED_DISPLAY_NORMAL);
+    oled_driver_display_text_center(7, "DEFENDED", OLED_DISPLAY_NORMAL);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     oled_driver_display_text(0, "Attacker", OLED_DISPLAY_NORMAL);
@@ -234,7 +238,7 @@ void game_engine_handle_battle_round_winner() {
   } else {
     current_game_state.attacker.life_points -= GAME_DEFAULT_ATTACK_POINTS;
     screen_module_display_game_red_team_logo();
-    oled_driver_display_text_center(7, "      PWNED   ", OLED_DISPLAY_NORMAL);
+    oled_driver_display_text_center(7, "PWNED", OLED_DISPLAY_NORMAL);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     oled_driver_display_text(0, "Defender", OLED_DISPLAY_NORMAL);
@@ -260,10 +264,6 @@ void game_engine_handle_battle_round_winner() {
 void game_engine_handle_server_data(char* ble_data) {
   int ble_command = ble_data[0];
   int command_value = ble_data[1];
-  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "BLE DATA FROM %d", current_game_state.team);
-  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "notify value %s", ble_data);
-  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "command value %d", ble_command);
-  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "value %d", command_value);
 
   switch (ble_command) {
     case BLE_COMMAND_RESPONSE_SELECTED:
@@ -282,10 +282,10 @@ void game_engine_handle_server_data(char* ble_data) {
       oled_driver_clear(OLED_DISPLAY_NORMAL);
       oled_driver_display_text_center(0, "Red Team Profile",
                                       OLED_DISPLAY_NORMAL);
-      oled_driver_display_text(2,
-                               current_game_state.opponent_profile->vuln->cwe,
-                               OLED_DISPLAY_NORMAL);
-      int started_page = 4;
+      // oled_driver_display_text(2,
+      //                          current_game_state.opponent_profile->vuln->cwe,
+      //                          OLED_DISPLAY_NORMAL);
+      int started_page = 2;
       oled_driver_display_text_splited(
           current_game_state.opponent_profile->vuln->name, &started_page,
           OLED_DISPLAY_NORMAL);
@@ -358,29 +358,37 @@ void game_engine_display_team_selection() {
 }
 
 void game_engine_display_owasp_profile_selection() {
-  int limit_page = 6;
-  if (current_option > GAME_OWASP_PROFILES_COUNT) {
-    limit_page = 6;
-    current_option = 0;
+  int total_profiles = GAME_OWASP_PROFILES_COUNT;
+
+  int profiles_per_page = 3;
+  int started_page = 1;
+
+  int upper_limit = current_option + profiles_per_page;
+  if (upper_limit > total_profiles) {
+    upper_limit = total_profiles;
   }
 
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   oled_driver_display_text(0, "Select Profile", OLED_DISPLAY_NORMAL);
 
-  for (int i = (int) current_option; i < limit_page + (int) current_option;
-       i++) {
-    game_owasp_profile_t* profile = game_engine_get_owasp_profile(i);
+  for (int i = current_option; i < upper_limit; i++) {
+    int profile_index = i % total_profiles;
+
+    game_owasp_profile_t* profile =
+        game_engine_get_owasp_profile(profile_index);
+
     if (i == current_option) {
-      char* prefix = "> ";
-      char item_text[strlen(prefix) + strlen(profile->vuln->cwe) + 1];
-      strcpy(item_text, prefix);
-      strcat(item_text, profile->vuln->cwe);
-      oled_driver_display_text((i + 1) - (int) current_option, item_text,
-                               OLED_DISPLAY_INVERTED);
+      char item_text[strlen(profile->vuln->cwe) + strlen(profile->vuln->name) +
+                     3];
+      sprintf(item_text, "> %s", profile->vuln->name);
+
+      oled_driver_display_text_splited(item_text, &started_page,
+                                       OLED_DISPLAY_INVERTED);
     } else {
-      oled_driver_display_text((i + 1) - (int) current_option,
-                               profile->vuln->cwe, OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_splited(profile->vuln->name, &started_page,
+                                       OLED_DISPLAY_NORMAL);
     }
+    started_page++;
   }
 }
 
@@ -420,4 +428,12 @@ game_owasp_profile_t* game_engine_get_owasp_profile(int index) {
     return &owasp_game_profiles[index];
   }
   return &owasp_game_profiles[0];
+}
+
+void game_engine_cb_disconnected_devices(game_team_color_t team_device) {
+  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Disconnected devices");
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(4, "Disconnected", OLED_DISPLAY_NORMAL);
+  vTaskDelay(2000 / portTICK_PERIOD_MS);
+  esp_restart();
 }
