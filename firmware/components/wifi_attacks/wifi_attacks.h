@@ -5,6 +5,13 @@
   #define DEFAULT_SCAN_LIST_SIZE CONFIG_SCAN_MAX_AP
 
 /**
+ * @brief List to the names of attacks
+ *
+ */
+char* WIFI_ATTACKS_LIST[] = {"Broadcast", "Rouge AP", "Combine", "Multi-AP",
+                             NULL};
+
+/**
  * @brief Structure to store deauth frame data
  *
  */
@@ -38,18 +45,5 @@ void wifi_attack_handle_attacks(wifi_attacks_types_t attack_type,
  */
 void wifi_attacks_module_stop();
 
-/**
- * @brief Start the broadcast attack
- *
- * @param ap_target target AP to attack
- */
-void wifi_attack_brod_send_deauth_frame(wifi_ap_record_t* ap_target);
-/**
- * @brief Start the Rogue AP  attack
- *
- * @note BSSID is MAC address of APs Wi-Fi interface
- *
- * @param ap_record target AP that will be cloned/duplicated
- */
-void wifi_attack_rogueap(const wifi_ap_record_t* ap_record);
+int wifi_attacks_get_attack_count();
 #endif  // WIFI_ATTACKS_MODULE_H

@@ -28,12 +28,6 @@ typedef struct {
 } wifi_module_t;
 
 /**
- * @brief List to the names of attacks
- *
- */
-static char* wifi_attacks[] = {"Broadcast", "Rouge AP", "Combine"};
-
-/**
  * @brief Start the wifi module
  *
  */

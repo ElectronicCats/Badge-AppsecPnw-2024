@@ -1,20 +1,21 @@
+
 #include "esp_bt.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatt_common_api.h"
 #include "esp_gattc_api.h"
-#include "esp_gatts_api.h"
-#ifndef BLE_CLIENT_MODULE_H
-  #define BLE_CLIENT_MODULE_H
-  #define TAG_BLE_CLIENT_MODULE "BLE_CLIENT_MODULE"
-  #define REMOTE_BOARD_ID       "EC_APPSECPWN_RED"
-  // GATT Client
-  #define REMOTE_SERVICE_USERNAME_UUID 0x00FF
-  #define REMOTE_NOTIFY_CHAR_UUID      0xFF01
-  #define DEVICE_PROFILE               0
-  #define INVALID_HANDLE               0
-  #define DEVICE_PROFILES              1
+#ifndef BT_GATTC_H
+  #define BT_GATTC_H
+  #define TAG_BT_GATTC            "bt_gattc"
+  #define REMOTE_BOARD            "EC_APPSECPWN_RED"
+  #define REMOTE_SERVICE_UUID     0x00FF
+  #define REMOTE_NOTIFY_CHAR_UUID 0xFF01
+  #define DEVICE_PROFILES         1
+  #define DEVICE_PROFILE          0
+  #define INVALID_HANDLE          0
+  #define MAX_REMOTE_DEVICE_NAME  20
+  #define SCAN_DURATION           60
 
 struct gattc_profile_inst {
   esp_gattc_cb_t gattc_cb;
@@ -41,7 +42,26 @@ typedef struct {
   esp_bd_addr_t remote_bda;
 } gattc_profile_inst;
 
-extern struct gattc_profile_inst gattc_profile_tab[DEVICE_PROFILES];
+typedef struct {
+  esp_bt_uuid_t remote_filter_service_uuid;
+  esp_bt_uuid_t remote_filter_char_uuid;
+  esp_bt_uuid_t notify_descr_uuid;
+  esp_ble_scan_params_t ble_scan_params;
+} gattc_scan_params_t;
+
+struct gattc_scan_params_t {
+  esp_bt_uuid_t remote_filter_service_uuid;
+  esp_bt_uuid_t remote_filter_char_uuid;
+  esp_bt_uuid_t notify_descr_uuid;
+  esp_ble_scan_params_t ble_scan_params;
+};
+
+typedef struct {
+  void (*handler_gattc_cb)(esp_gattc_cb_event_t event_type,
+                           esp_ble_gattc_cb_param_t* param);
+  void (*handler_gapc_cb)(esp_gap_ble_cb_event_t event_type,
+                          esp_ble_gap_cb_param_t* param);
+} bt_client_event_cb_t;
 
 /**
  * @brief GATT Client event handler
@@ -83,20 +103,28 @@ void ble_client_send_data(uint8_t* data, int length);
  *
  * @return void
  */
-void ble_client_gatt_profiles_event_handler(esp_gattc_cb_event_t event,
-                                            esp_gatt_if_t gattc_if,
-                                            esp_ble_gattc_cb_param_t* param);
+void ble_client_gattc_event_handler(esp_gattc_cb_event_t event,
+                                    esp_gatt_if_t gattc_if,
+                                    esp_ble_gattc_cb_param_t* param);
 
 /**
  * @brief Initialize the GATT Client profile
  *
  * @return void
  */
-void ble_client_task_begin(void);
+void bt_gattc_task_begin(void);
 /**
  * @brief Stop the GATT Client profile
  *
  * @return void
  */
-void ble_client_task_stop(void);
-#endif  // BLE_CLIENT_MODULE_H
+void bt_gattc_task_stop(void);
+
+esp_bt_uuid_t bt_gattc_set_default_ble_filter_service_uuid();
+esp_bt_uuid_t bt_gattc_set_default_ble_filter_char_uuid();
+esp_bt_uuid_t bt_gattc_set_default_ble_notify_descr_uuid();
+esp_ble_scan_params_t bt_gattc_set_default_ble_scan_params();
+void bt_gattc_set_ble_scan_params(gattc_scan_params_t* scan_params);
+void bt_gattc_set_cb(bt_client_event_cb_t event_cb);
+void bt_gattc_set_remote_device_name(const char* device_name);
+#endif  // BT_GATTC_H

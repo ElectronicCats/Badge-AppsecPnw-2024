@@ -1,7 +1,7 @@
 #include "esp_wifi.h"
 #ifndef WIFI_DRIVER_H
   #define WIFI_DRIVER_H
-  #define TAG_WIFI_DRIVER                 "driver:wifi"
+  #define TAG_WIFI_DRIVER                 "wifi_controllera:main"
   #define WIFI_MANAGER_AP_SSID            CONFIG_MANAGER_AP_SSID
   #define WIFI_MANAGER_AP_PASSWORD        CONFIG_MANAGER_AP_PASSWORD
   #define WIFI_MANAGER_AP_MAX_CONNECTIONS CONFIG_MANAGER_AP_MAX_CONNECTIONS
