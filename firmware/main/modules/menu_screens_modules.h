@@ -6,6 +6,15 @@
   #define TAG_MENU_SCREEN_MODULE    "MENU_SCREEN_MODULE"
   #define MAX_MENU_ITEMS_PER_SCREEN 3
 
+/**
+ * @brief Structure to store the app screen state information
+ *
+ */
+typedef struct {
+  bool in_app;
+  int app_selected;
+} app_screen_state_information_t;
+
 typedef enum {
   SCREEN_IN_NAVIGATION = 0,
   SCREEN_IN_APP,

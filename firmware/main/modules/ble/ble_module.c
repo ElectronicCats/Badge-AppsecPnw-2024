@@ -55,7 +55,7 @@ static void ble_module_state_machine(button_event_t button_pressed) {
   uint8_t button_name = button_pressed >> 4;
   uint8_t button_event = button_pressed & 0x0F;
 
-  ESP_LOGI(TAG_BLE_MODULE, "Game engine state machine from team: %d %d",
+  ESP_LOGI(TAG_BLE_MODULE, "BLE engine state machine from team: %d %d",
            button_name, button_event);
   switch (app_screen_state_information.app_selected) {
     case BLUETOOTH_MENU_AIRTAGS_SCAN:

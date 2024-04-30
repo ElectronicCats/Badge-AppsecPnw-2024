@@ -6,6 +6,7 @@
 #include "modules/ble/ble_module.h"
 #include "modules/game_engine_module.h"
 #include "modules/wifi/wifi_module.h"
+#include "modules/zigbee/zigbee_module.h"
 
 screen_module_layer_t previous_layer;
 screen_module_layer_t current_layer;
@@ -142,7 +143,6 @@ void screen_module_update_previous_layer() {
     case LAYER_WIFI_APPS:
     case LAYER_BLUETOOTH_APPS:
     case LAYER_ZIGBEE_APPS:
-    case LAYER_THREAD_APPS:
       // case LAYER_MATTER_APPS:
       // case LAYER_GPS:
       previous_layer = LAYER_APPLICATIONS;
@@ -168,6 +168,9 @@ void screen_module_update_previous_layer() {
     case LAYER_BLUETOOTH_SPAM:
     case LAYER_BLUETOOTH_GAME:
       previous_layer = LAYER_BLUETOOTH_APPS;
+      break;
+    case LAYER_ZIGBEE_SNIFFER:
+      previous_layer = LAYER_ZIGBEE_APPS;
       break;
     /* GPS applications */
     // case LAYER_GPS_DATE_TIME:
@@ -210,6 +213,8 @@ void screen_module_enter_submenu() {
           current_layer = LAYER_BLUETOOTH_APPS;
           break;
         case APPLICATIONS_MENU_ZIGBEE:
+          current_layer = LAYER_ZIGBEE_APPS;
+          break;
         case APPLICATIONS_MENU_THREAD:
         case APPLICATIONS_MENU_MATTER:
         case APPLICATIONS_MENU_GPS:
@@ -256,7 +261,14 @@ void screen_module_enter_submenu() {
     case LAYER_SETTINGS:
     case LAYER_ABOUT:
     case LAYER_ZIGBEE_APPS:
-    case LAYER_THREAD_APPS:
+      switch (selected_item) {
+        case ZIGBEE_MENU_SNIFFER:
+          current_layer = LAYER_ZIGBEE_SNIFFER;
+          zigbee_module_begin(selected_item);
+          break;
+        default:
+          break;
+      }
       // case LAYER_MATTER_APPS:
       break;
     default:
