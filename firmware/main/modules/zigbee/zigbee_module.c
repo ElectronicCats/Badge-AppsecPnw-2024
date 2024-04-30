@@ -13,6 +13,7 @@ static int trackers_count = 0;
 static int device_selection = 0;
 static TaskHandle_t zigbee_task_display_records = NULL;
 static TaskHandle_t zigbee_task_display_animation = NULL;
+static TaskHandle_t zigbee_task_sniffer = NULL;
 
 static void zigbee_module_app_selector();
 static void zigbee_module_state_machine(button_event_t button_pressed);
@@ -33,8 +34,8 @@ static void zigbee_module_app_selector() {
                   "zigbee_module_scanning", 4096, NULL, 5,
                   &zigbee_task_display_animation);
       ieee_sniffer_register_cb(zigbee_screens_display_scanning_text);
-      // ieee_sniffer_begin();
-      xTaskCreate(ieee_sniffer_begin, "ieee_sniffer_task", 4096, NULL, 5, NULL);
+      xTaskCreate(ieee_sniffer_begin, "ieee_sniffer_task", 4096, NULL, 5,
+                  &zigbee_task_sniffer);
       break;
     default:
       break;
@@ -55,6 +56,7 @@ static void zigbee_module_state_machine(button_event_t button_pressed) {
           ESP_LOGI(TAG_ZIGBEE_MODULE, "Button left pressed");
           vTaskSuspend(zigbee_task_display_animation);
           ieee_snifffer_stop();
+          vTaskDelete(zigbee_task_sniffer);
           module_keyboard_update_state(false, NULL);
           screen_module_exit_submenu();
           break;
