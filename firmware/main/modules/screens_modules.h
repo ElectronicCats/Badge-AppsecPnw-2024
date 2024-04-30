@@ -11,9 +11,9 @@ enum menu_layer_t {
   LAYER_WIFI_APPS,
   LAYER_BLUETOOTH_APPS,
   LAYER_ZIGBEE_APPS,
-  LAYER_THREAD_APPS,
-  // LAYER_MATTER_APPS,
-  // LAYER_GPS,
+  // LAYER_THREAD_APPS,
+  //  LAYER_MATTER_APPS,
+  //  LAYER_GPS,
   /* WiFi applications */
   LAYER_WIFI_ANALIZER,
   LAYER_WIFI_DEAUTH,
@@ -21,8 +21,8 @@ enum menu_layer_t {
   LAYER_BLUETOOTH_AIRTAGS_SCAN,
   LAYER_BLUETOOTH_SPAM,
   LAYER_BLUETOOTH_GAME,
-  /* Thread applications */
-  LAYER_THREAD_CLI,
+  /* Zigbee applications */
+  LAYER_ZIGBEE_SNIFFER,
   /* GPS applications */
   // LAYER_GPS_DATE_TIME,
   // LAYER_GPS_LOCATION,
@@ -83,7 +83,7 @@ enum menu_layer_bluetooth_items_t {
 };
 
 enum menu_layer_zigbee_items_t {
-  THREAD_MENU_CLI = 0,
+  ZIGBEE_MENU_SNIFFER = 0,
 };
 
 enum menu_layer_thread_items_t {
@@ -149,7 +149,7 @@ static char* bluetooth_items[] = {
 };
 
 static char* zigbee_items[] = {
-    "Zigbee CLI",
+    "Zigbee Sniffer",
     NULL,
 };
 
@@ -173,7 +173,7 @@ static char** menu_items[] = {
     main_items, applications_items, settings_items, about_items,
     /* Applications */
     wifi_items, bluetooth_items,
-    empty_items,  // Zigbee
+    zigbee_items,  // Zigbee
     empty_items,
     empty_items,  // Matter
     empty_items,
@@ -183,6 +183,8 @@ static char** menu_items[] = {
     /* Bluetooth applications */
     empty_items,  // Bluetooth Airtags scan
     empty_items,  // Bluetooth Game
+    /* Zigbee applications */
+    empty_items,  // Zigbee Sniffer
     /* Thread applications */
     empty_items,  // Thread CLI
     /* GPS applications */

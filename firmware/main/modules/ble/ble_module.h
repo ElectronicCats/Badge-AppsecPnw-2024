@@ -4,15 +4,6 @@
   #define TAG_BLE_MODULE "ble_module:main"
 
 /**
- * @brief Structure to store the app screen state information
- *
- */
-typedef struct {
-  bool in_app;
-  int app_selected;
-} app_screen_state_information_t;
-
-/**
  * @brief Begin the bluetooth module
  *
  * @param app_selected The selected app

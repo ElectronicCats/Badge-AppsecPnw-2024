@@ -14,5 +14,8 @@ set(modules_ble "modules/ble/ble_module.c"
 set(modules_wifi  "modules/wifi/wifi_module.c"
                   "modules/wifi/wifi_screens_module.c")
 
-idf_component_register(SRCS "main.c" "${drivers}" "${modules_game}" "${modules_ble}" "${modules_wifi}" "${modules}"
+set(modules_zigbee "modules/zigbee/zigbee_module.c"
+                  "modules/zigbee/zigbee_screens_module.c")
+
+idf_component_register(SRCS "main.c" "${drivers}" "${modules_game}" "${modules_ble}" "${modules_wifi}" "${modules_zigbee}" "${modules}"
                     INCLUDE_DIRS ".")
