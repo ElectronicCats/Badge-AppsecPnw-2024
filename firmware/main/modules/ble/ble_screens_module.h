@@ -2,6 +2,9 @@
 #ifndef BLE_SCREENS_MODULE_H
   #define BLE_SCREENS_MODULE_H
 
+void ble_screens_display_scanning_animation(void);
+void ble_screens_display_scanning_text(char* name);
+void ble_screens_display_ble_spam();
 void ble_screens_display_trackers_profiles(tracker_profile_t* trackers_scanned,
                                            int trackers_count,
                                            int device_selection);

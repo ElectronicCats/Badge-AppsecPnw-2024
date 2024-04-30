@@ -1,4 +1,5 @@
 #include "ble_module.h"
+#include "bt_spam.h"
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
 #include "modules/ble/ble_screens_module.h"
@@ -14,7 +15,8 @@ static int device_selection = 0;
 static bool is_displaying = false;
 static bool is_modal_displaying = false;
 static tracker_profile_t* scanned_airtags = NULL;
-static TaskHandle_t screen_app_task_display_records = NULL;
+static TaskHandle_t ble_task_display_records = NULL;
+static TaskHandle_t ble_task_display_animation = NULL;
 
 static void ble_module_app_selector();
 static void ble_module_state_machine(button_event_t button_pressed);
@@ -37,6 +39,12 @@ static void ble_module_app_selector() {
       trackers_scanner_register_cb(ble_module_display_trackers_cb);
       ble_module_task_start_trackers_display_devices();
       trackers_scanner_start();
+      break;
+    case BLUETOOTH_MENU_SPAM:
+      xTaskCreate(ble_screens_display_scanning_animation, "ble_module_scanning",
+                  4096, NULL, 5, &ble_task_display_animation);
+      bt_spam_register_cb(ble_screens_display_scanning_text);
+      bt_spam_app_main();
       break;
     default:
       break;
@@ -95,6 +103,25 @@ static void ble_module_state_machine(button_event_t button_pressed) {
           break;
       }
       break;
+    case BLUETOOTH_MENU_SPAM:
+      switch (button_name) {
+        case BUTTON_LEFT:
+          // TODO: Fix this xD
+          esp_restart();
+          // ESP_LOGI(TAG_BLE_MODULE, "Button left pressed");
+          // vTaskSuspend(ble_task_display_animation);
+          // module_keyboard_update_state(false, NULL);
+          // ESP_LOGI(TAG_BLE_MODULE, "Exiting bluetooth scanner 2");
+          // screen_module_exit_submenu();
+          break;
+        case BUTTON_RIGHT:
+        case BUTTON_UP:
+        case BUTTON_DOWN:
+        case BUTTON_BOOT:
+        default:
+          break;
+      }
+      break;
     default:
       break;
   }
@@ -129,11 +156,10 @@ static void ble_module_create_task_trackers_display_devices() {
 static void ble_module_task_start_trackers_display_devices() {
   is_displaying = true;
   xTaskCreate(ble_module_create_task_trackers_display_devices,
-              "display_records", 2048, NULL, 10,
-              &screen_app_task_display_records);
+              "display_records", 2048, NULL, 10, &ble_task_display_records);
 }
 
 static void ble_module_task_stop_trackers_display_devices() {
   is_displaying = false;
-  vTaskSuspend(screen_app_task_display_records);
+  vTaskSuspend(ble_task_display_records);
 }

@@ -1,6 +1,25 @@
 #include <string.h>
 #include "drivers/oled_ssd1306_driver.h"
+#include "modules/ble/ble_bitmaps.h"
 #include "trackers_scanner.h"
+
+void ble_screens_display_scanning_animation() {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "BLE SPAM", OLED_DISPLAY_NORMAL);
+  while (true) {
+    for (int i = 0; i < ble_bitmap_scan_attack_allArray_LEN; i++) {
+      oled_driver_display_bitmap(0, 16, ble_bitmap_scan_attack_allArray[i], 128,
+                                 32, OLED_DISPLAY_NORMAL);
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+  }
+}
+
+void ble_screens_display_scanning_text(char* name) {
+  oled_driver_clear_line(7, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(7, name, OLED_DISPLAY_INVERTED);
+}
 
 void ble_screens_display_trackers_profiles(tracker_profile_t* trackers_scanned,
                                            int trackers_count,

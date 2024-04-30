@@ -143,8 +143,8 @@ void screen_module_update_previous_layer() {
     case LAYER_BLUETOOTH_APPS:
     case LAYER_ZIGBEE_APPS:
     case LAYER_THREAD_APPS:
-    case LAYER_MATTER_APPS:
-    case LAYER_GPS:
+      // case LAYER_MATTER_APPS:
+      // case LAYER_GPS:
       previous_layer = LAYER_APPLICATIONS;
       break;
     case LAYER_ABOUT_VERSION:
@@ -165,14 +165,15 @@ void screen_module_update_previous_layer() {
       break;
     /* Bluetooth applications */
     case LAYER_BLUETOOTH_AIRTAGS_SCAN:
+    case LAYER_BLUETOOTH_SPAM:
     case LAYER_BLUETOOTH_GAME:
       previous_layer = LAYER_BLUETOOTH_APPS;
       break;
     /* GPS applications */
-    case LAYER_GPS_DATE_TIME:
-    case LAYER_GPS_LOCATION:
-      previous_layer = LAYER_GPS;
-      break;
+    // case LAYER_GPS_DATE_TIME:
+    // case LAYER_GPS_LOCATION:
+    //   previous_layer = LAYER_GPS;
+    //   break;
     default:
       ESP_LOGE(TAG_MENU_SCREEN_MODULE, "Invalid layer");
       break;
@@ -239,6 +240,10 @@ void screen_module_enter_submenu() {
           current_layer = LAYER_BLUETOOTH_AIRTAGS_SCAN;
           ble_module_begin(selected_item);
           break;
+        case BLUETOOTH_MENU_SPAM:
+          current_layer = LAYER_BLUETOOTH_SPAM;
+          ble_module_begin(selected_item);
+          break;
         case BLUETOOTH_MENU_GAME:
           current_layer = LAYER_BLUETOOTH_GAME;
           game_engine_state_machine_init();
@@ -252,7 +257,7 @@ void screen_module_enter_submenu() {
     case LAYER_ABOUT:
     case LAYER_ZIGBEE_APPS:
     case LAYER_THREAD_APPS:
-    case LAYER_MATTER_APPS:
+      // case LAYER_MATTER_APPS:
       break;
     default:
       ESP_LOGE(TAG_MENU_SCREEN_MODULE, "Invalid layer");
