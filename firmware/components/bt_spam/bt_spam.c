@@ -7,6 +7,8 @@
 #include "esp_random.h"
 
 static bt_spam_cb_display display_records_cb = NULL;
+static TimerHandle_t adv_timer;
+static int adv_index = 0;
 
 static esp_ble_adv_params_t ble_adv_params = {
     .adv_int_min = 0x20,
@@ -88,7 +90,7 @@ const uint8_t long_devices_raw[][31] = {
      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
 
-const char* long_names_devices[] = {
+static char* long_names_devices[] = {
     "Airpods",
     "Airpods Pro",
     "Airpods Max",
@@ -117,44 +119,44 @@ static uint8_t adv_raw_data[17] = {
 static void esp_gap_cb(esp_gap_ble_cb_event_t event,
                        esp_ble_gap_cb_param_t* param) {
   switch (event) {
-    case ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT:
-
-      printf("ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT\n");
-      // esp_ble_gap_start_advertising(&ble_adv_params);
-      break;
-
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
-      // esp_ble_gap_start_advertising(&ble_adv_params);
-      printf("ESP_GAP_BLE_ADV_START_COMPLETE_EVT\n");
       if (param->adv_start_cmpl.status == ESP_BT_STATUS_SUCCESS) {
         printf("Advertising started\n");
       } else
         printf("Unable to start advertising process, error code %d\n",
                param->scan_start_cmpl.status);
       break;
-
     default:
-
-      printf("Event %d unhandled\n", event);
       break;
   }
 }
 
-static void start_adv() {
-  while (true) {
-    for (int i = 0; i < sizeof(long_devices_raw) / 31; i++) {
-      if (display_records_cb) {
-        display_records_cb(long_names_devices[i]);
-      }
-      ESP_ERROR_CHECK(esp_ble_gap_config_adv_data_raw(
-          &long_devices_raw[i], sizeof(long_devices_raw[i])));
-      esp_ble_gap_start_advertising(&ble_adv_params);
-      vTaskDelay(5000 / portTICK_PERIOD_MS);
-      esp_ble_gap_stop_advertising();
-    }
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+static void start_adv_timer_callback() {
+  if (long_names_devices[adv_index] == NULL) {
+    return;
+  }
+
+  display_records_cb(long_names_devices[adv_index]);
+  esp_err_t err = esp_ble_gap_config_adv_data_raw(
+      &long_devices_raw[adv_index], sizeof(long_devices_raw[adv_index]));
+  if (err != ESP_OK) {
+    ESP_LOGE("BT_SPAM", "Error setting adv data: %s", esp_err_to_name(err));
+    return;
   }
 }
+
+static void start_adv() {
+  while (1) {
+    if (adv_index >
+        (sizeof(long_devices_raw) / sizeof(long_devices_raw[0]) - 1)) {
+      adv_index = 0;
+    }
+    start_adv_timer_callback();
+    adv_index++;
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+  }
+}
+
 void bt_spam_register_cb(bt_spam_cb_display callback) {
   display_records_cb = callback;
 }
@@ -171,5 +173,6 @@ void bt_spam_app_main() {
   // configure the adv data
   ESP_ERROR_CHECK(esp_ble_gap_config_adv_data_raw(&adv_raw_data, 17));
   vTaskDelay(500 / portTICK_PERIOD_MS);
-  xTaskCreate(&start_adv, "start_adv", 2048, NULL, 5, NULL);
+  esp_ble_gap_start_advertising(&ble_adv_params);
+  xTaskCreate(&start_adv, "start_adv", 4096, NULL, 5, NULL);
 }

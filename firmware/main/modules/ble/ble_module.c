@@ -3,6 +3,7 @@
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
 #include "modules/ble/ble_screens_module.h"
+#include "modules/led_events.h"
 #include "modules/menu_screens_modules.h"
 #include "trackers_scanner.h"
 
@@ -34,8 +35,10 @@ void ble_module_begin(int app_selected) {
 };
 
 static void ble_module_app_selector() {
+  led_control_run_effect(led_control_ble_tracking);
   switch (app_screen_state_information.app_selected) {
     case BLUETOOTH_MENU_AIRTAGS_SCAN:
+
       trackers_scanner_register_cb(ble_module_display_trackers_cb);
       ble_module_task_start_trackers_display_devices();
       trackers_scanner_start();
@@ -75,6 +78,7 @@ static void ble_module_state_machine(button_event_t button_pressed) {
           trackers_scanner_stop();
           module_keyboard_update_state(false, NULL);
           screen_module_exit_submenu();
+          led_control_stop();
           break;
         case BUTTON_RIGHT:
           ESP_LOGI(TAG_BLE_MODULE, "Button right pressed - Option selected: %d",
