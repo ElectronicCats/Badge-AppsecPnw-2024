@@ -93,6 +93,8 @@ game_owasp_actions_t owasp_game_actions_profile[] = {
      &owasp_game_profile_base_actions[35]},  // CWE-778, CWE-778R
     {&owasp_game_profile_base_actions[36],
      &owasp_game_profile_base_actions[37]},  // CWE-918, CWE-918R
+    {&owasp_game_profile_base_actions[36],
+     &owasp_game_profile_base_actions[1]}  // CWE-25, CWE-25R
 };
 
 game_owasp_profile_t owasp_game_profiles[] = {
@@ -115,6 +117,6 @@ game_owasp_profile_t owasp_game_profiles[] = {
     {&owasp_game_vulns[8], &owasp_game_actions_profile[16],
      &owasp_game_actions_profile[17]},  // A09
     {&owasp_game_vulns[9], &owasp_game_actions_profile[18],
-     &owasp_game_actions_profile[19]}  // A10
+     &owasp_game_actions_profile[1]}  // A10
 };
 #endif  // GAME_OWASP_PROFILE_H

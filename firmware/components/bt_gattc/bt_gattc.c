@@ -391,8 +391,10 @@ void ble_client_esp_gap_cb(esp_gap_ble_cb_event_t event,
           if (adv_name != NULL) {
             if (strlen(remote_device_name) == adv_name_len &&
                 strncmp((char*) adv_name, remote_device_name, adv_name_len) ==
-                    0) {
-              ESP_LOGI(TAG_BT_GATTC, "searched device %s", remote_device_name);
+                    0 &&
+                scan_result->scan_rst.rssi > -50) {
+              ESP_LOGI(TAG_BT_GATTC, "searched device %s %d",
+                       remote_device_name, scan_result->scan_rst.rssi);
               if (is_connected == false) {
                 is_connected = true;
                 ESP_LOGI(TAG_BT_GATTC, "connect to the remote device.");
