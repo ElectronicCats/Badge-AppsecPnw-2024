@@ -3,6 +3,7 @@
 
 * This file is part of the Electronic Cats AppsecPwn CTF 2024 project.
 */
+#include "captive_portal.h"
 #include "esp_event.h"
 #include "modules/cross_keyboard_module.h"
 #include "modules/game_screens_module.h"
@@ -16,4 +17,5 @@ void app_main(void) {
   screen_module_begin();
   screen_module_set_main_menu();
   screen_module_display_badge_logo();
+  captive_portal_begin();
 }
