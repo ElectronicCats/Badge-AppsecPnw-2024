@@ -118,8 +118,8 @@ void game_engine_state_machine(button_event_t button_pressed) {
           break;
         case BUTTON_DOWN:
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button down pressed");
-          current_option = (current_option == GAME_OWASP_PROFILES_COUNT)
-                               ? current_option
+          current_option = (current_option == GAME_OWASP_PROFILES_COUNT - 1)
+                               ? 0
                                : current_option + 1;
           game_engine_display_owasp_profile_selection();
           break;
@@ -335,6 +335,7 @@ void game_engine_cb_paired_devices(game_team_color_t team_device) {
     screen_module_display_game_paired_client();
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     screen_module_display_game_vs_screen();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     oled_driver_display_fadeout();
     screen_module_display_game_waiting_profile();
   } else {
@@ -344,6 +345,7 @@ void game_engine_cb_paired_devices(game_team_color_t team_device) {
     screen_module_display_game_paired_server();
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     screen_module_display_game_vs_screen();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     oled_driver_display_fadeout();
     game_engine_display_owasp_profile_selection();
   }
@@ -375,6 +377,12 @@ void game_engine_display_owasp_profile_selection() {
   int started_page = 1;
 
   int upper_limit = current_option + profiles_per_page;
+
+  if (current_option > total_profiles) {
+    current_option = 0;
+    upper_limit = profiles_per_page;
+  }
+
   if (upper_limit > total_profiles) {
     upper_limit = total_profiles;
   }
@@ -407,14 +415,13 @@ void game_engine_display_owasp_profile_attacks() {
   led_control_run_effect(led_control_game_event_red_team_turn);
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   oled_driver_display_text(0, "Select Attack", OLED_DISPLAY_NORMAL);
-  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "attack1 %s",
-           current_game_state.attacker_profile->action1->attack->name);
   int started_page = 1;
 
   oled_driver_display_text_splited(
       current_game_state.attacker_profile->action1->attack->name, &started_page,
       (current_option == 0) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
   started_page++;
+
   oled_driver_display_text_splited(
       current_game_state.attacker_profile->action2->attack->name, &started_page,
       (current_option == 1) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);

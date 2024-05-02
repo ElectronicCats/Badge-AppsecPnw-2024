@@ -19,8 +19,8 @@ void led_control_game_event_pairing(void) {
     rgb_led_start_breath_effect(&ble_led_controller, BLUE, 100);
     vTaskDelay(pdMS_TO_TICKS(6000));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_game_event_blue_team_turn(void) {
@@ -28,8 +28,8 @@ void led_control_game_event_blue_team_turn(void) {
     rgb_led_set_color(&ble_led_controller, BLUE);
     vTaskDelay(pdMS_TO_TICKS(3000));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_game_event_red_team_turn(void) {
@@ -37,8 +37,8 @@ void led_control_game_event_red_team_turn(void) {
     rgb_led_set_color(&ble_led_controller, RED);
     vTaskDelay(pdMS_TO_TICKS(3000));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_game_event_attacking(void) {
@@ -46,8 +46,8 @@ void led_control_game_event_attacking(void) {
     rgb_led_start_blink_effect(&ble_led_controller, YELLOW, 3, 500, 500, 3000);
     vTaskDelay(pdMS_TO_TICKS(3000));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_game_event_red_team_winner(void) {
@@ -55,8 +55,8 @@ void led_control_game_event_red_team_winner(void) {
     rgb_led_start_blink_effect(&ble_led_controller, RED, 3, 300, 300, 1200);
     vTaskDelay(pdMS_TO_TICKS(3000));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_game_event_blue_team_winner(void) {
@@ -64,8 +64,8 @@ void led_control_game_event_blue_team_winner(void) {
     rgb_led_start_blink_effect(&ble_led_controller, BLUE, 3, 300, 300, 1200);
     vTaskDelay(pdMS_TO_TICKS(3000));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_ble_tracking(void) {
@@ -73,8 +73,8 @@ void led_control_ble_tracking(void) {
     rgb_led_start_blink_effect(&ble_led_controller, BLUE, 3, 100, 100, 400);
     vTaskDelay(pdMS_TO_TICKS(1200));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_ble_spam_breathing(void) {
@@ -82,8 +82,8 @@ void led_control_ble_spam_breathing(void) {
     rgb_led_start_breath_effect(&ble_led_controller, BLUE, 2000);
     vTaskDelay(pdMS_TO_TICKS(1200));
   }
-  vTaskSuspend(NULL);
-  rgb_led_deinit(&ble_led_controller);
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
 }
 
 void led_control_stop(void) {
@@ -96,7 +96,7 @@ void led_control_stop(void) {
 void led_control_run_effect(effect_coontrol effect_function) {
   if (ble_led_evenet_task != NULL) {
     vTaskDelete(ble_led_evenet_task);
-    rgb_led_deinit(&ble_led_controller);
+    // rgb_led_deinit(&ble_led_controller);
   }
 
   if (!led_control) {
