@@ -28,7 +28,8 @@ typedef struct {
 typedef enum {
   WIFI_ATTACK_BROADCAST = 0,
   WIFI_ATTACK_ROGUE_AP,
-  WIFI_ATTACK_COMBINE
+  WIFI_ATTACK_COMBINE,
+  WIFI_ATTACK_MULTI_AP
 } wifi_attacks_types_t;
 
 /**

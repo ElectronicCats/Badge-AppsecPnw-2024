@@ -191,8 +191,15 @@ void wifi_module_state_machine(button_event_t button_pressed) {
                    "Button right pressed - Option selected: %d",
                    current_option);
           current_wifi_state.state = WIFI_STATE_ATTACK;
-          wifi_attack_handle_attacks(current_option,
-                                     &ap_records->records[index_targeted]);
+          if (current_option == WIFI_ATTACK_MULTI_AP) {
+            for (int i = 0; i < ap_records->count; i++) {
+              wifi_attack_handle_attacks(WIFI_ATTACK_COMBINE,
+                                         &ap_records->records[i]);
+            }
+          } else {
+            wifi_attack_handle_attacks(current_option,
+                                       &ap_records->records[index_targeted]);
+          }
           xTaskCreate(wifi_screens_module_animate_attacking,
                       "wifi_module_scanning", 4096,
                       &ap_records->records[index_targeted], 5,

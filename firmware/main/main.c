@@ -17,5 +17,5 @@ void app_main(void) {
   screen_module_begin();
   screen_module_set_main_menu();
   screen_module_display_badge_logo();
-  captive_portal_begin();
+  // captive_portal_begin();
 }
