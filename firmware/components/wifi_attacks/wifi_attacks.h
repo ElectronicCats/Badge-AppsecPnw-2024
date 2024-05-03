@@ -8,8 +8,8 @@
  * @brief List to the names of attacks
  *
  */
-char* WIFI_ATTACKS_LIST[] = {"Broadcast", "Rouge AP", "Combine", "Multi-AP",
-                             NULL};
+char* WIFI_ATTACKS_LIST[] = {"Broadcast", "Rouge AP",       "Combine",
+                             "Multi-AP",  "Captive Portal", NULL};
 
 /**
  * @brief Structure to store deauth frame data
@@ -29,7 +29,8 @@ typedef enum {
   WIFI_ATTACK_BROADCAST = 0,
   WIFI_ATTACK_ROGUE_AP,
   WIFI_ATTACK_COMBINE,
-  WIFI_ATTACK_MULTI_AP
+  WIFI_ATTACK_MULTI_AP,
+  WIFI_ATTACK_PASSWORD,
 } wifi_attacks_types_t;
 
 /**

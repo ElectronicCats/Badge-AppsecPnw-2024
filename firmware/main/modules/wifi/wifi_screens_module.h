@@ -40,9 +40,29 @@ void wifi_screens_module_display_details_network(wifi_ap_record_t* ap_record,
  * @brief Display the wifi module attack selector screen
  *
  * @param attack_options The list of attack options
+ * @param list_count The number of options
  * @param current_option The current option selected
  */
 void wifi_screens_module_display_attack_selector(char* attack_options[],
                                                  int list_count,
                                                  int current_option);
+
+void wifi_screens_module_display_captive_pass(char* ssid,
+                                              char* user,
+                                              char* pass);
+
+void wifi_screens_module_display_captive_user_pass(char* ssid,
+                                                   char* user,
+                                                   char* pass);
+
+/**
+ * @brief Display the wifi module portals selector screen
+ *
+ * @param attack_options The list of portals options
+ * @param list_count The number of options
+ * @param current_option The current option selected
+ */
+void wifi_screens_module_display_captive_selector(char* attack_options[],
+                                                  int list_count,
+                                                  int current_option);
 #endif  // WIFI_SCREENS_MODULE_H

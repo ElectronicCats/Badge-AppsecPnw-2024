@@ -27,4 +27,8 @@ void led_control_game_event_blue_team_winner(void);
 // BLE
 void led_control_ble_tracking(void);
 void led_control_ble_spam_breathing(void);
+
+// WIFI
+void led_control_wifi_scanning(void);
+void led_control_wifi_attacking(void);
 #endif  // LED_EVENTS_H

