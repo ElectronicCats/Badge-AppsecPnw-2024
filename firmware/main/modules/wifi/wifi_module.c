@@ -1,8 +1,10 @@
 
 #include "modules/wifi/wifi_module.h"
+#include "captive_portal.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "modules/cross_keyboard_module.h"
+#include "modules/led_events.h"
 #include "modules/menu_screens_modules.h"
 #include "modules/wifi/wifi_screens_module.h"
 #include "string.h"
@@ -49,6 +51,8 @@ void wifi_module_begin(void) {
   current_wifi_state.state = WIFI_STATE_SCANNING;
   memset(&current_wifi_state.wifi_config, 0, sizeof(wifi_config_t));
   current_wifi_state.wifi_config = wifi_driver_access_point_begin();
+
+  led_control_run_effect(led_control_wifi_scanning);
 
   xTaskCreate(wifi_screens_module_scanning, "wifi_module_scanning", 4096, NULL,
               5, &task_display_scanning);
@@ -100,9 +104,6 @@ void wifi_module_state_machine(button_event_t button_pressed) {
           break;
         }
         case BUTTON_RIGHT:
-          ESP_LOGI(TAG_WIFI_MODULE,
-                   "Button right pressed - Option selected: %d",
-                   current_option);
           show_details = true;
           index_targeted = current_option;
           current_wifi_state.state = WIFI_STATE_DETAILS;
@@ -146,9 +147,6 @@ void wifi_module_state_machine(button_event_t button_pressed) {
           break;
         }
         case BUTTON_RIGHT:
-          ESP_LOGI(TAG_WIFI_MODULE,
-                   "Button right pressed - Option selected: %d",
-                   current_option);
           current_wifi_state.state = WIFI_STATE_ATTACK_SELECTOR;
           int count_attacks = wifi_attacks_get_attack_count();
           wifi_screens_module_display_attack_selector(
@@ -187,16 +185,29 @@ void wifi_module_state_machine(button_event_t button_pressed) {
           break;
         }
         case BUTTON_RIGHT:
-          ESP_LOGI(TAG_WIFI_MODULE,
-                   "Button right pressed - Option selected: %d",
-                   current_option);
+          led_control_run_effect(led_control_wifi_attacking);
+
           current_wifi_state.state = WIFI_STATE_ATTACK;
-          wifi_attack_handle_attacks(current_option,
-                                     &ap_records->records[index_targeted]);
-          xTaskCreate(wifi_screens_module_animate_attacking,
-                      "wifi_module_scanning", 4096,
-                      &ap_records->records[index_targeted], 5,
-                      &task_display_attacking);
+
+          if (current_option == WIFI_ATTACK_MULTI_AP) {
+            for (int i = 0; i < ap_records->count; i++) {
+              wifi_attack_handle_attacks(WIFI_ATTACK_COMBINE,
+                                         &ap_records->records[i]);
+            }
+          } else if (current_option == WIFI_ATTACK_PASSWORD) {
+            current_wifi_state.state = WIFI_STATE_ATTACK_CAPTIVE_PORTAL;
+            current_option = 0;
+            wifi_screens_module_display_captive_selector(CAPTIVE_PORTALS_LIST,
+                                                         2, current_option);
+          } else {
+            wifi_attack_handle_attacks(current_option,
+                                       &ap_records->records[index_targeted]);
+
+            xTaskCreate(wifi_screens_module_animate_attacking,
+                        "wifi_module_scanning", 4096,
+                        &ap_records->records[index_targeted], 5,
+                        &task_display_attacking);
+          }
           break;
         case BUTTON_UP: {
           int count_attacks = wifi_attacks_get_attack_count();
@@ -234,15 +245,13 @@ void wifi_module_state_machine(button_event_t button_pressed) {
           wifi_attacks_module_stop();
           vTaskSuspend(task_display_attacking);
 
-          current_wifi_state.state = WIFI_STATE_SCANNED;
-          wifi_screens_module_display_scanned_networks(
-              ap_records->records, ap_records->count, current_option);
+          current_wifi_state.state = WIFI_STATE_ATTACK_SELECTOR;
+          int count_attacks = wifi_attacks_get_attack_count();
+          wifi_screens_module_display_attack_selector(
+              WIFI_ATTACKS_LIST, count_attacks, current_option);
           break;
         }
         case BUTTON_RIGHT:
-          ESP_LOGI(TAG_WIFI_MODULE,
-                   "Button right pressed - Option selected: %d",
-                   current_option);
           break;
         case BUTTON_UP: {
           current_option = (current_option == 0) ? 0 : current_option - 1;
@@ -251,6 +260,75 @@ void wifi_module_state_machine(button_event_t button_pressed) {
         case BUTTON_DOWN: {
           current_option =
               (current_option == (3 - 1)) ? current_option : current_option + 1;
+          break;
+        }
+        case BUTTON_BOOT:
+        default:
+          break;
+      }
+      break;
+    }
+    case WIFI_STATE_ATTACK_CAPTIVE_PORTAL: {
+      switch (button_name) {
+        case BUTTON_LEFT: {
+          current_wifi_state.state = WIFI_STATE_ATTACK_SELECTOR;
+          int count_attacks = wifi_attacks_get_attack_count();
+          wifi_screens_module_display_attack_selector(
+              WIFI_ATTACKS_LIST, count_attacks, current_option);
+        }
+        case BUTTON_RIGHT:
+          char* wifi_ssid = malloc(
+              strlen((char*) ap_records->records[index_targeted].ssid) + 2);
+          strcpy(wifi_ssid, (char*) ap_records->records[index_targeted].ssid);
+          wifi_ssid[strlen((char*) ap_records->records[index_targeted].ssid)] =
+              ' ';
+          wifi_ssid[strlen((char*) ap_records->records[index_targeted].ssid) +
+                    1] = '\0';
+
+          wifi_config_t wifi_config_captive = {
+              .ap = {.ssid = "",
+                     .ssid_len = 0,
+                     .password = "",
+                     .max_connection = 4,
+                     .authmode = WIFI_AUTH_WPA_WPA2_PSK}};
+          strncpy((char*) wifi_config_captive.ap.ssid, wifi_ssid,
+                  strlen(wifi_ssid));
+          wifi_config_captive.ap.ssid[strlen(wifi_ssid)] = '\0';
+          wifi_config_captive.ap.ssid_len = strlen(wifi_ssid);
+          captive_portal_set_config(&wifi_config_captive);
+
+          if (current_option == 0) {
+            captive_portal_register_cb(
+                wifi_screens_module_display_captive_user_pass);
+            wifi_screens_module_display_captive_user_pass(
+                (char*) ap_records->records[index_targeted].ssid, "", "");
+          } else {
+            captive_portal_register_cb(
+                wifi_screens_module_display_captive_pass);
+            wifi_screens_module_display_captive_pass(
+                (char*) ap_records->records[index_targeted].ssid, "", "");
+          }
+
+          captive_portal_set_portal(current_option);
+
+          xTaskCreate(captive_portal_begin, "captive_portal_start", 4096, NULL,
+                      5, NULL);
+
+          // wifi_attack_handle_attacks(WIFI_ATTACK_COMBINE,
+          // &ap_records->records[index_targeted]);
+          break;
+        case BUTTON_UP: {
+          current_option = (current_option == 0) ? 0 : current_option - 1;
+          wifi_screens_module_display_captive_selector(CAPTIVE_PORTALS_LIST, 2,
+                                                       current_option);
+          break;
+        }
+        case BUTTON_DOWN: {
+          current_option =
+              (current_option == (3 - 1)) ? current_option : current_option + 1;
+
+          wifi_screens_module_display_captive_selector(CAPTIVE_PORTALS_LIST, 2,
+                                                       current_option);
           break;
         }
         case BUTTON_BOOT:

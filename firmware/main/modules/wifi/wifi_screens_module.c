@@ -150,3 +150,49 @@ void wifi_screens_module_display_attack_selector(char* attack_options[],
     }
   }
 }
+
+void wifi_screens_module_display_captive_pass(char* ssid,
+                                              char* user,
+                                              char* pass) {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "Captive Portal", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(1, "SSID", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(2, ssid, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(3, "PASS", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(4, pass, OLED_DISPLAY_INVERTED);
+}
+
+void wifi_screens_module_display_captive_user_pass(char* ssid,
+                                                   char* user,
+                                                   char* pass) {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "Captive Portal", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(1, "SSID", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(2, ssid, OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(3, "USER", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(4, user, OLED_DISPLAY_INVERTED);
+  oled_driver_display_text_center(5, "PASS", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(6, pass, OLED_DISPLAY_INVERTED);
+}
+
+void wifi_screens_module_display_captive_selector(char* attack_options[],
+                                                  int list_count,
+                                                  int current_option) {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "Select Portal", OLED_DISPLAY_NORMAL);
+  for (int i = 0; i < list_count; i++) {
+    if (attack_options[i] == NULL) {
+      break;
+    }
+
+    if (i == current_option) {
+      char* prefix = "> ";
+      char item_text[strlen(prefix) + strlen(attack_options[i]) + 1];
+      strcpy(item_text, prefix);
+      strcat(item_text, attack_options[i]);
+      oled_driver_display_text(i + 1, item_text, OLED_DISPLAY_INVERTED);
+    } else {
+      oled_driver_display_text(i + 1, attack_options[i], OLED_DISPLAY_NORMAL);
+    }
+  }
+}
