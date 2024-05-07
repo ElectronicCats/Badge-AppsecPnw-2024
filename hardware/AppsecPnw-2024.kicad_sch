@@ -4924,10 +4924,6 @@
 		(at 40.64 85.09)
 		(uuid "b723b5f8-8a2a-4f45-98b2-844f568ca6b4")
 	)
-	(no_connect
-		(at 40.64 64.77)
-		(uuid "fb42af3e-0cee-4845-b484-f2af1b308922")
-	)
 	(wire
 		(pts
 			(xy 78.74 72.39) (xy 78.74 74.93)
@@ -5087,6 +5083,16 @@
 			(type default)
 		)
 		(uuid "1751bf30-7695-4533-8aa9-114b142939ef")
+	)
+	(wire
+		(pts
+			(xy 109.22 97.79) (xy 109.22 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "17d90a27-700d-45be-acc2-aae0b646462d")
 	)
 	(wire
 		(pts
@@ -5620,6 +5626,16 @@
 	)
 	(wire
 		(pts
+			(xy 109.22 83.82) (xy 109.22 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e821a0a-c24b-488b-9ae1-1911730d4c51")
+	)
+	(wire
+		(pts
 			(xy 178.308 49.276) (xy 178.308 51.308)
 		)
 		(stroke
@@ -5937,6 +5953,16 @@
 			(type default)
 		)
 		(uuid "a9752d8f-830d-4570-be7d-681edffadd24")
+	)
+	(wire
+		(pts
+			(xy 36.83 64.77) (xy 40.64 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aa10c504-1741-45d9-ac74-054e7f41762a")
 	)
 	(wire
 		(pts
@@ -6841,6 +6867,17 @@
 		)
 		(uuid "5796c7c4-af78-436b-9f37-fc3d2a7da137")
 	)
+	(label "IO8"
+		(at 109.22 97.79 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5e7df969-069d-466a-bc32-dc718b1c37a1")
+	)
 	(label "UP"
 		(at 78.74 49.53 0)
 		(fields_autoplaced yes)
@@ -6961,6 +6998,17 @@
 			(justify right bottom)
 		)
 		(uuid "a03d772d-05a4-4d5e-a733-c88140ef07b7")
+	)
+	(label "IO8"
+		(at 36.83 64.77 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a4f589cc-205d-4ba8-860c-e34b87ca9a2b")
 	)
 	(label "RED"
 		(at 78.74 59.69 0)
@@ -8379,6 +8427,71 @@
 			(project "AppsecPnw-2024"
 				(path "/cf60c621-db9c-496a-8528-e48a112b4341"
 					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 109.22 83.82 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "317397ac-cd3e-4453-a3a7-4a1b00ac4638")
+		(property "Reference" "#PWR03"
+			(at 109.22 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 109.601 79.4258 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 109.22 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 109.22 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 109.22 83.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "183791b6-7245-40e8-a637-989c5ab345ee")
+		)
+		(instances
+			(project "AppsecPnw-2024"
+				(path "/cf60c621-db9c-496a-8528-e48a112b4341"
+					(reference "#PWR03")
 					(unit 1)
 				)
 			)
@@ -11553,6 +11666,85 @@
 			(project "AppsecPnw-2024"
 				(path "/cf60c621-db9c-496a-8528-e48a112b4341"
 					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 109.22 90.17 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "dbda87d5-bd36-45ea-a6cc-fbfef5ade0c2")
+		(property "Reference" "R5"
+			(at 111.76 88.8999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "3.3K"
+			(at 111.76 91.4399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 107.442 90.17 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 109.22 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 109.22 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC#" "C22978"
+			(at 109.22 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "3846eafc-aa86-4fbc-bad5-9b495f963208")
+		)
+		(pin "1"
+			(uuid "feed91c7-0300-41a6-8ef5-5c86228755eb")
+		)
+		(instances
+			(project "AppsecPnw-2024"
+				(path "/cf60c621-db9c-496a-8528-e48a112b4341"
+					(reference "R5")
 					(unit 1)
 				)
 			)
