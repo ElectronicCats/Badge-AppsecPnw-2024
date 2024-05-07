@@ -28,4 +28,4 @@ Hardware released under an CERN Open Hardware Licence v1.2. See the LICENSE_HARD
 
 Electronic Cats is a registered trademark, please do not use if you sell these PCBs.
 
-August 2023
+May 2024
