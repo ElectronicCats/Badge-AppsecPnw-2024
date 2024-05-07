@@ -57,7 +57,7 @@ void screen_module_display_game_waiting_profile() {
 void screen_module_display_game_sending_attack() {
   oled_driver_display_fadeout();
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_text(1, "appsec@ exploit", OLED_DISPLAY_NORMAL);
+  oled_driver_display_text(0, "appsec@ exploit", OLED_DISPLAY_NORMAL);
   oled_driver_display_text(2, " Sending Attack", OLED_DISPLAY_NORMAL);
   oled_driver_display_bitmap(48, 32, bitmap_attacker_logo, 32, 32,
                              OLED_DISPLAY_NORMAL);
