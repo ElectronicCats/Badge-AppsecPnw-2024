@@ -4,7 +4,8 @@ set(modules "modules/cross_keyboard_module.c"
             "modules/game_screens_module.c"
             "modules/menu_screens_modules.c"
             "modules/game_engine_module.c"
-            "modules/led_events.c")
+            "modules/led_events.c"
+            "modules/device/device_screens_module.c")
 
 set(modules_game "modules/game/game_ble_client.c"
                   "modules/game/game_ble_server.c")

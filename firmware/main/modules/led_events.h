@@ -31,4 +31,7 @@ void led_control_ble_spam_breathing(void);
 // WIFI
 void led_control_wifi_scanning(void);
 void led_control_wifi_attacking(void);
+
+// Zigbee
+void led_control_zigbee_scanning(void);
 #endif  // LED_EVENTS_H

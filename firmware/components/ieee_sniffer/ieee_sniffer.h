@@ -5,6 +5,10 @@
   #define IEEE_SNIFFER_H
   #define TAG_IEEE_SNIFFER "ieee_sniffer"
 
+  #define IEEE_SNIFFER_CHANNEL_MIN     11
+  #define IEEE_SNIFFER_CHANNEL_MAX     26
+  #define IEEE_SNIFFER_CHANNEL_DEFAULT 11
+
   #define LIMIT_PACKETS          1000
   #define FRAME_VERSION_STD_2003 0
   #define FRAME_VERSION_STD_2006 1
@@ -46,9 +50,10 @@ typedef struct mac_fcs {
 /**
  * @brief Callback to handle the IEEE sniffer
  *
- * @param record The tracker profile record
+ * @param packets_count The number of packets found
+ * @param channel The channel where the record was found
  */
-typedef void (*ieee_sniffer_cb_t)(int packets_count);
+typedef void (*ieee_sniffer_cb_t)(int packets_count, int channel);
 
 /**
  * @brief Register the callback for the IEEE sniffer
@@ -65,5 +70,12 @@ void ieee_sniffer_begin(void);
 /**
  * @brief Stop the IEEE sniffer
  */
-void ieee_snifffer_stop(void);
+void ieee_sniffer_stop(void);
+
+/**
+ * @brief Set the channel for the IEEE sniffer
+ *
+ * @param channel The channel to set
+ */
+void ieee_sniffer_set_channel(int channel);
 #endif  // IEEE_SNIFFER_H

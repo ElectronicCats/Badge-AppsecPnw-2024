@@ -4,6 +4,7 @@
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
 #include "modules/ble/ble_module.h"
+#include "modules/device/device_screens_module.h"
 #include "modules/game_engine_module.h"
 #include "modules/wifi/wifi_module.h"
 #include "modules/zigbee/zigbee_module.h"
@@ -274,6 +275,27 @@ void screen_module_enter_submenu() {
     }
     case LAYER_SETTINGS:
     case LAYER_ABOUT:
+      switch (selected_item) {
+        case ABOUT_MENU_VERSION:
+          current_layer = LAYER_ABOUT_VERSION;
+          device_screens_module_version();
+          break;
+        case ABOUT_MENU_LICENSE:
+          current_layer = LAYER_ABOUT_LICENSE;
+          device_screens_module_licence();
+          break;
+        case ABOUT_MENU_CREDITS:
+          current_layer = LAYER_ABOUT_CREDITS;
+          device_screens_module_credits();
+          break;
+        case ABOUT_MENU_LEGAL:
+          current_layer = LAYER_ABOUT_LEGAL;
+          device_screens_module_legal();
+          break;
+        default:
+          break;
+      }
+      break;
     case LAYER_ZIGBEE_APPS:
       switch (selected_item) {
         case ZIGBEE_MENU_SNIFFER:

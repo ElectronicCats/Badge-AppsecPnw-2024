@@ -13,7 +13,7 @@
 static esp_err_t err;
 static QueueHandle_t packet_rx_queue = NULL;
 static ieee_sniffer_cb_t display_records_cb = NULL;
-static int current_channel = 20;
+static int current_channel = IEEE_SNIFFER_CHANNEL_DEFAULT;
 static int packets_count = 0;
 
 static void debug_print_packet(uint8_t* packet, uint8_t packet_length);
@@ -32,6 +32,23 @@ void esp_ieee802154_receive_done(uint8_t* frame,
 
 void ieee_sniffer_register_cb(ieee_sniffer_cb_t callback) {
   display_records_cb = callback;
+}
+
+void ieee_sniffer_set_channel(int channel) {
+  current_channel = channel;
+  if (channel < IEEE_SNIFFER_CHANNEL_MIN) {
+    current_channel = IEEE_SNIFFER_CHANNEL_MAX;
+  } else if (channel > IEEE_SNIFFER_CHANNEL_MAX) {
+    current_channel = IEEE_SNIFFER_CHANNEL_MIN;
+  }
+
+  err = esp_ieee802154_set_channel(current_channel);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG_IEEE_SNIFFER, "Error setting channel: %s",
+             esp_err_to_name(err));
+    return;
+  }
+  ESP_LOGI(TAG_IEEE_SNIFFER, "Channel set to %d", current_channel);
 }
 
 void ieee_sniffer_begin(void) {
@@ -77,7 +94,7 @@ void ieee_sniffer_begin(void) {
   }
 }
 
-void ieee_snifffer_stop(void) {
+void ieee_sniffer_stop(void) {
   err = esp_ieee802154_disable();
   if (err != ESP_OK) {
     ESP_LOGE(TAG_IEEE_SNIFFER, "Error disabling IEEE 802.15.4 driver: %s",
@@ -92,7 +109,7 @@ static void debug_handler_task(void* pvParameters) {
   while (xQueueReceive(packet_rx_queue, &packet, portMAX_DELAY) != pdFALSE) {
     if (display_records_cb) {
       packets_count++;
-      display_records_cb(packets_count);
+      display_records_cb(packets_count, current_channel);
       if (packets_count > LIMIT_PACKETS) {
         packets_count = 0;
       }
@@ -158,7 +175,6 @@ static void debug_print_packet(uint8_t* packet, uint8_t packet_length) {
       uint8_t src_addr[8] = {0};
       uint16_t short_dst_addr = 0;
       uint16_t short_src_addr = 0;
-      bool broadcast = false;
 
       switch (fcs->destAddrType) {
         case ADDR_MODE_NONE: {
@@ -171,7 +187,6 @@ static void debug_print_packet(uint8_t* packet, uint8_t packet_length) {
           short_dst_addr = *((uint16_t*) &packet[position]);
           position += sizeof(uint16_t);
           if (pan_id == 0xFFFF && short_dst_addr == 0xFFFF) {
-            broadcast = true;
             pan_id = *((uint16_t*) &packet[position]);  // srcPan
             position += sizeof(uint16_t);
             ESP_LOGI(TAG_IEEE_SNIFFER, "Broadcast on PAN %04x", pan_id);
@@ -235,8 +250,6 @@ static void debug_print_packet(uint8_t* packet, uint8_t packet_length) {
         }
       }
 
-      uint8_t* header = &packet[0];
-      uint8_t header_length = position;
       uint8_t* data = &packet[position];
       uint8_t data_length = packet_length - position - sizeof(uint16_t);
       position += data_length;
