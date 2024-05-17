@@ -18,9 +18,10 @@
 
 game_match_information_t current_game_state;
 uint8_t ble_command[GAME_BLE_COMMAND_LENGTH];
-int current_option = 0;
-int current_turn = 0;
-int last_profile_index = 0;
+static int current_option = 0;
+static int current_turn = 0;
+static int last_profile_index = 0;
+static int random_option = 0;
 uint16_t game_profile_history[GAME_OWASP_PROFILES_COUNT];
 
 static void game_engine_int_profile_history();
@@ -28,16 +29,17 @@ static int game_engine_find_profile_history(int profile_index);
 static void game_engine_set_profile_history();
 static void game_engine_decrement_turn();
 static void game_engine_handle_battle_winner_profile();
+static void game_engine_handle_unlock_badge(int team_winner);
 static int game_engine_get_owasp_profile_index(game_owasp_profile_t* profile);
 static int generate_random_float();
 
 static int generate_random_float() {
-  int random_num = rand() % (1 - 0 + 1) + 0;
+  int max_value = 1;
+  int random_num = rand() % (max_value + 1);
   return random_num;
 }
 
 static void game_engine_int_profile_history() {
-  preferences_clear();
   bool is_configured = preferences_get_bool(PREFERENCE_CONFIGURED_TAG, false);
   for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
     game_profile_history[i] = 0;
@@ -53,6 +55,10 @@ static void game_engine_int_profile_history() {
   if (!is_configured) {
     preferences_put_bool(PREFERENCE_CONFIGURED_TAG, true);
     preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, 0);
+    preferences_put_int("BADGE", 0);
+    preferences_put_int("UBADGEJEDI", 0);
+    preferences_put_int("UBADGESITH", 0);
+    preferences_put_int("SHOWBADGE", 0);
   }
 }
 
@@ -72,37 +78,92 @@ static void game_engine_decrement_turn() {
 static void game_engine_set_profile_history() {
   int profile_index =
       game_engine_get_owasp_profile_index(current_game_state.attacker_profile);
+  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile index: %d", profile_index);
   game_profile_history[profile_index] = 1;
   last_profile_index = profile_index;
+  // game_engine_handle_unlock_badge();
 }
 
-static void game_engine_handle_unlock_badge() {
-  int profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
-  if (profile_level >= 3 && profile_level < 6) {
-    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Badge unlocked: 3");
-  } else if (profile_level >= 6 && profile_level < 9) {
-    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Badge unlocked: 6");
-  } else if (profile_level >= 9 && profile_level < 10) {
-    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Badge unlocked: 9");
-  } else if (profile_level >= 10) {
-    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Badge unlocked: 10");
+static void game_engine_handle_unlock_badge(int team_winner) {
+  int is_unlocked_badge = preferences_get_int("BADGE", 99);
+
+  if (is_unlocked_badge == 1) {
+    return;
   }
+  if (current_game_state.team != team_winner) {
+    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "This is not your family");
+    return;
+  }
+
+  int profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  oled_driver_display_text_center(1, "Rank unlocked", OLED_DISPLAY_NORMAL);
+  if (profile_level >= 3 && profile_level < 6) {
+    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Rank unlocked: 3");
+
+    if (team_winner == GAME_TEAM_BLUE) {
+      oled_driver_display_text_center(3, "Padawan", OLED_DISPLAY_NORMAL);
+    } else {
+      oled_driver_display_text_center(3, "Lord", OLED_DISPLAY_NORMAL);
+    }
+
+  } else if (profile_level >= 6 && profile_level < 9) {
+    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Rank unlocked: 6");
+    if (team_winner == GAME_TEAM_BLUE) {
+      oled_driver_display_text_center(3, "Knight", OLED_DISPLAY_NORMAL);
+    } else {
+      oled_driver_display_text_center(3, "Master", OLED_DISPLAY_NORMAL);
+    }
+  } else if (profile_level >= 9 && profile_level < 10) {
+    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Rank unlocked: 9");
+    if (team_winner == GAME_TEAM_BLUE) {
+      oled_driver_display_text_center(3, "Master", OLED_DISPLAY_NORMAL);
+    } else {
+      oled_driver_display_text_center(3, "Darth", OLED_DISPLAY_NORMAL);
+    }
+  } else if (profile_level >= 10) {
+    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Rank unlocked: 10");
+    if (team_winner == GAME_TEAM_BLUE) {
+      preferences_put_int("UBADGEJEDI", 1);
+      oled_driver_display_text_center(2, "You unlock", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(3, "the FORCE", OLED_DISPLAY_NORMAL);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      oled_driver_display_fadeout();
+      screen_module_display_badge_jedi();
+      oled_driver_display_text_center(1, "Grand Master", OLED_DISPLAY_NORMAL);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    } else {
+      preferences_put_int("UBADGESITH", 1);
+      oled_driver_display_text_center(2, "You unlock", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(3, "the DARKNEST", OLED_DISPLAY_NORMAL);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      oled_driver_display_fadeout();
+      screen_module_display_badge_sith();
+      oled_driver_display_text_center(0, "Dark Side", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(1, "Dark Lord", OLED_DISPLAY_NORMAL);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
+    preferences_put_int("BADGE", 1);
+  }
+
+  vTaskDelay(2000 / portTICK_PERIOD_MS);
 }
 
 static void game_engine_handle_battle_winner_profile() {
-  int unlocked_badge = 0;
+  int unlocked_badge = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  char* profile_name = malloc(10);
   uint16_t profiles_list[GAME_OWASP_PROFILES_COUNT];
   // Get the saved profiles
   for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
-    char* profile_name = malloc(10);
+    // char* profile_name = malloc(10);
     sprintf(profile_name, "owasp_%d ", i);
     int profile = preferences_get_int(profile_name, 99);
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile history owasp: %d", profile);
     profiles_list[i] = profile;
-    if (profile == 1) {
-      unlocked_badge++;
-    }
-    free(profile_name);
+    // if (profile == 1) {
+    //   unlocked_badge++;
+    // }
+    // free(profile_name);
   }
 
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Unlocked badges: %d", unlocked_badge);
@@ -110,26 +171,29 @@ static void game_engine_handle_battle_winner_profile() {
   for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, " Profile %d: %d - %d", i,
              game_profile_history[i], profiles_list[i]);
-    char* profile_name = malloc(10);
+    // char* profile_name = malloc(10);
     sprintf(profile_name, "owasp_%d ", i);
-    preferences_put_int(profile_name, game_profile_history[i]);
-    free(profile_name);
+    if (game_profile_history[i] == 1 && profiles_list[i] == 0) {
+      preferences_put_int(profile_name, game_profile_history[i]);
+      unlocked_badge++;
+    }
+
+    // free(profile_name);
   }
 
   preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, unlocked_badge);
 
   for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
-    char* profile_name = malloc(10);
-    sprintf(profile_name, "owasp_%d ", i);
     int profile = preferences_get_int(profile_name, 99);
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile history saved owasp: %d",
              profile);
-    profiles_list[i] = profile;
-    free(profile_name);
+    // free(profile_name);
   }
 
-  uint32_t profile_level =
-      preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  int profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+
+  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile level: %d", profile_level);
+  free(profile_name);
 }
 
 void game_engine_state_machine_init() {
@@ -289,10 +353,19 @@ void game_engine_state_machine(button_event_t button_pressed) {
           ESP_LOGI(TAG_GAME_ENGINE_MODULE,
                    "Button right pressed - Option selected: %d",
                    current_option);
+          if (random_option == 1) {
+            if (current_option == 0) {
+              current_option = 1;
+            } else {
+              current_option = 0;
+            }
+          }
           current_game_state.opponent_action = current_option;
           ble_command[0] = BLE_COMMAND_RESPONSE_SELECTED;
           ble_command[1] = current_option;
           ble_client_send_data(ble_command, GAME_BLE_COMMAND_LENGTH);
+
+          game_engine_set_profile_history();
 
           game_engine_handle_battle_round_winner();
           break;
@@ -301,7 +374,7 @@ void game_engine_state_machine(button_event_t button_pressed) {
             break;
           }
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button up pressed");
-          current_option = (current_option == 0) ? 0 : current_option - 1;
+          current_option = (current_option == 0) ? 1 : current_option - 1;
           game_engine_display_owasp_profile_response();
           break;
         case BUTTON_DOWN:
@@ -309,8 +382,7 @@ void game_engine_state_machine(button_event_t button_pressed) {
             break;
           }
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button down pressed");
-          current_option =
-              (current_option == 1) ? current_option : current_option + 1;
+          current_option = (current_option == 1) ? 0 : current_option + 1;
           game_engine_display_owasp_profile_response();
           break;
         case BUTTON_BOOT:
@@ -326,18 +398,26 @@ void game_engine_state_machine(button_event_t button_pressed) {
 
 void game_engine_handle_game_over() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
+  int team_winner = 0;
   if (current_game_state.attacker.life_points <= 0) {
     screen_module_display_game_red_team_logo();
     led_control_run_effect(led_control_game_event_red_team_winner);
+    team_winner = GAME_TEAM_RED;
   } else {
     led_control_run_effect(led_control_game_event_blue_team_winner);
     screen_module_display_game_blue_team_logo();
+    team_winner = GAME_TEAM_BLUE;
   }
-  game_engine_handle_battle_winner_profile();
   oled_driver_display_text_center(7, "WINNER", OLED_DISPLAY_NORMAL);
   vTaskDelay(2000 / portTICK_PERIOD_MS);
   oled_driver_display_fadeout();
-  esp_restart();
+
+  if (team_winner == current_game_state.team) {
+    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Winner team: %d", team_winner);
+    game_engine_handle_battle_winner_profile();
+    game_engine_handle_unlock_badge(team_winner);
+  }
+  // esp_restart();
 }
 
 void game_engine_handle_battle_round_winner() {
@@ -434,6 +514,7 @@ void game_engine_handle_server_data(char* ble_data) {
       led_control_run_effect(led_control_game_event_blue_team_turn);
 
       current_game_state.game_state = GAME_STATE_OPPONENT_RESPONSE_SELECTION;
+      random_option = generate_random_float();
       game_engine_display_owasp_profile_response();
       break;
     }
@@ -533,27 +614,15 @@ void game_engine_display_owasp_profile_attacks() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   oled_driver_display_text(0, "Select Attack", OLED_DISPLAY_NORMAL);
   int started_page = 1;
-  int random_option = generate_random_float();
-  if (random_option == 0) {
-    oled_driver_display_text_splited(
-        current_game_state.attacker_profile->action1->attack->name,
-        &started_page,
-        (current_option == 0) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
 
-    oled_driver_display_text_splited(
-        current_game_state.attacker_profile->action2->attack->name,
-        &started_page,
-        (current_option == 1) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
-  } else {
-    oled_driver_display_text_splited(
-        current_game_state.attacker_profile->action2->attack->name,
-        &started_page,
-        (current_option == 0) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
-    oled_driver_display_text_splited(
-        current_game_state.attacker_profile->action1->attack->name,
-        &started_page,
-        (current_option == 1) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
-  }
+  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Random option: %d", random_option);
+  oled_driver_display_text_splited(
+      current_game_state.attacker_profile->action1->attack->name, &started_page,
+      (current_option == 0) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
+  started_page++;
+  oled_driver_display_text_splited(
+      current_game_state.attacker_profile->action2->attack->name, &started_page,
+      (current_option == 1) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
 }
 
 void game_engine_display_owasp_profile_response() {
@@ -561,12 +630,16 @@ void game_engine_display_owasp_profile_response() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   oled_driver_display_text(0, "Select Response", OLED_DISPLAY_NORMAL);
   int started_page = 1;
-  int random_option = generate_random_float();
+
+  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Random option sadssdasdsda: %d",
+           random_option);
+  // random_option = generate_random_float();
   if (random_option == 0) {
     oled_driver_display_text_splited(
         current_game_state.attacker_profile->action1->response->name,
         &started_page,
         (current_option == 0) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
+    started_page++;
     oled_driver_display_text_splited(
         current_game_state.attacker_profile->action2->response->name,
         &started_page,
@@ -576,6 +649,7 @@ void game_engine_display_owasp_profile_response() {
         current_game_state.attacker_profile->action2->response->name,
         &started_page,
         (current_option == 0) ? OLED_DISPLAY_INVERTED : OLED_DISPLAY_NORMAL);
+    started_page++;
     oled_driver_display_text_splited(
         current_game_state.attacker_profile->action1->response->name,
         &started_page,

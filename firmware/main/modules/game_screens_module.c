@@ -2,12 +2,25 @@
 #include "esp_log.h"
 #include "modules/bitmaps.h"
 #include "modules/game_engine_module.h"
+#include "preferences.h"
 #include "string.h"
 
 void screen_module_display_badge_logo() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  oled_driver_display_bitmap(0, 0, bitmap_owasp_logo, 128, 64,
-                             OLED_DISPLAY_NORMAL);
+  int is_unlocked_badge = preferences_get_int("BADGE", 99);
+  if (is_unlocked_badge == 0 || is_unlocked_badge == 99) {
+    oled_driver_display_bitmap(0, 0, bitmap_owasp_logo, 128, 64,
+                               OLED_DISPLAY_NORMAL);
+  } else {
+    int what_badge = preferences_get_int("SHOWBADGE", 99);
+    if (what_badge == 0) {
+      oled_driver_display_bitmap(0, 0, epd_bitmap_sith_1, 128, 64,
+                                 OLED_DISPLAY_INVERTED);
+    } else {
+      oled_driver_display_bitmap(0, 0, michi_bitmap_jedi_1_bg, 128, 64,
+                                 OLED_DISPLAY_INVERTED);
+    }
+  }
 }
 
 void screen_module_display_game_pairing_server() {
@@ -113,4 +126,16 @@ void screen_module_display_attacker_profile(game_owasp_profile_t* profile) {
                                    OLED_DISPLAY_NORMAL);
   free(cwe);
   free(cwe_text);
+}
+
+void screen_module_display_badge_sith() {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_bitmap(0, 8, epd_bitmap_sith_1, 128, 64,
+                             OLED_DISPLAY_INVERTED);
+}
+
+void screen_module_display_badge_jedi() {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_bitmap(0, 8, michi_bitmap_jedi_1_bg, 128, 64,
+                             OLED_DISPLAY_INVERTED);
 }

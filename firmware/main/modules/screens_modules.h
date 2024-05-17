@@ -43,7 +43,7 @@ typedef enum menu_layer_t screen_module_layer_t;
 
 enum menu_layer_main_items_t {
   MAIN_MENU_APPLICATIONS = 0,
-  MAIN_MENU_SETTINGS,
+  // MAIN_MENU_SETTINGS,
   MAIN_MENU_ABOUT,
 };
 
@@ -72,8 +72,8 @@ enum menu_layer_about_items_t {
 };
 
 enum menu_layer_wifi_items_t {
-  WIFI_MENU_ANALIZER = 0,
-  WIFI_MENU_DEAUTH,
+  // WIFI_MENU_ANALIZER = 0,
+  WIFI_MENU_DEAUTH = 0,
 };
 
 enum menu_layer_bluetooth_items_t {
@@ -93,7 +93,7 @@ enum menu_layer_thread_items_t {
 
 static char* main_items[] = {
     "Applications",
-    "Settings",
+    //"Settings",
     "About",
     NULL,
 };
@@ -136,7 +136,7 @@ static char* legal_text[] = {
 };
 
 static char* wifi_items[] = {
-    "Analizer",
+    //"Analizer",
     "Deauth",
     NULL,
 };

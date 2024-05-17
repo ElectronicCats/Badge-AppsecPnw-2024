@@ -171,7 +171,7 @@ void screen_module_update_previous_layer() {
     case LAYER_SETTINGS_DISPLAY:
     case LAYER_SETTINGS_SOUND:
     case LAYER_SETTINGS_SYSTEM:
-      previous_layer = LAYER_SETTINGS;
+      // previous_layer = LAYER_SETTINGS;
       break;
     /* WiFi applications */
     case LAYER_WIFI_ANALIZER:
@@ -207,9 +207,9 @@ void screen_module_enter_submenu() {
         case MAIN_MENU_APPLICATIONS:
           current_layer = LAYER_APPLICATIONS;
           break;
-        case MAIN_MENU_SETTINGS:
-          current_layer = LAYER_SETTINGS;
-          break;
+        // case MAIN_MENU_SETTINGS:
+        // current_layer = LAYER_SETTINGS;
+        // break;
         case MAIN_MENU_ABOUT:
           current_layer = LAYER_ABOUT;
           break;
@@ -241,10 +241,10 @@ void screen_module_enter_submenu() {
     }
     case LAYER_WIFI_APPS: {
       switch (selected_item) {
-        case WIFI_MENU_ANALIZER:
-          current_layer = LAYER_WIFI_ANALIZER;
-          screen_module_display_in_progress();
-          break;
+        // case WIFI_MENU_ANALIZER:
+        //  current_layer = LAYER_WIFI_ANALIZER;
+        //  screen_module_display_in_progress();
+        //  break;
         case WIFI_MENU_DEAUTH:
           current_layer = LAYER_WIFI_DEAUTH;
           wifi_module_begin();
@@ -274,6 +274,7 @@ void screen_module_enter_submenu() {
       break;
     }
     case LAYER_SETTINGS:
+      break;
     case LAYER_ABOUT:
       switch (selected_item) {
         case ABOUT_MENU_VERSION:

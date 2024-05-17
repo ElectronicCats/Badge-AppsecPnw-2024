@@ -18,4 +18,7 @@ void screen_module_display_game_waiting_response(void);
 void screen_module_display_game_points_life(int life_points);
 void screen_module_display_attacker_profile(game_owasp_profile_t* profile);
 
+void screen_module_display_badge_sith();
+void screen_module_display_badge_jedi();
+
 #endif  // GAME_SCREENS_MODULE_H

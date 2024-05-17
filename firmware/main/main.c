@@ -19,6 +19,7 @@ void app_main(void) {
     ESP_LOGE(TAG_MAIN, "Error initializing preferences: %s",
              esp_err_to_name(err));
   }
+  // preferences_clear();
   module_keyboard_begin();
   screen_module_begin();
   screen_module_set_main_menu();
