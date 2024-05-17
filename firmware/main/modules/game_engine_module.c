@@ -58,7 +58,7 @@ static void game_engine_int_profile_history() {
     preferences_put_int("BADGE", 0);
     preferences_put_int("UBADGEJEDI", 0);
     preferences_put_int("UBADGESITH", 0);
-    preferences_put_int("SHOWBADGE", 0);
+    preferences_put_int("SHOWBADGE", 99);
   }
 }
 
@@ -87,13 +87,11 @@ static void game_engine_set_profile_history() {
 static void game_engine_handle_unlock_badge(int team_winner) {
   int is_unlocked_badge = preferences_get_int("BADGE", 99);
 
-  if (is_unlocked_badge == 1) {
-    return;
-  }
   if (current_game_state.team != team_winner) {
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, "This is not your family");
     return;
   }
+  ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Unlocking badge: %d", is_unlocked_badge);
 
   int profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
   oled_driver_display_text_center(1, "Rank unlocked", OLED_DISPLAY_NORMAL);
@@ -126,9 +124,10 @@ static void game_engine_handle_unlock_badge(int team_winner) {
       preferences_put_int("UBADGEJEDI", 1);
       oled_driver_display_text_center(2, "You unlock", OLED_DISPLAY_NORMAL);
       oled_driver_display_text_center(3, "the FORCE", OLED_DISPLAY_NORMAL);
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
       oled_driver_display_fadeout();
       screen_module_display_badge_jedi();
+      oled_driver_display_text_center(0, "Do. Or do not", OLED_DISPLAY_NORMAL);
       oled_driver_display_text_center(1, "Grand Master", OLED_DISPLAY_NORMAL);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
 
@@ -136,13 +135,22 @@ static void game_engine_handle_unlock_badge(int team_winner) {
       preferences_put_int("UBADGESITH", 1);
       oled_driver_display_text_center(2, "You unlock", OLED_DISPLAY_NORMAL);
       oled_driver_display_text_center(3, "the DARKNEST", OLED_DISPLAY_NORMAL);
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
       oled_driver_display_fadeout();
       screen_module_display_badge_sith();
-      oled_driver_display_text_center(0, "Dark Side", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(0, "Unlimited Power!",
+                                      OLED_DISPLAY_NORMAL);
       oled_driver_display_text_center(1, "Dark Lord", OLED_DISPLAY_NORMAL);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
+    char* profile_name = malloc(10);
+
+    // Get the saved profiles
+    for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+      sprintf(profile_name, "owasp_%d ", i);
+      preferences_put_int(profile_name, 0);
+    }
+    preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, 0);
     preferences_put_int("BADGE", 1);
   }
 
@@ -153,17 +161,15 @@ static void game_engine_handle_battle_winner_profile() {
   int unlocked_badge = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
   char* profile_name = malloc(10);
   uint16_t profiles_list[GAME_OWASP_PROFILES_COUNT];
+  // int unlocket_jedi = preferences_get_int("UBADGEJEDI", 99);
+  // int unlocked_sith = preferences_get_int("UBADGESITH", 99);
+
   // Get the saved profiles
   for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
-    // char* profile_name = malloc(10);
     sprintf(profile_name, "owasp_%d ", i);
     int profile = preferences_get_int(profile_name, 99);
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile history owasp: %d", profile);
     profiles_list[i] = profile;
-    // if (profile == 1) {
-    //   unlocked_badge++;
-    // }
-    // free(profile_name);
   }
 
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Unlocked badges: %d", unlocked_badge);
@@ -283,11 +289,17 @@ void game_engine_state_machine(button_event_t button_pressed) {
 
           break;
         case BUTTON_UP:
+          if (current_game_state.team == GAME_TEAM_BLUE) {
+            break;
+          }
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button up pressed");
           current_option = (current_option == 0) ? 0 : current_option - 1;
           game_engine_display_owasp_profile_selection();
           break;
         case BUTTON_DOWN:
+          if (current_game_state.team == GAME_TEAM_BLUE) {
+            break;
+          }
           ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Button down pressed");
           current_option = (current_option == GAME_OWASP_PROFILES_COUNT - 1)
                                ? 0
@@ -414,10 +426,29 @@ void game_engine_handle_game_over() {
 
   if (team_winner == current_game_state.team) {
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Winner team: %d", team_winner);
-    game_engine_handle_battle_winner_profile();
-    game_engine_handle_unlock_badge(team_winner);
+    int unlocket_jedi = preferences_get_int("UBADGEJEDI", 99);
+    int unlocked_sith = preferences_get_int("UBADGESITH", 99);
+    if (team_winner == GAME_TEAM_BLUE && unlocket_jedi == 1) {
+      oled_driver_display_text_center(0, "You are", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(1, "a Jedi", OLED_DISPLAY_NORMAL);
+      int started_page = 2;
+      oled_driver_display_text_splited("The Force will be with you. Always",
+                                       &started_page, OLED_DISPLAY_NORMAL);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+    } else if (team_winner == GAME_TEAM_RED && unlocked_sith == 1) {
+      oled_driver_display_text_center(0, "You are", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(1, "a Sith", OLED_DISPLAY_NORMAL);
+      int started_page = 2;
+      oled_driver_display_text_splited("The Force is strong with this one",
+                                       &started_page, OLED_DISPLAY_NORMAL);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+    } else {
+      game_engine_handle_battle_winner_profile();
+      game_engine_handle_unlock_badge(team_winner);
+    }
   }
-  // esp_restart();
+  vTaskDelay(2000 / portTICK_PERIOD_MS);
+  esp_restart();
 }
 
 void game_engine_handle_battle_round_winner() {
@@ -425,30 +456,36 @@ void game_engine_handle_battle_round_winner() {
   if (current_game_state.opponent_action ==
       current_game_state.attacker_action) {
     current_game_state.opponent.life_points -= GAME_DEFAULT_ATTACK_POINTS;
-    screen_module_display_game_blue_team_logo();
     led_control_run_effect(led_control_game_event_blue_team_turn);
+    screen_module_display_game_blue_team_logo();
     oled_driver_display_text_center(7, "DEFENDED", OLED_DISPLAY_NORMAL);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    oled_driver_display_text(0, "Attacker", OLED_DISPLAY_NORMAL);
+    oled_driver_clear(OLED_DISPLAY_NORMAL);
     screen_module_display_game_points_life(
         current_game_state.opponent.life_points);
+    oled_driver_display_text(0, "Attacker", OLED_DISPLAY_NORMAL);
+
     if (current_game_state.opponent.life_points <= 0) {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
       game_engine_handle_game_over();
       return;
     }
 
   } else {
     current_game_state.attacker.life_points -= GAME_DEFAULT_ATTACK_POINTS;
-    screen_module_display_game_red_team_logo();
     led_control_run_effect(led_control_game_event_red_team_turn);
+    screen_module_display_game_red_team_logo();
     oled_driver_display_text_center(7, "PWNED", OLED_DISPLAY_NORMAL);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    oled_driver_display_text(0, "Defender", OLED_DISPLAY_NORMAL);
+    oled_driver_clear(OLED_DISPLAY_NORMAL);
     screen_module_display_game_points_life(
         current_game_state.attacker.life_points);
+    oled_driver_display_text(0, "Defender", OLED_DISPLAY_NORMAL);
+
     if (current_game_state.attacker.life_points <= 0) {
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
       game_engine_handle_game_over();
       return;
     }

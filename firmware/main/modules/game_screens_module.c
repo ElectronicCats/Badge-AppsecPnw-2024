@@ -7,18 +7,29 @@
 
 void screen_module_display_badge_logo() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  int is_unlocked_badge = preferences_get_int("BADGE", 99);
-  if (is_unlocked_badge == 0 || is_unlocked_badge == 99) {
-    oled_driver_display_bitmap(0, 0, bitmap_owasp_logo, 128, 64,
-                               OLED_DISPLAY_NORMAL);
+  int what_badge = preferences_get_int("SHOWBADGE", 99);
+  int jedi_badge = preferences_get_int("UBADGEJEDI", 99);
+  int sith_badge = preferences_get_int("UBADGESITH", 99);
+  ESP_LOGI("BADGE", "what_badge: %d", what_badge);
+  ESP_LOGI("BADGE", "jedi_badge: %d", jedi_badge);
+  ESP_LOGI("BADGE", "sith_badge: %d", sith_badge);
+
+  if (what_badge == 1) {
+    oled_driver_display_bitmap(0, 0, michi_bitmap_jedi_1_bg, 128, 64,
+                               OLED_DISPLAY_INVERTED);
+  } else if (what_badge == 2) {
+    oled_driver_display_bitmap(0, 0, epd_bitmap_sith_1, 128, 64,
+                               OLED_DISPLAY_INVERTED);
   } else {
-    int what_badge = preferences_get_int("SHOWBADGE", 99);
-    if (what_badge == 0) {
+    if (jedi_badge == 1) {
+      oled_driver_display_bitmap(0, 0, michi_bitmap_jedi_1_bg, 128, 64,
+                                 OLED_DISPLAY_INVERTED);
+    } else if (sith_badge == 1) {
       oled_driver_display_bitmap(0, 0, epd_bitmap_sith_1, 128, 64,
                                  OLED_DISPLAY_INVERTED);
     } else {
-      oled_driver_display_bitmap(0, 0, michi_bitmap_jedi_1_bg, 128, 64,
-                                 OLED_DISPLAY_INVERTED);
+      oled_driver_display_bitmap(0, 0, bitmap_owasp_logo, 128, 64,
+                                 OLED_DISPLAY_NORMAL);
     }
   }
 }
@@ -105,11 +116,10 @@ void screen_module_display_game_waiting_response() {
 }
 
 void screen_module_display_game_points_life(int life_points) {
-  oled_driver_display_fadeout();
   oled_driver_clear(OLED_DISPLAY_NORMAL);
-  char life_text[17];
-  sprintf(life_text, "        %d", life_points);
-  oled_driver_display_text_large(4, life_text, OLED_DISPLAY_NORMAL);
+  char life_text[16];
+  sprintf(life_text, "%d", life_points);
+  oled_driver_display_text_center(4, life_text, OLED_DISPLAY_NORMAL);
 }
 
 void screen_module_display_attacker_profile(game_owasp_profile_t* profile) {

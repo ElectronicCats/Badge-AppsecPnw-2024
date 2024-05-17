@@ -43,7 +43,7 @@ typedef enum menu_layer_t screen_module_layer_t;
 
 enum menu_layer_main_items_t {
   MAIN_MENU_APPLICATIONS = 0,
-  // MAIN_MENU_SETTINGS,
+  MAIN_MENU_SETTINGS,
   MAIN_MENU_ABOUT,
 };
 
@@ -86,14 +86,9 @@ enum menu_layer_zigbee_items_t {
   ZIGBEE_MENU_SNIFFER = 0,
 };
 
-enum menu_layer_thread_items_t {
-  GPS_MENU_DATE_TIME = 0,
-  GPS_MENU_LOCATION,
-};
-
 static char* main_items[] = {
     "Applications",
-    //"Settings",
+    "Settings",
     "About",
     NULL,
 };
@@ -106,7 +101,8 @@ static char* applications_items[] = {
 };
 
 static char* settings_items[] = {
-    "Display", "Device", "Sound", "System", NULL,
+    "Display",
+    NULL,
 };
 
 static char* settings_system_items[] = {"Team", NULL};
@@ -150,17 +146,6 @@ static char* bluetooth_items[] = {
 
 static char* zigbee_items[] = {
     "Zigbee Sniffer",
-    NULL,
-};
-
-static char* thread_items[] = {
-    "Thread CLI",
-    NULL,
-};
-
-static char* gps_items[] = {
-    "Date & Time",
-    "Location",
     NULL,
 };
 
