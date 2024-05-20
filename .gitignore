@@ -25,13 +25,19 @@ fp-info-cache
 *.xml
 *.csv
 
-
 hardware/Template-KiCAD-Project-CI-backups/
 
 hardware/AppsecPnw-2024-backups/
 
-.devcontainer/*
-.vscode/*
-build/*
-managed_components/*
-!partitions.csv
+# Visual Studio config files
+.vscode/
+
+# macOS folder attributes
+/**/.DS_Store
+# Firmware
+/**/build/
+/**/managed_components/
+# IDF sdkconfig
+/**/sdkconfig
+/**/sdkconfig.old
+/**/dependencies.lock
