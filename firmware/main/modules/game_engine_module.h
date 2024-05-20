@@ -4,13 +4,30 @@
   #define TAG_GAME_ENGINE_MODULE     "GAME_ENGINE_MODULE"
   #define GAME_RED_TEAM              0
   #define GAME_BLUE_TEAM             1
-  #define GAME_DEFAULT_LIFE_POINTS   20
+  #define GAME_DEFAULT_LIFE_POINTS   30
   #define GAME_DEFAULT_ATTACK_POINTS 10
   #define GAME_BLE_COMMAND_LENGTH    2
 
   #define OWASP_IDENTIFIER_LENGTH 8
   #define OWASP_CWE_LENGTH        3
   #define OWASP_NAME_MAX_LENGTH   50
+
+  #define PREFERENCE_CONFIGURED_TAG    "GAME_CONFIGURED"
+  #define PREFERENCE_PROFILE_LEVEL_TAG "PROFILE_LEVEL"
+
+typedef enum {
+  GAME_SITH_RANGE_APPRENTICE = 0,  // Level 3
+  GAME_SITH_RANGE_MASTER,          // Level 6
+  GAME_SITH_RANGE_LORD,            // Level 9
+  GAME_SITH_RANGE_EMPEROR          // Level 10
+} game_sith_range_t;
+
+typedef enum {
+  GAME_JEDI_RANGE_YOUNGLING = 0,
+  GAME_JEDI_RANGE_PADAWAN,
+  GAME_JEDI_RANGE_KNIGHT,
+  GAME_JEDI_RANGE_MASTER
+} game_jedi_range_t;
 
 /**
  * @brief Enum to represent the game engine state.

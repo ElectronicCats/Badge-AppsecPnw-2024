@@ -2,6 +2,7 @@
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
 #include "ieee_sniffer.h"
+#include "modules/led_events.h"
 #include "modules/menu_screens_modules.h"
 #include "modules/zigbee/zigbee_screens_module.h"
 
@@ -11,6 +12,7 @@ static app_screen_state_information_t app_screen_state_information = {
 };
 static int trackers_count = 0;
 static int device_selection = 0;
+static int current_channel = IEEE_SNIFFER_CHANNEL_DEFAULT;
 static TaskHandle_t zigbee_task_display_records = NULL;
 static TaskHandle_t zigbee_task_display_animation = NULL;
 static TaskHandle_t zigbee_task_sniffer = NULL;
@@ -36,6 +38,9 @@ static void zigbee_module_app_selector() {
       ieee_sniffer_register_cb(zigbee_screens_display_scanning_text);
       xTaskCreate(ieee_sniffer_begin, "ieee_sniffer_task", 4096, NULL, 5,
                   &zigbee_task_sniffer);
+
+      zigbee_screens_display_scanning_text(0, current_channel);
+      led_control_run_effect(led_control_zigbee_scanning);
       break;
     default:
       break;
@@ -55,7 +60,7 @@ static void zigbee_module_state_machine(button_event_t button_pressed) {
         case BUTTON_LEFT:
           ESP_LOGI(TAG_ZIGBEE_MODULE, "Button left pressed");
           vTaskSuspend(zigbee_task_display_animation);
-          ieee_snifffer_stop();
+          ieee_sniffer_stop();
           vTaskDelete(zigbee_task_sniffer);
           module_keyboard_update_state(false, NULL);
           screen_module_exit_submenu();
@@ -65,9 +70,19 @@ static void zigbee_module_state_machine(button_event_t button_pressed) {
           break;
         case BUTTON_UP:
           ESP_LOGI(TAG_ZIGBEE_MODULE, "Button up pressed");
+          current_channel = (current_channel == IEEE_SNIFFER_CHANNEL_MIN)
+                                ? IEEE_SNIFFER_CHANNEL_MAX
+                                : (current_channel - 1);
+          ieee_sniffer_set_channel(current_channel);
+          zigbee_screens_display_scanning_text(0, current_channel);
           break;
         case BUTTON_DOWN:
           ESP_LOGI(TAG_ZIGBEE_MODULE, "Button down pressed");
+          current_channel = (current_channel == IEEE_SNIFFER_CHANNEL_MAX)
+                                ? IEEE_SNIFFER_CHANNEL_MIN
+                                : (current_channel + 1);
+          ieee_sniffer_set_channel(current_channel);
+          zigbee_screens_display_scanning_text(0, current_channel);
           break;
         case BUTTON_BOOT:
         default:

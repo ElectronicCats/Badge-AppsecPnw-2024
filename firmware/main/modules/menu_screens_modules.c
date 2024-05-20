@@ -4,19 +4,24 @@
 #include "drivers/oled_ssd1306_driver.h"
 #include "esp_log.h"
 #include "modules/ble/ble_module.h"
+#include "modules/device/device_screens_module.h"
 #include "modules/game_engine_module.h"
 #include "modules/wifi/wifi_module.h"
 #include "modules/zigbee/zigbee_module.h"
+#include "preferences.h"
 
-screen_module_layer_t previous_layer;
-screen_module_layer_t current_layer;
-uint8_t selected_item;
-int submenu_items = 0;
+static screen_module_layer_t previous_layer;
+static screen_module_layer_t current_layer;
+static uint8_t selected_item;
+static int submenu_items = 0;
 
 static app_state_t app_state = {
     .in_app = false,
     .app_handler = NULL,
 };
+
+static void settings_module_state_machine(button_event_t button_pressed);
+static void screen_module_display_settings_display();
 
 void screen_module_begin() {
   oled_driver_init();
@@ -240,10 +245,10 @@ void screen_module_enter_submenu() {
     }
     case LAYER_WIFI_APPS: {
       switch (selected_item) {
-        case WIFI_MENU_ANALIZER:
-          current_layer = LAYER_WIFI_ANALIZER;
-          screen_module_display_in_progress();
-          break;
+        // case WIFI_MENU_ANALIZER:
+        //  current_layer = LAYER_WIFI_ANALIZER;
+        //  screen_module_display_in_progress();
+        //  break;
         case WIFI_MENU_DEAUTH:
           current_layer = LAYER_WIFI_DEAUTH;
           wifi_module_begin();
@@ -273,7 +278,39 @@ void screen_module_enter_submenu() {
       break;
     }
     case LAYER_SETTINGS:
+      switch (selected_item) {
+        case SETTINGS_MENU_DISPLAY:
+          current_layer = LAYER_SETTINGS_DISPLAY;
+          selected_item = 0;
+          module_keyboard_update_state(true, settings_module_state_machine);
+          screen_module_display_settings_display();
+          break;
+        default:
+          break;
+      }
+      break;
     case LAYER_ABOUT:
+      switch (selected_item) {
+        case ABOUT_MENU_VERSION:
+          current_layer = LAYER_ABOUT_VERSION;
+          device_screens_module_version();
+          break;
+        case ABOUT_MENU_LICENSE:
+          current_layer = LAYER_ABOUT_LICENSE;
+          device_screens_module_licence();
+          break;
+        case ABOUT_MENU_CREDITS:
+          current_layer = LAYER_ABOUT_CREDITS;
+          device_screens_module_credits();
+          break;
+        case ABOUT_MENU_LEGAL:
+          current_layer = LAYER_ABOUT_LEGAL;
+          device_screens_module_legal();
+          break;
+        default:
+          break;
+      }
+      break;
     case LAYER_ZIGBEE_APPS:
       switch (selected_item) {
         case ZIGBEE_MENU_SNIFFER:
@@ -319,4 +356,116 @@ app_state_t screen_module_get_app_state() {
 
 screen_module_layer_t screen_module_get_current_layer() {
   return current_layer;
+}
+
+static void settings_module_state_machine(button_event_t button_pressed) {
+  uint8_t button_name = button_pressed >> 4;
+  uint8_t button_event = button_pressed & 0x0F;
+
+  ESP_LOGI(TAG_BLE_MODULE, "BLE engine state machine from team: %d %d",
+           button_name, button_event);
+  switch (button_name) {
+    case BUTTON_LEFT:
+      module_keyboard_update_state(false, NULL);
+      screen_module_exit_submenu();
+      break;
+    case BUTTON_RIGHT:
+      int is_jedi_unlocked = preferences_get_int("UBADGEJEDI", 99);
+      int is_sith_unlocked = preferences_get_int("UBADGESITH", 99);
+      if ((selected_item == 1 && is_jedi_unlocked == 0) ||
+          (selected_item == 2 && is_sith_unlocked == 0)) {
+        oled_driver_clear(OLED_DISPLAY_NORMAL);
+        oled_driver_display_text_center(3, "Jedi badge locked",
+                                        OLED_DISPLAY_NORMAL);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        module_keyboard_update_state(false, NULL);
+        screen_module_exit_submenu();
+        break;
+      }
+      preferences_put_int("SHOWBADGE", selected_item);
+      oled_driver_clear(OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(3, "Splash changed", OLED_DISPLAY_NORMAL);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+      module_keyboard_update_state(false, NULL);
+      screen_module_exit_submenu();
+      break;
+    case BUTTON_UP:
+      selected_item = (selected_item == 0) ? 2 : selected_item - 1;
+      screen_module_display_settings_display();
+      break;
+    case BUTTON_DOWN:
+      selected_item = (selected_item == 2) ? 0 : selected_item + 1;
+      screen_module_display_settings_display();
+      break;
+    case BUTTON_BOOT:
+    default:
+      break;
+  }
+}
+
+static void screen_module_display_settings_display() {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_center(0, "Display", OLED_DISPLAY_NORMAL);
+  int is_jedi_unlocked = preferences_get_int("UBADGEJEDI", 99);
+  int is_sith_unlocked = preferences_get_int("UBADGESITH", 99);
+  static char* background_splash[] = {
+      "Default",
+      "Jedi",
+      "Sith",
+      NULL,
+  };
+
+  for (int i = 0; i < 3; i++) {
+    if (selected_item == i) {
+      if (strcmp(background_splash[i], "Jedi") == 0 && is_jedi_unlocked == 0) {
+        char item_text[strlen(background_splash[i]) + strlen("Locked") + 3];
+        sprintf(item_text, "> %s Locked", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_INVERTED);
+      } else if (strcmp(background_splash[i], "Jedi") == 0 &&
+                 is_jedi_unlocked == 1) {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "> %s", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_INVERTED);
+      } else if (strcmp(background_splash[i], "Sith") == 0 &&
+                 is_sith_unlocked == 0) {
+        char item_text[strlen(background_splash[i]) + strlen("Locked") + 3];
+        sprintf(item_text, "> %s Locked", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_INVERTED);
+      } else if (strcmp(background_splash[i], "Sith") == 0 &&
+                 is_sith_unlocked == 1) {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "> %s", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_INVERTED);
+      } else {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "> %s", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_INVERTED);
+      }
+    } else {
+      if (strcmp(background_splash[i], "Jedi") == 0 && is_jedi_unlocked == 0) {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "%s Locked", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_NORMAL);
+      } else if (strcmp(background_splash[i], "Jedi") == 0 &&
+                 is_jedi_unlocked == 1) {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "%s", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_NORMAL);
+      } else if (strcmp(background_splash[i], "Sith") == 0 &&
+                 is_sith_unlocked == 0) {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "%s Locked", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_NORMAL);
+      } else if (strcmp(background_splash[i], "Sith") == 0 &&
+                 is_sith_unlocked == 1) {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "%s", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_NORMAL);
+      } else {
+        char item_text[strlen(background_splash[i]) + 3];
+        sprintf(item_text, "%s", background_splash[i]);
+        oled_driver_display_text(i + 2, item_text, OLED_DISPLAY_NORMAL);
+      }
+    }
+  }
 }
