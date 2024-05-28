@@ -47,7 +47,17 @@ static void game_engine_int_profile_history() {
       char* profile_name = malloc(10);
       sprintf(profile_name, "owasp_%d ", i);
       int profile = preferences_put_int(profile_name, 0);
-      game_profile_history[i] = profile;
+      game_profile_history[i] = 0;
+      free(profile_name);
+    }
+  }
+  for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+    game_profile_history[i] = 0;
+    if (!is_configured) {
+      char* profile_name = malloc(11);
+      sprintf(profile_name, "owaspr_%d ", i);
+      int profile = preferences_put_int(profile_name, 0);
+      game_profile_history[i] = 0;
       free(profile_name);
     }
   }
@@ -55,6 +65,7 @@ static void game_engine_int_profile_history() {
   if (!is_configured) {
     preferences_put_bool(PREFERENCE_CONFIGURED_TAG, true);
     preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, 0);
+    preferences_put_int(PREFERENCE_BPROFILE_LEVEL_TAG, 0);
     preferences_put_int("BADGE", 0);
     preferences_put_int("UBADGEJEDI", 0);
     preferences_put_int("UBADGESITH", 0);
@@ -93,7 +104,13 @@ static void game_engine_handle_unlock_badge(int team_winner) {
   }
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Unlocking badge: %d", is_unlocked_badge);
 
-  int profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  int profile_level = 0;
+  if (current_game_state.team == GAME_BLUE_TEAM) {
+    profile_level = preferences_get_int(PREFERENCE_BPROFILE_LEVEL_TAG, 99);
+  } else {
+    profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  }
+  // preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
   oled_driver_display_text_center(1, "Rank unlocked", OLED_DISPLAY_NORMAL);
   if (profile_level >= 3 && profile_level < 6) {
     ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Rank unlocked: 3");
@@ -143,14 +160,26 @@ static void game_engine_handle_unlock_badge(int team_winner) {
       oled_driver_display_text_center(1, "Dark Lord", OLED_DISPLAY_NORMAL);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
-    char* profile_name = malloc(10);
+    char* profile_name = malloc(11);
 
     // Get the saved profiles
-    for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
-      sprintf(profile_name, "owasp_%d ", i);
-      preferences_put_int(profile_name, 0);
+    if (current_game_state.team == GAME_BLUE_TEAM) {
+      for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+        sprintf(profile_name, "owasp_%d ", i);
+        preferences_put_int(profile_name, 0);
+      }
+    } else {
+      for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+        sprintf(profile_name, "owaspr_%d ", i);
+        preferences_put_int(profile_name, 0);
+      }
     }
-    preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, 0);
+    if (current_game_state.team == GAME_BLUE_TEAM) {
+      preferences_put_int(PREFERENCE_BPROFILE_LEVEL_TAG, 0);
+    } else {
+      preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, 0);
+    }
+    // preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, 0);
     preferences_put_int("BADGE", 1);
   }
 
@@ -158,36 +187,69 @@ static void game_engine_handle_unlock_badge(int team_winner) {
 }
 
 static void game_engine_handle_battle_winner_profile() {
-  int unlocked_badge = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
-  char* profile_name = malloc(10);
+  int unlocked_badge = 0;
+  if (current_game_state.team == GAME_BLUE_TEAM) {
+    unlocked_badge = preferences_get_int(PREFERENCE_BPROFILE_LEVEL_TAG, 99);
+  } else {
+    unlocked_badge = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  }
+  char* profile_name = malloc(11);
   uint16_t profiles_list[GAME_OWASP_PROFILES_COUNT];
   // int unlocket_jedi = preferences_get_int("UBADGEJEDI", 99);
   // int unlocked_sith = preferences_get_int("UBADGESITH", 99);
 
   // Get the saved profiles
-  for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
-    sprintf(profile_name, "owasp_%d ", i);
-    int profile = preferences_get_int(profile_name, 99);
-    ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile history owasp: %d", profile);
-    profiles_list[i] = profile;
+  if (current_game_state.team == GAME_BLUE_TEAM) {
+    for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+      sprintf(profile_name, "owasp_%d ", i);
+      int profile = preferences_get_int(profile_name, 99);
+      ESP_LOGI(TAG_GAME_ENGINE_MODULE, "B Profile history owasp: %d", profile);
+      profiles_list[i] = profile;
+    }
+  } else {
+    for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+      sprintf(profile_name, "owaspr_%d ", i);
+      int profile = preferences_get_int(profile_name, 99);
+      ESP_LOGI(TAG_GAME_ENGINE_MODULE, "R Profile history owasp: %d", profile);
+      profiles_list[i] = profile;
+    }
   }
 
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Unlocked badges: %d", unlocked_badge);
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile history index|current|prev");
-  for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
-    ESP_LOGI(TAG_GAME_ENGINE_MODULE, " Profile %d: %d - %d", i,
-             game_profile_history[i], profiles_list[i]);
-    // char* profile_name = malloc(10);
-    sprintf(profile_name, "owasp_%d ", i);
-    if (game_profile_history[i] == 1 && profiles_list[i] == 0) {
-      preferences_put_int(profile_name, game_profile_history[i]);
-      unlocked_badge++;
-    }
+  if (current_game_state.team == GAME_BLUE_TEAM) {
+    for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+      ESP_LOGI(TAG_GAME_ENGINE_MODULE, "B Profile %d: %d - %d", i,
+               game_profile_history[i], profiles_list[i]);
+      // char* profile_name = malloc(10);
+      sprintf(profile_name, "owasp_%d ", i);
+      if (game_profile_history[i] == 1 && profiles_list[i] == 0) {
+        preferences_put_int(profile_name, game_profile_history[i]);
+        unlocked_badge++;
+      }
 
-    // free(profile_name);
+      // free(profile_name);
+    }
+  } else {
+    for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
+      ESP_LOGI(TAG_GAME_ENGINE_MODULE, "R Profile %d: %d - %d", i,
+               game_profile_history[i], profiles_list[i]);
+      // char* profile_name = malloc(10);
+      sprintf(profile_name, "owaspr_%d ", i);
+      if (game_profile_history[i] == 1 && profiles_list[i] == 0) {
+        preferences_put_int(profile_name, game_profile_history[i]);
+        unlocked_badge++;
+      }
+
+      // free(profile_name);
+    }
   }
 
-  preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, unlocked_badge);
+  if (current_game_state.team == GAME_BLUE_TEAM) {
+    preferences_put_int(PREFERENCE_BPROFILE_LEVEL_TAG, unlocked_badge);
+  } else {
+    preferences_put_int(PREFERENCE_PROFILE_LEVEL_TAG, unlocked_badge);
+  }
 
   for (int i = 0; i < GAME_OWASP_PROFILES_COUNT; i++) {
     int profile = preferences_get_int(profile_name, 99);
@@ -196,7 +258,12 @@ static void game_engine_handle_battle_winner_profile() {
     // free(profile_name);
   }
 
-  int profile_level = preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  int profile_level = 0;
+  if (current_game_state.team == GAME_BLUE_TEAM) {
+    preferences_get_int(PREFERENCE_BPROFILE_LEVEL_TAG, 99);
+  } else {
+    preferences_get_int(PREFERENCE_PROFILE_LEVEL_TAG, 99);
+  }
 
   ESP_LOGI(TAG_GAME_ENGINE_MODULE, "Profile level: %d", profile_level);
   free(profile_name);
@@ -224,7 +291,7 @@ void game_engine_state_machine(button_event_t button_pressed) {
     case GAME_STATE_TEAM_SELECTION:
       switch (button_name) {
         case BUTTON_LEFT:
-          if (button_event == BUTTON_DOUBLE_CLICK) {
+          if (button_event == BUTTON_LONG_PRESS_UP) {
             module_keyboard_update_state(false, NULL);
             screen_module_exit_submenu();
             break;
@@ -403,6 +470,21 @@ void game_engine_state_machine(button_event_t button_pressed) {
       }
       break;
     case GAME_STATE_PAIRING_DEVICES:
+      switch (button_name) {
+        case BUTTON_LEFT:
+          if (button_event == BUTTON_LONG_PRESS_UP) {
+            screen_module_set_screen(LAYER_BLUETOOTH_APPS);
+            esp_restart();
+          }
+          break;
+        case BUTTON_RIGHT:
+        case BUTTON_UP:
+        case BUTTON_DOWN:
+        case BUTTON_BOOT:
+        default:
+          break;
+      }
+      break;
     default:
       break;
   }
@@ -447,7 +529,7 @@ void game_engine_handle_game_over() {
       game_engine_handle_unlock_badge(team_winner);
     }
   }
-  vTaskDelay(2000 / portTICK_PERIOD_MS);
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
   esp_restart();
 }
 

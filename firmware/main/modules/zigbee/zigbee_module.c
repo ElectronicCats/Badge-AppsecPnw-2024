@@ -32,6 +32,8 @@ void zigbee_module_begin(int app_selected) {
 static void zigbee_module_app_selector() {
   switch (app_screen_state_information.app_selected) {
     case ZIGBEE_MENU_SNIFFER:
+      zigbee_screens_display_device_ad();
+      vTaskDelay(8000 / portTICK_PERIOD_MS);
       xTaskCreate(zigbee_screens_display_scanning_animation,
                   "zigbee_module_scanning", 4096, NULL, 5,
                   &zigbee_task_display_animation);
@@ -58,12 +60,16 @@ static void zigbee_module_state_machine(button_event_t button_pressed) {
       ESP_LOGI(TAG_ZIGBEE_MODULE, "Bluetooth scanner entered");
       switch (button_name) {
         case BUTTON_LEFT:
-          ESP_LOGI(TAG_ZIGBEE_MODULE, "Button left pressed");
-          vTaskSuspend(zigbee_task_display_animation);
-          ieee_sniffer_stop();
-          vTaskDelete(zigbee_task_sniffer);
-          module_keyboard_update_state(false, NULL);
-          screen_module_exit_submenu();
+          if (button_event == BUTTON_LONG_PRESS_UP) {
+            ESP_LOGI(TAG_ZIGBEE_MODULE, "Button left pressed");
+            vTaskSuspend(zigbee_task_display_animation);
+            ieee_sniffer_stop();
+            vTaskDelete(zigbee_task_sniffer);
+            module_keyboard_update_state(false, NULL);
+            screen_module_exit_submenu();
+            break;
+          }
+
           break;
         case BUTTON_RIGHT:
           ESP_LOGI(TAG_ZIGBEE_MODULE, "Button right pressed - Option selected");

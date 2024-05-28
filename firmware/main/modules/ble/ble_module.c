@@ -65,6 +65,17 @@ static void ble_module_state_machine(button_event_t button_pressed) {
       ESP_LOGI(TAG_BLE_MODULE, "Bluetooth scanner entered");
       switch (button_name) {
         case BUTTON_LEFT:
+
+          if (button_event == BUTTON_LONG_PRESS_UP) {
+            // ble_module_task_stop_trackers_display_devices();
+            // trackers_scanner_stop();
+            // module_keyboard_update_state(false, NULL);
+            // screen_module_exit_submenu();
+            // led_control_stop();
+            led_control_stop();
+            screen_module_set_screen(LAYER_BLUETOOTH_APPS);
+            esp_restart();
+          }
           ESP_LOGI(TAG_BLE_MODULE, "Button left pressed");
           if (is_modal_displaying) {
             is_modal_displaying = false;
@@ -74,11 +85,6 @@ static void ble_module_state_machine(button_event_t button_pressed) {
             break;
           }
 
-          ble_module_task_stop_trackers_display_devices();
-          trackers_scanner_stop();
-          module_keyboard_update_state(false, NULL);
-          screen_module_exit_submenu();
-          led_control_stop();
           break;
         case BUTTON_RIGHT:
           ESP_LOGI(TAG_BLE_MODULE, "Button right pressed - Option selected: %d",
@@ -109,7 +115,15 @@ static void ble_module_state_machine(button_event_t button_pressed) {
       switch (button_name) {
         case BUTTON_LEFT:
           // TODO: Fix this xD
-          esp_restart();
+          if (button_event == BUTTON_LONG_PRESS_UP) {
+            // ble_module_task_stop_trackers_display_devices();
+            // trackers_scanner_stop();
+            // module_keyboard_update_state(false, NULL);
+            // screen_module_exit_submenu();
+            led_control_stop();
+            screen_module_set_screen(LAYER_BLUETOOTH_APPS);
+            esp_restart();
+          }
           // ESP_LOGI(TAG_BLE_MODULE, "Button left pressed");
           // vTaskSuspend(ble_task_display_animation);
           // module_keyboard_update_state(false, NULL);

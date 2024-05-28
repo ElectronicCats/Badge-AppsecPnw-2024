@@ -29,18 +29,27 @@ static void scanning_task(void* pvParameters) {
   vTaskSuspend(task_display_scanning);
   wifi_screens_module_display_scanned_networks(
       ap_records->records, ap_records->count, current_option);
+  current_wifi_state.state = WIFI_STATE_SCANNED;
   vTaskDelete(NULL);
 }
 
 void wifi_module_exit() {
   module_keyboard_update_state(SCREEN_IN_NAVIGATION, NULL);
-  wifi_driver_ap_stop();
+  // wifi_driver_ap_stop();
+  ESP_LOGI(TAG_WIFI_MODULE, "Exiting WiFi module");
+  // led_control_stop();
+  ESP_LOGI(TAG_WIFI_MODULE, "Exiting WiFi module 2");
+  screen_module_set_screen(LAYER_WIFI_APPS);
+
+  ESP_LOGI(TAG_WIFI_MODULE, "Exiting WiFi module 3");
+  esp_restart();
   if (task_display_scanning != NULL) {
     vTaskDelete(task_display_scanning);
   }
   if (task_display_attacking) {
     vTaskDelete(task_display_attacking);
   }
+  // led_control_stop();
   screen_module_exit_submenu();
 }
 
@@ -67,8 +76,6 @@ void wifi_module_begin(void) {
     }
     ap_records = wifi_scanner_get_ap_records();
   }
-
-  current_wifi_state.state = WIFI_STATE_SCANNED;
 }
 
 void wifi_module_state_machine(button_event_t button_pressed) {
@@ -79,10 +86,10 @@ void wifi_module_state_machine(button_event_t button_pressed) {
     case WIFI_STATE_SCANNING: {
       switch (button_name) {
         case BUTTON_LEFT: {
-          if (button_event == BUTTON_DOUBLE_CLICK) {
-            wifi_module_exit();
-            break;
-          }
+          // if (button_event == BUTTON_LONG_PRESS_UP) {
+          //   wifi_module_exit();
+          //   break;
+          // }
           break;
         }
         case BUTTON_RIGHT:
@@ -97,7 +104,7 @@ void wifi_module_state_machine(button_event_t button_pressed) {
     case WIFI_STATE_SCANNED: {
       switch (button_name) {
         case BUTTON_LEFT: {
-          if (button_event == BUTTON_DOUBLE_CLICK) {
+          if (button_event == BUTTON_LONG_PRESS_UP) {
             wifi_module_exit();
             break;
           }
@@ -135,15 +142,16 @@ void wifi_module_state_machine(button_event_t button_pressed) {
     case WIFI_STATE_DETAILS: {
       switch (button_name) {
         case BUTTON_LEFT: {
-          if (button_event == BUTTON_DOUBLE_CLICK) {
+          if (button_event == BUTTON_LONG_PRESS_UP) {
             wifi_module_exit();
             break;
           }
           current_option = 0;
           show_details = false;
-          current_wifi_state.state = WIFI_STATE_SCANNED;
+
           wifi_screens_module_display_scanned_networks(
               ap_records->records, ap_records->count, current_option);
+          current_wifi_state.state = WIFI_STATE_SCANNED;
           break;
         }
         case BUTTON_RIGHT:
@@ -173,7 +181,7 @@ void wifi_module_state_machine(button_event_t button_pressed) {
     case WIFI_STATE_ATTACK_SELECTOR: {
       switch (button_name) {
         case BUTTON_LEFT: {
-          if (button_event == BUTTON_DOUBLE_CLICK) {
+          if (button_event == BUTTON_LONG_PRESS_UP) {
             wifi_module_exit();
             break;
           }
@@ -234,7 +242,7 @@ void wifi_module_state_machine(button_event_t button_pressed) {
     case WIFI_STATE_ATTACK: {
       switch (button_name) {
         case BUTTON_LEFT: {
-          if (button_event == BUTTON_DOUBLE_CLICK) {
+          if (button_event == BUTTON_LONG_PRESS_UP) {
             wifi_attacks_module_stop();
             wifi_module_exit();
             vTaskSuspend(task_display_attacking);
@@ -275,6 +283,7 @@ void wifi_module_state_machine(button_event_t button_pressed) {
           int count_attacks = wifi_attacks_get_attack_count();
           wifi_screens_module_display_attack_selector(
               WIFI_ATTACKS_LIST, count_attacks, current_option);
+          break;
         }
         case BUTTON_RIGHT:
           char* wifi_ssid = malloc(

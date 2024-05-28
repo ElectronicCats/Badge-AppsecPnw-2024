@@ -15,7 +15,7 @@ void module_keyboard_button_event_cb(void* arg, void* data) {
   const char* button_name_str = button_names[button_name];
   const char* button_event_str = button_events_name[button_event];
   if (button_event != BUTTON_SINGLE_CLICK &&
-      button_event != BUTTON_DOUBLE_CLICK) {
+      button_event != BUTTON_LONG_PRESS_UP) {
     return;
   }
 
@@ -31,26 +31,26 @@ void module_keyboard_button_event_cb(void* arg, void* data) {
 
   switch (button_name) {
     case BUTTON_LEFT:
-      if (button_event == BUTTON_DOUBLE_CLICK) {
+      if (button_event == BUTTON_LONG_PRESS_UP) {
         break;
       }
       screen_module_exit_submenu();
       break;
     case BUTTON_RIGHT:
-      if (button_event == BUTTON_DOUBLE_CLICK) {
+      if (button_event == BUTTON_LONG_PRESS_UP) {
         break;
       }
       screen_module_enter_submenu();
       break;
     case BUTTON_UP:
-      if (button_event == BUTTON_DOUBLE_CLICK) {
+      if (button_event == BUTTON_LONG_PRESS_UP) {
         break;
       }
       screen_module_decrement_index_item();
       screen_module_display_menu();
       break;
     case BUTTON_DOWN:
-      if (button_event == BUTTON_DOUBLE_CLICK) {
+      if (button_event == BUTTON_LONG_PRESS_UP) {
         break;
       }
       screen_module_increment_index_item();
@@ -82,9 +82,9 @@ void keyboard_driver_button_register_event_cb(button_handle_t button_handle,
   button_error |= iot_button_register_cb(button_handle, BUTTON_SINGLE_CLICK,
                                          module_keyboard_button_event_cb,
                                          (void*) (BUTTON_SINGLE_CLICK | mask));
-  button_error |= iot_button_register_cb(button_handle, BUTTON_DOUBLE_CLICK,
+  button_error |= iot_button_register_cb(button_handle, BUTTON_LONG_PRESS_UP,
                                          module_keyboard_button_event_cb,
-                                         (void*) (BUTTON_DOUBLE_CLICK | mask));
+                                         (void*) (BUTTON_LONG_PRESS_UP | mask));
   button_error |= iot_button_register_cb(
       button_handle, BUTTON_LONG_PRESS_START, module_keyboard_button_event_cb,
       (void*) (BUTTON_LONG_PRESS_START | mask));
