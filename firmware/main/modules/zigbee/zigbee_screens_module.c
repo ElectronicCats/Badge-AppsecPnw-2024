@@ -2,6 +2,17 @@
 #include "drivers/oled_ssd1306_driver.h"
 #include "modules/zigbee/zigbee_bitmaps.h"
 
+void zigbee_screens_display_device_ad() {
+  oled_driver_clear(OLED_DISPLAY_NORMAL);
+  int index_page = 1;
+  oled_driver_display_text_splited("To view the data you need", &index_page,
+                                   OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_splited("connect the board and open", &index_page,
+                                   OLED_DISPLAY_NORMAL);
+  oled_driver_display_text_splited("a serial terminal", &index_page,
+                                   OLED_DISPLAY_NORMAL);
+}
+
 void zigbee_screens_display_scanning_animation() {
   oled_driver_clear(OLED_DISPLAY_NORMAL);
   oled_driver_display_text_center(0, "ZIGBEE SNIFFER", OLED_DISPLAY_NORMAL);

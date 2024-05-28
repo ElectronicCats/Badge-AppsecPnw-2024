@@ -118,6 +118,15 @@ void screen_module_set_main_menu() {
   previous_layer = LAYER_MAIN_MENU;
   current_layer = LAYER_MAIN_MENU;
   submenu_items = 0;
+  preferences_put_int("MENUNUMBER", 99);
+}
+
+void screen_module_set_screen(int screen_layer) {
+  previous_layer = screen_layer;
+  current_layer = screen_layer;
+  submenu_items = 0;
+  preferences_put_int("MENUNUMBER", screen_layer);
+  screen_module_display_menu();
 }
 
 void screen_module_display_in_progress() {
@@ -385,6 +394,9 @@ static void settings_module_state_machine(button_event_t button_pressed) {
       preferences_put_int("SHOWBADGE", selected_item);
       oled_driver_clear(OLED_DISPLAY_NORMAL);
       oled_driver_display_text_center(3, "Splash changed", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(4, "Rebooting card", OLED_DISPLAY_NORMAL);
+      oled_driver_display_text_center(5, "To apply changes",
+                                      OLED_DISPLAY_NORMAL);
       vTaskDelay(2000 / portTICK_PERIOD_MS);
       module_keyboard_update_state(false, NULL);
       screen_module_exit_submenu();

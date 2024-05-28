@@ -138,4 +138,6 @@ app_state_t screen_module_get_app_state(void);
 screen_module_layer_t screen_module_get_current_layer(void);
 
 int screen_module_get_count_menu_items(char* items[]);
+
+void screen_module_set_screen(int screen_layer);
 #endif  // MENU_SCREENS_MODULE_H
