@@ -15,13 +15,7 @@ dependencies:
     component_hash: null
     source:
       type: idf
-    version: 5.2.1
-  iperf:
-    component_hash: null
-    source:
-      path: C:\ESP_IDF\v5.2.1\esp-idf\examples\common_components\iperf
-      type: local
-    version: '*'
-manifest_hash: a519f4bb2076a47a4122ba08a7e7a8e46a09714f0d0d20dd3afeb970c08c8f91
+    version: 5.4.0
+manifest_hash: 10c5216f2e8c7b2280a3317a4657fff8a9f7ce52aa2a72d98c57a152a102da02
 target: esp32c6
 version: 1.0.0

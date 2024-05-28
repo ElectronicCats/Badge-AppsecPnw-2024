@@ -2,7 +2,5 @@
 #define ZIGBEE_SCREENS_MODULE_H
 
 void zigbee_screens_display_scanning_animation(void);
-void zigbee_screens_display_scanning_text(int packets, int channel);
-
-void zigbee_screens_display_device_ad();
+void zigbee_screens_display_scanning_text(int count, int channel);
 #endif  // ZIGBEE_SCREENS_MODULE_H
