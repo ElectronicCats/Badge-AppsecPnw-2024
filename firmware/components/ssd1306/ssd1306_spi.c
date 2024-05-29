@@ -8,7 +8,7 @@
 
 #include "ssd1306.h"
 
-#define TAG "SSD1306"
+#define TAG "SSD1306_SPI"
 
 #if CONFIG_SPI2_HOST
   #define HOST_ID SPI2_HOST

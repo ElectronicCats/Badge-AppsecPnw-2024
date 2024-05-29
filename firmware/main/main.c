@@ -9,6 +9,7 @@
 #include "modules/game_screens_module.h"
 #include "modules/menu_screens_modules.h"
 #include "preferences.h"
+#include "modules/led_events.h"
 
 const char* TAG_MAIN = "MAIN";
 

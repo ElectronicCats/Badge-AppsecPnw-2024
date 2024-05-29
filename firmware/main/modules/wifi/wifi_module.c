@@ -36,12 +36,7 @@ static void scanning_task(void* pvParameters) {
 void wifi_module_exit() {
   module_keyboard_update_state(SCREEN_IN_NAVIGATION, NULL);
   // wifi_driver_ap_stop();
-  ESP_LOGI(TAG_WIFI_MODULE, "Exiting WiFi module");
-  // led_control_stop();
-  ESP_LOGI(TAG_WIFI_MODULE, "Exiting WiFi module 2");
   screen_module_set_screen(LAYER_WIFI_APPS);
-
-  ESP_LOGI(TAG_WIFI_MODULE, "Exiting WiFi module 3");
   esp_restart();
   if (task_display_scanning != NULL) {
     vTaskDelete(task_display_scanning);
@@ -70,7 +65,7 @@ void wifi_module_begin(void) {
   ap_records = wifi_scanner_get_ap_records();
 
   while (!valid_records) {
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(1500 / portTICK_PERIOD_MS);
     if (ap_records->count > 10) {
       valid_records = true;
     }

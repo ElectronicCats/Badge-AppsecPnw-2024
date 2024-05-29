@@ -121,7 +121,7 @@ static esp_err_t setup_ledc(int led_gpio, ledc_channel_t led_channel) {
   // Prepare individual configuration for each LED
   ledc_channel_config_t ledc_channel_cfg = {
       .channel = led_channel,
-      .duty = 0,  // Initial duty value (LED is off)
+      .duty = 8,  // Initial duty value (LED is off)
       .gpio_num = led_gpio,
       .speed_mode = LEDC_LOW_SPEED_MODE,
       .hpoint = 0,
@@ -220,9 +220,9 @@ esp_err_t rgb_led_init(rgb_led_t* rgb_led_cfg) {
   // ESP_ERROR_CHECK(gpio_reset_pin(led.blue_pin));
   ESP_ERROR_CHECK(gpio_set_direction(led.blue_pin, GPIO_MODE_OUTPUT));
 
-  ESP_ERROR_CHECK(gpio_set_level(led.red_pin, 0));
-  ESP_ERROR_CHECK(gpio_set_level(led.green_pin, 0));
-  ESP_ERROR_CHECK(gpio_set_level(led.blue_pin, 0));
+  ESP_ERROR_CHECK(gpio_set_level(led.red_pin, 1));
+  ESP_ERROR_CHECK(gpio_set_level(led.green_pin, 1));
+  ESP_ERROR_CHECK(gpio_set_level(led.blue_pin, 1));
 
   ESP_RETURN_ON_ERROR(setup_ledc(led.red_pin, led.red_channel), TAG,
                       "Failed to setup RED LED");

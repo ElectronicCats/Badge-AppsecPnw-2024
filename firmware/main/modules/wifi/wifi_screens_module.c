@@ -34,7 +34,7 @@ void wifi_screens_module_scanning(void) {
                                  OLED_DISPLAY_NORMAL);
       vTaskDelay(500 / portTICK_PERIOD_MS);
     }
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(600 / portTICK_PERIOD_MS);
   }
 }
 

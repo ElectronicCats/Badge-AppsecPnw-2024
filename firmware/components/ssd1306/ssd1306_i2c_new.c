@@ -8,7 +8,7 @@
 
 #include "ssd1306.h"
 
-#define TAG "SSD1306"
+#define TAG "SSD1306_new"
 
 #if CONFIG_I2C_PORT_0
   #define I2C_NUM I2C_NUM_0
@@ -21,7 +21,7 @@
 #define I2C_MASTER_FREQ_HZ \
   400000  // I2C clock of SSD1306 can run at 400 kHz max.
 #define I2C_TICKS_TO_WAIT \
-  200  // Maximum ticks to wait before issuing a timeout.
+  400  // Maximum ticks to wait before issuing a timeout.
 
 i2c_master_dev_handle_t dev_handle;
 
